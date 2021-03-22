@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 
 import com.cdo.util.resource.GlobalResource;
 import com.cdoframework.cdolib.base.Return;
-import com.cdoframework.cdolib.base.Utility;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.servicebus.IServiceBus;
 import com.cdoframework.cdolib.servicebus.ServiceBus;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
  * 创建业务处理的实例

@@ -4,32 +4,20 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 
-import com.cdoframework.cdolib.base.DataType;
-import com.cdoframework.cdolib.base.Utility;
+import com.cdo.field.FieldType;
 import com.cdoframework.cdolib.data.cdo.DataBufferUtil;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
- * 重新构造
+ * 定义dateTime数组字段
  * @author KenelLiu
  *
  */
-public class DateTimeArrayField extends ArrayFieldImpl
-{
-
-	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
-
-	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-
-	/**
-	 * 
-	 */
+public class DateTimeArrayField extends ArrayFieldImpl{
 	private static final long serialVersionUID = -1218499970415772864L;
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 	private final int dataIndex=1;//数据保存的起始位置
 	private final int databuffer=8;//数据占用字节
-
 	
 	public void setValue(String[] strsValue)
 	{		
@@ -37,10 +25,11 @@ public class DateTimeArrayField extends ArrayFieldImpl
 			strsValue=new String[0];
 		}
 		long[] lsValue=new long[strsValue.length];
+		SimpleDateFormat sdf=new SimpleDateFormat(PATTERN_DATETIME);
 		for(int i=0;i<strsValue.length;i++)
 		{
 			try{
-				lsValue[i]=java.sql.Timestamp.valueOf(strsValue[i]).getTime();
+				lsValue[i]=sdf.parse(strsValue[i]).getTime();
 			}catch(Exception ex){
 				throw new RuntimeException("arr index="+i+",["+strsValue[i]+"] Invalid dateTime or Invalid dateTime format,dateTime format must is "+PATTERN_DATETIME);
 			}
@@ -144,7 +133,7 @@ public class DateTimeArrayField extends ArrayFieldImpl
 
 	private void allocate(long[] lsValue){
 
-		buffer=DataBufferUtil.allocate(lsValue.length, DataType.DATETIME_ARRAY_TYPE, buffer, dataIndex, databuffer);
+		buffer=DataBufferUtil.allocate(lsValue.length, FieldType.DATETIME_ARRAY_TYPE, buffer, dataIndex, databuffer);
 		//设置起始位置  
 		buffer.position(dataIndex);
 		for(int i=0;i<lsValue.length;i++){
@@ -152,10 +141,6 @@ public class DateTimeArrayField extends ArrayFieldImpl
 		}
 		buffer.flip();
 	}			
-	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
-
-	//内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
-
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	@Override
 	public void toXML(StringBuilder strbXML)
@@ -207,53 +192,29 @@ public class DateTimeArrayField extends ArrayFieldImpl
 		str_JSON.append("],");
 		return str_JSON.toString();
 	}
-	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	//事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	//事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
-
+	
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
-
-	public DateTimeArrayField(String strFieldName)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.DATETIME_ARRAY);
-		
+	public DateTimeArrayField(String strFieldName){
+		super(strFieldName);		
+		setFieldType(type.DATETIME_ARRAY);		
 		setLongValue(new long[0]);
 	}
 
-	public DateTimeArrayField(String strFieldName,String[] strsValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.DATETIME_ARRAY);
-		
+	public DateTimeArrayField(String strFieldName,String[] strsValue){
+		super(strFieldName);		
+		setFieldType(type.DATETIME_ARRAY);		
 		setValue(strsValue);
 	}
 
-	public DateTimeArrayField(String strFieldName,long[] lsValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.DATETIME_ARRAY);
-		
+	public DateTimeArrayField(String strFieldName,long[] lsValue){
+		super(strFieldName);		
+		setFieldType(type.DATETIME_ARRAY);		
 		setLongValue(lsValue);
 	}
 	
-	 public DateTimeArrayField(String strFieldName,ByteBuffer buffer)
-	 {
-			super(strFieldName);
-			
-			setType(Data.DATETIME_ARRAY);
-			
+	public DateTimeArrayField(String strFieldName,ByteBuffer buffer){
+			super(strFieldName);			
+			setFieldType(type.DATETIME_ARRAY);			
 			this.buffer=buffer;
 	}
 }

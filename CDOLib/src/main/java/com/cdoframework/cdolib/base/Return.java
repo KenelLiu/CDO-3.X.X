@@ -25,6 +25,11 @@ import java.io.Serializable;
 **********************************************************************/
 final public class Return implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8554204960600320065L;
+
 	/*静态对象--------------------------------------------------------------
 	此处声明该类的所有静态(static)对象，并根据要求创建和初始化对象,举例如下：
 	static public MyApp myApp=new MyApp();

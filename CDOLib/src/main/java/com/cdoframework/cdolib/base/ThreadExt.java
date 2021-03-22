@@ -1,13 +1,3 @@
-/**
- * www.cdoforum.com 2007版权所有
-
- * $Header: /CVSData/Frank/CVSROOT/CDOForum/CDOLib/Source/com/cdoframework/cdolib/base/ThreadExt.java,v 1.2 2008/03/30 08:59:32 Frank Exp $
- *
- * $Log: ThreadExt.java,v $
- * Revision 1.2  2008/03/30 08:59:32  Frank
- * *** empty log message ***
- *
- */
 
 package com.cdoframework.cdolib.base;
 

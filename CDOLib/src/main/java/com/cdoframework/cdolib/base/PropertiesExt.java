@@ -1,32 +1,4 @@
-/**
-*$Header: /CVSData/Frank/CVSROOT/CDOForum/CDOLib/Source/com/cdoframework/cdolib/base/PropertiesExt.java,v 1.1 2008/03/05 01:34:42 Frank Exp $
-*掌信彩通信息科技(中国)有限公司版权所有
-*$Log: PropertiesExt.java,v $
-*Revision 1.1  2008/03/05 01:34:42  Frank
-**** empty log message ***
-*
-*Revision 1.1  2007/12/27 12:28:05  Frank
-**** empty log message ***
-*
-*Revision 1.1  2007/12/15 09:35:38  Frank
-**** empty log message ***
-*
-*Revision 1.3  2007/12/15 09:07:13  Frank
-**** empty log message ***
-*
-*Revision 1.2  2007/08/30 14:14:23  Frank
-**** empty log message ***
-*
-*Revision 1.1  2007/07/24 13:40:40  Frank
-**** empty log message ***
-*
-*Revision 1.1  2007/07/24 13:36:57  Frank
-**** empty log message ***
-*
-*Revision 1.1  2006/11/15 14:07:21  linshihong
-**** empty log message ***
-*
-*/
+
 package com.cdoframework.cdolib.base;
 
 import java.io.FileInputStream;

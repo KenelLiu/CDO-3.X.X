@@ -7,6 +7,7 @@ import com.cdo.field.DateField;
 import com.cdo.field.DateTimeField;
 import com.cdo.field.DoubleField;
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.FileField;
 import com.cdo.field.FloatField;
 import com.cdo.field.IntegerField;
@@ -25,7 +26,6 @@ import com.cdo.field.array.LongArrayField;
 import com.cdo.field.array.ShortArrayField;
 import com.cdo.field.array.StringArrayField;
 import com.cdo.field.array.TimeArrayField;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.data.cdo.CDO.FieldId;
 /**
  * 
@@ -44,7 +44,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	BooleanField field=new BooleanField(fieldId.strFieldId,buffer);
-   		cdo.setObjectValue(fieldId,DataType.BOOLEAN_TYPE,null,field,cdo);
+   		cdo.setObjectValue(fieldId,FieldType.BOOLEAN_TYPE,null,field,cdo);
     }
     
     protected void setShortValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -56,7 +56,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new ShortField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.SHORT_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.SHORT_TYPE,null,field,cdo);
     }
 
     protected void setIntegerValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -68,7 +68,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new IntegerField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.INTEGER_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.INTEGER_TYPE,null,field,cdo);
     }
 
     protected void setLongValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -82,7 +82,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new LongField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.LONG_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.LONG_TYPE,null,field,cdo);
     }
 
     protected void setFloatValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -95,7 +95,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new FloatField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.FLOAT_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.FLOAT_TYPE,null,field,cdo);
     }
 
     protected void setDoubleValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -108,7 +108,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DoubleField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.DOUBLE_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.DOUBLE_TYPE,null,field,cdo);
     }
 
     protected void setStringValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -121,7 +121,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new StringField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.STRING_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.STRING_TYPE,null,field,cdo);
     }
 
     
@@ -135,7 +135,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.DATE_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.DATE_TYPE,null,field,cdo);
     }
 
     protected void setTimeValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -148,7 +148,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new TimeField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.TIME_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.TIME_TYPE,null,field,cdo);
     }
 
     protected void setDateTimeValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -161,7 +161,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateTimeField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.DATETIME_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.DATETIME_TYPE,null,field,cdo);
     }
     
     protected void setFileValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -174,7 +174,7 @@ public class CDOBuffer {
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new FileField(fieldId.strFieldId,buffer);
-		cdo.setObjectValue(fieldId,DataType.FILE_TYPE,null,field,cdo);
+		cdo.setObjectValue(fieldId,FieldType.FILE_TYPE,null,field,cdo);
 		if(fieldId.nType==FieldId.SIMPLE){
 			cdo.setFileCount(cdo.getSerialFileCount()+1);
 		}
@@ -198,7 +198,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new BooleanArrayField(fieldId.strFieldId,buffer);
-    		cdo.setObjectValue(fieldId,DataType.BOOLEAN_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.BOOLEAN_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -219,7 +219,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new ByteArrayField(fieldId.strFieldId,buffer);
-    		cdo.setObjectValue(fieldId,DataType.BYTE_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.BYTE_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -240,7 +240,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new ShortArrayField(fieldId.strFieldId,buffer);
-    		cdo.setObjectValue(fieldId,DataType.SHORT_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.SHORT_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -261,7 +261,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new IntegerArrayField(fieldId.strFieldId,buffer); 
-    		cdo.setObjectValue(fieldId,DataType.INTEGER_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.INTEGER_ARRAY_TYPE,null,field,cdo);
     	}
     }
     protected void setFloatArrayValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -281,7 +281,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new FloatArrayField(fieldId.strFieldId,buffer); 
-    		cdo.setObjectValue(fieldId,DataType.FLOAT_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.FLOAT_ARRAY_TYPE,null,field,cdo);
     	}
     }
     protected void setDoubleArrayValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -300,7 +300,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new DoubleArrayField(fieldId.strFieldId,buffer); 
-    		cdo.setObjectValue(fieldId,DataType.DOUBLE_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.DOUBLE_ARRAY_TYPE,null,field,cdo);
     	}
     }
     protected void setLongArrayValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -320,7 +320,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new LongArrayField(fieldId.strFieldId,buffer); 
-    		cdo.setObjectValue(fieldId,DataType.LONG_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.LONG_ARRAY_TYPE,null,field,cdo);
     	}
     }
     protected void setStringArrayValue(CDO cdo,String strFieldId,ByteBuffer buffer)
@@ -340,7 +340,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new StringArrayField(fieldId.strFieldId,buffer);  
-    		cdo.setObjectValue(fieldId,DataType.STRING_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.STRING_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -361,7 +361,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new DateArrayField(fieldId.strFieldId,buffer);  
-    		cdo.setObjectValue(fieldId,DataType.DATE_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.DATE_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -382,7 +382,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new TimeArrayField(fieldId.strFieldId,buffer);  
-    		cdo.setObjectValue(fieldId,DataType.TIME_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.TIME_ARRAY_TYPE,null,field,cdo);
     	}
     }
 
@@ -403,7 +403,7 @@ public class CDOBuffer {
     	else
     	{
     		Field field=new DateTimeArrayField(fieldId.strFieldId,buffer);     		
-    		cdo.setObjectValue(fieldId,DataType.DATETIME_ARRAY_TYPE,null,field,cdo);
+    		cdo.setObjectValue(fieldId,FieldType.DATETIME_ARRAY_TYPE,null,field,cdo);
     	}
     }  
 }

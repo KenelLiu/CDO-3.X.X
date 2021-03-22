@@ -24,6 +24,7 @@ import com.cdo.field.DateField;
 import com.cdo.field.DateTimeField;
 import com.cdo.field.DoubleField;
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.FileField;
 import com.cdo.field.FloatField;
 import com.cdo.field.IntegerField;
@@ -44,8 +45,7 @@ import com.cdo.field.array.ShortArrayField;
 import com.cdo.field.array.StringArrayField;
 import com.cdo.field.array.TimeArrayField;
 import com.cdo.google.GoogleCDO;
-import com.cdoframework.cdolib.base.DataType;
-import com.cdoframework.cdolib.base.Utility;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
  *CDO 维护一个通用数据类型
@@ -428,7 +428,7 @@ public class CDO implements java.io.Serializable
     		{
     			return null;
     		}
-    		if(cdoMainField.getType().getDataType()>=DataType.BOOLEAN_ARRAY_TYPE && fieldId.strFieldId.equalsIgnoreCase("length")==true)
+    		if(cdoMainField.getFieldType().getType()>=FieldType.BOOLEAN_ARRAY_TYPE && fieldId.strFieldId.equalsIgnoreCase("length")==true)
     		{//是数组类型
 //    			return new ObjectExt(DataType.INTEGER_TYPE,cdoMainField.getLength());
     			return new IntegerField(((ArrayField)cdoMainField).getLength());
@@ -489,58 +489,58 @@ public class CDO implements java.io.Serializable
      */
     private Field getValueAtExt(Field field,int nIndex)
 	{
-		switch(field.getType().getDataType())
+		switch(field.getFieldType().getType())
 		{
-			case DataType.BOOLEAN_ARRAY_TYPE:
+			case FieldType.BOOLEAN_ARRAY_TYPE:
 			{
 				return new BooleanField(((BooleanArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.BYTE_ARRAY_TYPE:
+			case FieldType.BYTE_ARRAY_TYPE:
 			{
 				return new ByteField(((ByteArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.SHORT_ARRAY_TYPE:
+			case FieldType.SHORT_ARRAY_TYPE:
 			{
 				return new ShortField(((ShortArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.INTEGER_ARRAY_TYPE:
+			case FieldType.INTEGER_ARRAY_TYPE:
 			{
 				return new IntegerField(((IntegerArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.LONG_ARRAY_TYPE:
+			case FieldType.LONG_ARRAY_TYPE:
 			{
 				return  new LongField(((LongArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.FLOAT_ARRAY_TYPE:
+			case FieldType.FLOAT_ARRAY_TYPE:
 			{
 				return new FloatField(((FloatArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.DOUBLE_ARRAY_TYPE:
+			case FieldType.DOUBLE_ARRAY_TYPE:
 			{
 				return new DoubleField(((DoubleArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.STRING_ARRAY_TYPE:
+			case FieldType.STRING_ARRAY_TYPE:
 			{
 				return new StringField("",((StringArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.DATE_ARRAY_TYPE:
+			case FieldType.DATE_ARRAY_TYPE:
 			{
 				return new DateField("",((DateArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.TIME_ARRAY_TYPE:
+			case FieldType.TIME_ARRAY_TYPE:
 			{
 				return new TimeField("",((TimeArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.DATETIME_ARRAY_TYPE:
+			case FieldType.DATETIME_ARRAY_TYPE:
 			{
 				return new DateTimeField("",((DateTimeArrayField)field).getValueAt(nIndex));
 			}
-			case DataType.CDO_ARRAY_TYPE:
+			case FieldType.CDO_ARRAY_TYPE:
 			{
 				return new CDOField(((CDOArrayField)field).getValueAt(nIndex));
 			}
 		}
-		throw new RuntimeException(field.getType().getFieldType()+" Type cast failed");	
+		throw new RuntimeException(field.getFieldType().getName()+" Type cast failed");	
 	}
     
     /**
@@ -790,7 +790,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new BooleanField(fieldId.strFieldId,bValue);
-   		this.setObjectValue(fieldId,DataType.BOOLEAN_TYPE,bValue,field,this);
+   		this.setObjectValue(fieldId,FieldType.BOOLEAN_TYPE,bValue,field,this);
     }
   
     public void setByteValue(String strFieldId,byte byValue)
@@ -801,7 +801,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new ByteField(fieldId.strFieldId,byValue);
-		this.setObjectValue(fieldId,DataType.BYTE_TYPE,byValue,field,this);
+		this.setObjectValue(fieldId,FieldType.BYTE_TYPE,byValue,field,this);
     }
     
     
@@ -816,7 +816,7 @@ public class CDO implements java.io.Serializable
     	}    	
     	
     	Field field=new ShortField(fieldId.strFieldId,shValue);
-		this.setObjectValue(fieldId,DataType.SHORT_TYPE,shValue,field,this);
+		this.setObjectValue(fieldId,FieldType.SHORT_TYPE,shValue,field,this);
     }
 
     public void setIntegerValue(String strFieldId,int nValue)
@@ -829,7 +829,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new IntegerField(fieldId.strFieldId,nValue);
-		this.setObjectValue(fieldId,DataType.INTEGER_TYPE,nValue,field,this);
+		this.setObjectValue(fieldId,FieldType.INTEGER_TYPE,nValue,field,this);
     }
 
     public void setLongValue(String strFieldId,long lValue)
@@ -843,7 +843,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new LongField(fieldId.strFieldId,lValue);
-		this.setObjectValue(fieldId,DataType.LONG_TYPE,lValue,field,this);
+		this.setObjectValue(fieldId,FieldType.LONG_TYPE,lValue,field,this);
     }
 
     public void setFloatValue(String strFieldId,float fValue)
@@ -856,7 +856,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new FloatField(fieldId.strFieldId,fValue);
-		this.setObjectValue(fieldId,DataType.FLOAT_TYPE,fValue,field,this);
+		this.setObjectValue(fieldId,FieldType.FLOAT_TYPE,fValue,field,this);
     }
 
     public void setDoubleValue(String strFieldId,double dValue)
@@ -869,7 +869,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DoubleField(fieldId.strFieldId,dValue);
-		this.setObjectValue(fieldId,DataType.DOUBLE_TYPE,dValue,field,this);
+		this.setObjectValue(fieldId,FieldType.DOUBLE_TYPE,dValue,field,this);
     }
 
     public void setStringValue(String strFieldId,String strValue)
@@ -882,7 +882,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new StringField(fieldId.strFieldId,strValue);
-		this.setObjectValue(fieldId,DataType.STRING_TYPE,strValue,field,this);
+		this.setObjectValue(fieldId,FieldType.STRING_TYPE,strValue,field,this);
     }
     /**
      * 
@@ -897,7 +897,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new FileField(fieldId.strFieldId,file);
-		this.setObjectValue(fieldId,DataType.FILE_TYPE,file,field,this);
+		this.setObjectValue(fieldId,FieldType.FILE_TYPE,file,field,this);
 		if(fieldId.nType==FieldId.SIMPLE)
 			fileCount++;
     }
@@ -912,7 +912,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateField(fieldId.strFieldId,strValue);
-		this.setObjectValue(fieldId,DataType.DATE_TYPE,strValue,field,this);
+		this.setObjectValue(fieldId,FieldType.DATE_TYPE,strValue,field,this);
     }
     
     public void setDateValue(String strFieldId,long lValue)
@@ -924,7 +924,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateField(fieldId.strFieldId,lValue);
-		this.setObjectValue(fieldId,DataType.DATE_TYPE,lValue,field,this);
+		this.setObjectValue(fieldId,FieldType.DATE_TYPE,lValue,field,this);
     }
     
     public void setTimeValue(String strFieldId,String strValue)
@@ -937,7 +937,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new TimeField(fieldId.strFieldId,strValue);
-		this.setObjectValue(fieldId,DataType.TIME_TYPE,strValue,field,this);
+		this.setObjectValue(fieldId,FieldType.TIME_TYPE,strValue,field,this);
     }
 
     public void setTimeValue(String strFieldId,long lValue)
@@ -950,7 +950,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new TimeField(fieldId.strFieldId,lValue);
-		this.setObjectValue(fieldId,DataType.TIME_TYPE,lValue,field,this);
+		this.setObjectValue(fieldId,FieldType.TIME_TYPE,lValue,field,this);
     }
     
     public void setDateTimeValue(String strFieldId,String strValue)
@@ -963,7 +963,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateTimeField(fieldId.strFieldId,strValue);
-		this.setObjectValue(fieldId,DataType.DATETIME_TYPE,strValue,field,this);
+		this.setObjectValue(fieldId,FieldType.DATETIME_TYPE,strValue,field,this);
     }
 
     public void setDateTimeValue(String strFieldId,long lValue)
@@ -976,7 +976,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new DateTimeField(fieldId.strFieldId,lValue);
-		this.setObjectValue(fieldId,DataType.DATETIME_TYPE,lValue,field,this);
+		this.setObjectValue(fieldId,FieldType.DATETIME_TYPE,lValue,field,this);
     }
     
     public void setCDOValue(String strFieldId,CDO cdoValue)
@@ -989,7 +989,7 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	Field field=new CDOField(fieldId.strFieldId,cdoValue);
-		this.setObjectValue(fieldId,DataType.CDO_TYPE,cdoValue,field,this);
+		this.setObjectValue(fieldId,FieldType.CDO_TYPE,cdoValue,field,this);
     }
 
     public void setBooleanArrayValue(String strFieldId,boolean[] bsValue)
@@ -1009,7 +1009,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new BooleanArrayField(fieldId.strFieldId,bsValue);
-    		this.setObjectValue(fieldId,DataType.BOOLEAN_ARRAY_TYPE,bsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.BOOLEAN_ARRAY_TYPE,bsValue,field,this);
     	}
     }
 
@@ -1030,7 +1030,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new ByteArrayField(fieldId.strFieldId,bysValue);
-    		this.setObjectValue(fieldId,DataType.BYTE_ARRAY_TYPE,bysValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.BYTE_ARRAY_TYPE,bysValue,field,this);
     	}
     }
 
@@ -1051,7 +1051,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new ShortArrayField(fieldId.strFieldId,shsValue);
-    		this.setObjectValue(fieldId,DataType.SHORT_ARRAY_TYPE,shsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.SHORT_ARRAY_TYPE,shsValue,field,this);
     	}
     }
 
@@ -1072,7 +1072,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new IntegerArrayField(fieldId.strFieldId,nsValue); 
-    		this.setObjectValue(fieldId,DataType.INTEGER_ARRAY_TYPE,nsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.INTEGER_ARRAY_TYPE,nsValue,field,this);
     	}
     }
     public void setFloatArrayValue(String strFieldId,float[] fsValue)
@@ -1092,7 +1092,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new FloatArrayField(fieldId.strFieldId,fsValue); 
-    		this.setObjectValue(fieldId,DataType.FLOAT_ARRAY_TYPE,fsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.FLOAT_ARRAY_TYPE,fsValue,field,this);
     	}
     }
     public void setDoubleArrayValue(String strFieldId,double[] dblsValue)
@@ -1112,7 +1112,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new DoubleArrayField(fieldId.strFieldId,dblsValue); 
-    		this.setObjectValue(fieldId,DataType.DOUBLE_ARRAY_TYPE,dblsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.DOUBLE_ARRAY_TYPE,dblsValue,field,this);
     	}
     }
     public void setLongArrayValue(String strFieldId,long[] lsValue)
@@ -1132,7 +1132,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new LongArrayField(fieldId.strFieldId,lsValue); 
-    		this.setObjectValue(fieldId,DataType.LONG_ARRAY_TYPE,lsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.LONG_ARRAY_TYPE,lsValue,field,this);
     	}
     }
     public void setStringArrayValue(String strFieldId,String[] strsValue)
@@ -1152,7 +1152,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new StringArrayField(fieldId.strFieldId,strsValue);  
-    		this.setObjectValue(fieldId,DataType.STRING_ARRAY_TYPE,strsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.STRING_ARRAY_TYPE,strsValue,field,this);
     	}
     }
 
@@ -1173,7 +1173,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new DateArrayField(fieldId.strFieldId,strsValue);  
-    		this.setObjectValue(fieldId,DataType.DATE_ARRAY_TYPE,strsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.DATE_ARRAY_TYPE,strsValue,field,this);
     	}
     }
 
@@ -1194,7 +1194,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new DateArrayField(fieldId.strFieldId,lsValue);  
-    		this.setObjectValue(fieldId,DataType.DATE_ARRAY_TYPE,lsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.DATE_ARRAY_TYPE,lsValue,field,this);
     	}
     }
     
@@ -1215,7 +1215,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new TimeArrayField(fieldId.strFieldId,strsValue);  
-    		this.setObjectValue(fieldId,DataType.TIME_ARRAY_TYPE,strsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.TIME_ARRAY_TYPE,strsValue,field,this);
     	}
     }
     public void setTimeArrayValue(String strFieldId,long[] lsValue)
@@ -1235,7 +1235,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new TimeArrayField(fieldId.strFieldId,lsValue);  
-    		this.setObjectValue(fieldId,DataType.TIME_ARRAY_TYPE,lsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.TIME_ARRAY_TYPE,lsValue,field,this);
     	}
     }
     
@@ -1256,7 +1256,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new DateTimeArrayField(fieldId.strFieldId,strsValue);     		
-    		this.setObjectValue(fieldId,DataType.DATETIME_ARRAY_TYPE,strsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.DATETIME_ARRAY_TYPE,strsValue,field,this);
     	}
     }
 
@@ -1277,7 +1277,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new DateTimeArrayField(fieldId.strFieldId,lsValue);     		
-    		this.setObjectValue(fieldId,DataType.DATETIME_ARRAY_TYPE,lsValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.DATETIME_ARRAY_TYPE,lsValue,field,this);
     	}
     }
     
@@ -1300,7 +1300,7 @@ public class CDO implements java.io.Serializable
     	else
     	{
     		Field field=new CDOArrayField(fieldId.strFieldId,cdosValue); 
-    		this.setObjectValue(fieldId,DataType.CDO_ARRAY_TYPE,cdosValue,field,this);
+    		this.setObjectValue(fieldId,FieldType.CDO_ARRAY_TYPE,cdosValue,field,this);
     	}		
 	}
   
@@ -1341,39 +1341,39 @@ public class CDO implements java.io.Serializable
 	    }
 		nIndex=this.getIndexValue(fieldId.strIndexFieldId,cdoRoot);	
 		
-   		switch(arrField.getType().getDataType())
+   		switch(arrField.getFieldType().getType())
    		{
-   			case DataType.BOOLEAN_ARRAY_TYPE:
+   			case FieldType.BOOLEAN_ARRAY_TYPE:
    			{
    				((BooleanArrayField)arrField).setValueAt(nIndex,(Boolean)objValue);
    				break;
    			}
-   			case DataType.BYTE_ARRAY_TYPE:
+   			case FieldType.BYTE_ARRAY_TYPE:
    			{
    				((ByteArrayField)arrField).setValueAt(nIndex,(Byte)objValue);
    				break;
    			}
-   			case DataType.SHORT_ARRAY_TYPE:
+   			case FieldType.SHORT_ARRAY_TYPE:
    			{
    				((ShortArrayField)arrField).setValueAt(nIndex,(Short)objValue);
    				break;
    			}
-   			case DataType.INTEGER_ARRAY_TYPE:
+   			case FieldType.INTEGER_ARRAY_TYPE:
    			{
    				((IntegerArrayField)arrField).setValueAt(nIndex,(Integer)objValue);
    				break;
    			}
-   			case DataType.LONG_ARRAY_TYPE:
+   			case FieldType.LONG_ARRAY_TYPE:
    			{
    				((LongArrayField)arrField).setValueAt(nIndex,(Long)objValue);
    				break;
    			}
-   			case DataType.STRING_ARRAY_TYPE:
+   			case FieldType.STRING_ARRAY_TYPE:
    			{
    				((StringArrayField)arrField).setValueAt(nIndex,(String)objValue);
    				break;
    			}
-   			case DataType.DATE_ARRAY_TYPE:
+   			case FieldType.DATE_ARRAY_TYPE:
    			{
    				if(objValue instanceof String){
    					((DateArrayField)arrField).setValueAt(nIndex,(String)objValue);
@@ -1382,7 +1382,7 @@ public class CDO implements java.io.Serializable
    				}
    				break;
    			}
-   			case DataType.TIME_ARRAY_TYPE:
+   			case FieldType.TIME_ARRAY_TYPE:
    			{	
    				if(objValue instanceof String){
    					((TimeArrayField)arrField).setValueAt(nIndex,(String)objValue);
@@ -1391,7 +1391,7 @@ public class CDO implements java.io.Serializable
    				}
    				break;
    			}
-   			case DataType.DATETIME_ARRAY_TYPE:
+   			case FieldType.DATETIME_ARRAY_TYPE:
    			{
    				if(objValue instanceof String){
    					((DateTimeArrayField)arrField).setValueAt(nIndex,(String)objValue);
@@ -1400,7 +1400,7 @@ public class CDO implements java.io.Serializable
    				}
    				break;
    			}
-	   		case DataType.CDO_ARRAY_TYPE:
+	   		case FieldType.CDO_ARRAY_TYPE:
 	   		{
 	   				((CDOArrayField)arrField).setValueAt(nIndex,(CDO)objValue);
 	   				break;
@@ -1489,7 +1489,7 @@ public class CDO implements java.io.Serializable
 		try
 		{
 			int length=0;
-			if(objExt.getType().getDataType()>=DataType.BOOLEAN_ARRAY_TYPE){
+			if(objExt.getFieldType().getType()>=FieldType.BOOLEAN_ARRAY_TYPE){
 				length=((ArrayField)objExt).getLength();
 			}
 			return length==0;
@@ -1515,14 +1515,14 @@ public class CDO implements java.io.Serializable
 			throw new RuntimeException("Invalid FieldId "+strFieldId);
     	}
     	
-   		this.setObjectValue(fieldId,field.getType().getDataType(),field.getObjectValue(),field,this);
+   		this.setObjectValue(fieldId,field.getFieldType().getType(),field.getObjectValue(),field,this);
  
     }
 	
 	public void remove(String key)
 	{
 		Field objExt=hmItem.remove(key);
-		if(objExt!=null && objExt.getType().getDataType()==DataType.FILE_TYPE && !key.contains(".")){
+		if(objExt!=null && objExt.getFieldType().getType()==FieldType.FILE_TYPE && !key.contains(".")){
 			fileCount--;
 		}
 	}
@@ -1561,8 +1561,8 @@ public class CDO implements java.io.Serializable
 			for(Iterator<Map.Entry<String, Field>> it=this.entrySet().iterator();it.hasNext();){
 				entry=it.next();
 				field=entry.getValue();
-				byte type=field.getType().getDataType();
-				if(type==DataType.CDO_TYPE || type==DataType.CDO_ARRAY_TYPE){
+				byte type=field.getFieldType().getType();
+				if(type==FieldType.CDO_TYPE || type==FieldType.CDO_ARRAY_TYPE){
 					continue;
 				}
 				field.release();								

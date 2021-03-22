@@ -8,6 +8,7 @@ import com.cdo.field.DateField;
 import com.cdo.field.DateTimeField;
 import com.cdo.field.DoubleField;
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.FloatField;
 import com.cdo.field.IntegerField;
 import com.cdo.field.LongField;
@@ -25,7 +26,6 @@ import com.cdo.field.array.LongArrayField;
 import com.cdo.field.array.ShortArrayField;
 import com.cdo.field.array.StringArrayField;
 import com.cdo.field.array.TimeArrayField;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
 import com.cdoframework.cdolib.data.cdo.CDOField;
@@ -53,79 +53,79 @@ public class DataEngineHelp {
 				return ;
 			}
 			//value 为变量形式数据
-			byte type =cdoRequest.getObject(strValueId).getType().getDataType();
+			byte type =cdoRequest.getObject(strValueId).getFieldType().getType();
 			switch(type){
-				case DataType.BOOLEAN_TYPE:
+				case FieldType.BOOLEAN_TYPE:
 					cdoRequest.setBooleanValue(strFieldId, cdoRequest.getBooleanValue(strValueId));
 					break;
-				case DataType.BYTE_TYPE:
+				case FieldType.BYTE_TYPE:
 					cdoRequest.setByteValue(strFieldId, cdoRequest.getByteValue(strValueId));
 					break;
-				case DataType.CDO_TYPE:
+				case FieldType.CDO_TYPE:
 					cdoRequest.setCDOValue(strFieldId, cdoRequest.getCDOValue(strValueId));					
 					break;
-				case DataType.DATE_TYPE:
+				case FieldType.DATE_TYPE:
 					cdoRequest.setDateValue(strFieldId, cdoRequest.getDateValue(strValueId));
 					break;
-				case DataType.DATETIME_TYPE:
+				case FieldType.DATETIME_TYPE:
 					cdoRequest.setDateTimeValue(strFieldId, cdoRequest.getDateTimeValue(strValueId));
 					break;
-				case DataType.DOUBLE_TYPE:
+				case FieldType.DOUBLE_TYPE:
 					cdoRequest.setDoubleValue(strFieldId, cdoRequest.getDoubleValue(strValueId));
 					break;
-				case DataType.FLOAT_TYPE:
+				case FieldType.FLOAT_TYPE:
 					cdoRequest.setFloatValue(strFieldId, cdoRequest.getFloatValue(strValueId));
 					break;
-				case DataType.INTEGER_TYPE:
+				case FieldType.INTEGER_TYPE:
 					cdoRequest.setIntegerValue(strFieldId, cdoRequest.getIntegerValue(strValueId));
 					break;
-				case DataType.LONG_TYPE:
+				case FieldType.LONG_TYPE:
 					cdoRequest.setLongValue(strFieldId, cdoRequest.getLongValue(strValueId));
 					break;
-				case DataType.SHORT_TYPE:
+				case FieldType.SHORT_TYPE:
 					cdoRequest.setShortValue(strFieldId, cdoRequest.getShortValue(strValueId));
 					break;
-				case DataType.STRING_TYPE:
+				case FieldType.STRING_TYPE:
 					cdoRequest.setStringValue(strFieldId, cdoRequest.getStringValue(strValueId));
 					break;
-				case DataType.TIME_TYPE:
+				case FieldType.TIME_TYPE:
 					cdoRequest.setTimeValue(strFieldId, cdoRequest.getTimeValue(strValueId));
 					break;
 					
-				case DataType.BOOLEAN_ARRAY_TYPE:
+				case FieldType.BOOLEAN_ARRAY_TYPE:
 					cdoRequest.setBooleanArrayValue(strFieldId, cdoRequest.getBooleanArrayValue(strValueId));
 					break;
-				case DataType.BYTE_ARRAY_TYPE:
+				case FieldType.BYTE_ARRAY_TYPE:
 					cdoRequest.setByteArrayValue(strFieldId, cdoRequest.getByteArrayValue(strValueId));
 					break;
-				case DataType.CDO_ARRAY_TYPE:
+				case FieldType.CDO_ARRAY_TYPE:
 					cdoRequest.setCDOArrayValue(strFieldId, cdoRequest.getCDOArrayValue(strValueId));					
 					break;
-				case DataType.DATE_ARRAY_TYPE:
+				case FieldType.DATE_ARRAY_TYPE:
 					cdoRequest.setDateArrayValue(strFieldId, cdoRequest.getDateArrayValue(strValueId));
 					break;
-				case DataType.DATETIME_ARRAY_TYPE:
+				case FieldType.DATETIME_ARRAY_TYPE:
 					cdoRequest.setDateTimeArrayValue(strFieldId, cdoRequest.getDateTimeArrayValue(strValueId));
 					break;
-				case DataType.DOUBLE_ARRAY_TYPE:
+				case FieldType.DOUBLE_ARRAY_TYPE:
 					cdoRequest.setDoubleArrayValue(strFieldId, cdoRequest.getDoubleArrayValue(strValueId));
 					break;
-				case DataType.FLOAT_ARRAY_TYPE:
+				case FieldType.FLOAT_ARRAY_TYPE:
 					cdoRequest.setFloatArrayValue(strFieldId, cdoRequest.getFloatArrayValue(strValueId));
 					break;
-				case DataType.INTEGER_ARRAY_TYPE:
+				case FieldType.INTEGER_ARRAY_TYPE:
 					cdoRequest.setIntegerArrayValue(strFieldId, cdoRequest.getIntegerArrayValue(strValueId));
 					break;
-				case DataType.LONG_ARRAY_TYPE:
+				case FieldType.LONG_ARRAY_TYPE:
 					cdoRequest.setLongArrayValue(strFieldId, cdoRequest.getLongArrayValue(strValueId));
 					break;
-				case DataType.SHORT_ARRAY_TYPE:
+				case FieldType.SHORT_ARRAY_TYPE:
 					cdoRequest.setShortArrayValue(strFieldId, cdoRequest.getShortArrayValue(strValueId));
 					break;
-				case DataType.STRING_ARRAY_TYPE:
+				case FieldType.STRING_ARRAY_TYPE:
 					cdoRequest.setStringArrayValue(strFieldId, cdoRequest.getStringArrayValue(strValueId));
 					break;
-				case DataType.TIME_ARRAY_TYPE:
+				case FieldType.TIME_ARRAY_TYPE:
 					cdoRequest.setTimeArrayValue(strFieldId, cdoRequest.getTimeArrayValue(strValueId));
 					break;					
 			}
@@ -1132,57 +1132,57 @@ public class DataEngineHelp {
 		if(!cdoRequest.exists(arrKey))
 			return 0;
 		 Field field=cdoRequest.getObject(arrKey);
-		switch(field.getType().getDataType()){
-			case DataType.BOOLEAN_ARRAY_TYPE:
+		switch(field.getFieldType().getType()){
+			case FieldType.BOOLEAN_ARRAY_TYPE:
 			{
 				return ((BooleanArrayField)field).getLength();
 			}
-			case DataType.BYTE_ARRAY_TYPE:
+			case FieldType.BYTE_ARRAY_TYPE:
 			{
 				return ((ByteArrayField)field).getLength();
 			}
-			case DataType.SHORT_ARRAY_TYPE:
+			case FieldType.SHORT_ARRAY_TYPE:
 			{
 				return ((ShortArrayField)field).getLength();
 			}
-			case DataType.INTEGER_ARRAY_TYPE:
+			case FieldType.INTEGER_ARRAY_TYPE:
 			{
 				return ((IntegerArrayField)field).getLength();
 			}
-			case DataType.LONG_ARRAY_TYPE:
+			case FieldType.LONG_ARRAY_TYPE:
 			{
 				return  ((LongArrayField)field).getLength();
 			}
-			case DataType.FLOAT_ARRAY_TYPE:
+			case FieldType.FLOAT_ARRAY_TYPE:
 			{
 				return ((FloatArrayField)field).getLength();
 			}
-			case DataType.DOUBLE_ARRAY_TYPE:
+			case FieldType.DOUBLE_ARRAY_TYPE:
 			{
 				return ((DoubleArrayField)field).getLength();
 			}
-			case DataType.STRING_ARRAY_TYPE:
+			case FieldType.STRING_ARRAY_TYPE:
 			{
 				return ((StringArrayField)field).getLength();
 			}
-			case DataType.DATE_ARRAY_TYPE:
+			case FieldType.DATE_ARRAY_TYPE:
 			{
 				return ((DateArrayField)field).getLength();
 			}
-			case DataType.TIME_ARRAY_TYPE:
+			case FieldType.TIME_ARRAY_TYPE:
 			{
 				return ((TimeArrayField)field).getLength();
 			}
-			case DataType.DATETIME_ARRAY_TYPE:
+			case FieldType.DATETIME_ARRAY_TYPE:
 			{
 				return ((DateTimeArrayField)field).getLength();
 			}
-			case DataType.CDO_ARRAY_TYPE:
+			case FieldType.CDO_ARRAY_TYPE:
 			{
 				return ((CDOArrayField)field).getLength();
 			}
 		 }
-		logger.warn(field.getType().getFieldType()+" Type is not array");	
+		logger.warn(field.getFieldType().getName()+" Type is not array");	
 		return 0;
 	}
 }

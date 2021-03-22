@@ -5,15 +5,14 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import com.cdo.google.GoogleCDO;
+import com.cdo.pattern.Pattern;
 import com.google.protobuf.ByteString;
-
-
 /**
  * 重新构造
  * @author KenelLiu
  *
  */
-public abstract class FieldImpl implements Field
+public abstract class FieldImpl implements Field,Pattern
 {
 
 
@@ -24,17 +23,17 @@ public abstract class FieldImpl implements Field
 
 	private static final long serialVersionUID = 1324693182949266208L;
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
-	private Data nType;
+	private FieldType.type type;
 	private String strName;
 	protected ByteBuffer buffer=null;//需要谨慎操作，仅在内部字段里使用
 	
-	public void setType(Data nType)
+	public void setFieldType(FieldType.type type)
 	{
-		this.nType=nType;
+		this.type=type;
 	}
-	public Data getType()
+	public FieldType.type getFieldType()
 	{
-		return nType;
+		return type;
 	}
 
 	public void setName(String strName)
@@ -46,33 +45,13 @@ public abstract class FieldImpl implements Field
 		return strName;
 	}
 
-	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
 
-	//内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
-
-	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
-
-	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	//事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	//事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
-
-	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
-
-	public FieldImpl()
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		nType=Data.NONE;
-		strName="";
+	public FieldImpl(){
+		this("");
 	}
 
-	public FieldImpl(String strFieldName)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		nType=Data.NONE;
+	public FieldImpl(String strFieldName){
+		this.type=FieldType.type.NONE;
 		strName=strFieldName;
 	}
 	@Override

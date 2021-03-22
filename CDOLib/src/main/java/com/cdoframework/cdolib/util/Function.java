@@ -5,63 +5,7 @@ package com.cdoframework.cdolib.util;
  *
  */
 public class Function
-{	
-	/**
-	 * 将文本内容格式化以符合HTML显示要求
-	 */
-	public static String FormatTextForMongodb(String strText)
-	{
-		if(strText==null)
-		{
-			return null;
-		}
-		StringBuilder strbText=new StringBuilder(strText.length());
-		int nLength=strText.length();
-		for(int i=0;i<nLength;i++)
-		{
-			char ch=strText.charAt(i);
-			switch(ch)
-			{
-			case '[':
-				strbText.append("\\[");
-				break;
-			case ']':
-				strbText.append("\\]");
-				break;
-			case '(':
-				strbText.append("\\(");
-				break;
-			case ')':
-				strbText.append("\\)");
-				break;	
-			case '{':
-				strbText.append("\\{");
-				break;
-			case '}':
-				strbText.append("\\}");
-				break;	
-			case '\\':
-				strbText.append("\\\\");
-				break;
-			case '+':
-				strbText.append("\\+");
-				break;
-			case '*':
-				strbText.append("\\*");
-				break;
-			case '?':
-				strbText.append("\\?");
-				break;
-			case '.':
-				strbText.append("\\.");
-				break;
-			default:
-				strbText.append(ch);
-				break;
-			}
-		}
-		return strbText.toString();
-	}		
+{		
 	public static String FormatTextForXML(String strText)
 	{
 		if(strText==null)

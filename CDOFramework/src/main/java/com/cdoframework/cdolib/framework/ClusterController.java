@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.IActiveObject;
 import com.cdoframework.cdolib.base.Return;
-import com.cdoframework.cdolib.base.Utility;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.IDataEngine;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
  * @author Frank

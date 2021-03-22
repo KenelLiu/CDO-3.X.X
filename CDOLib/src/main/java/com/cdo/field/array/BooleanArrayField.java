@@ -3,23 +3,16 @@ package com.cdo.field.array;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import com.cdoframework.cdolib.base.DataType;
-import com.cdoframework.cdolib.base.Utility;
+import com.cdo.field.FieldType;
 import com.cdoframework.cdolib.data.cdo.DataBufferUtil;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
- * 重新构造
+ * 定义Boolean数组字段
  * @author KenelLiu
  *
  */
-public class BooleanArrayField extends ArrayFieldImpl
-{
-
-	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
-
-	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
+public class BooleanArrayField extends ArrayFieldImpl{
 	private static final long serialVersionUID = -4963315441783800310L;
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------	
 	private final int dataIndex=1;//数据保存的起始位置
@@ -95,7 +88,7 @@ public class BooleanArrayField extends ArrayFieldImpl
 	}
 	
 	private void allocate(boolean[] bsValue){
-		buffer=DataBufferUtil.allocate(bsValue.length, DataType.BOOLEAN_ARRAY_TYPE, buffer, dataIndex, databuffer);
+		buffer=DataBufferUtil.allocate(bsValue.length, FieldType.BOOLEAN_ARRAY_TYPE, buffer, dataIndex, databuffer);
 		//设置起始位置  
 		buffer.position(dataIndex);
 		for(int i=0;i<bsValue.length;i++){
@@ -106,9 +99,6 @@ public class BooleanArrayField extends ArrayFieldImpl
 		}
 		buffer.flip();
 	}	
-	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
-
-	//内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
 
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	@Override
@@ -163,31 +153,18 @@ public class BooleanArrayField extends ArrayFieldImpl
 		str_JSON.append("],");
 		return str_JSON.toString();
 	}
-	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	//事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	//事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
 
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
-	public BooleanArrayField(String strName)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
+	public BooleanArrayField(String strName){
 		super(strName);
-		setType(Data.BOOLEAN_ARRAY);
+		setFieldType(type.BOOLEAN_ARRAY);
 		allocate(new boolean[0]);
 	}
 
-	public BooleanArrayField(String strName,boolean[] bsValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strName);
-		
-		setType(Data.BOOLEAN_ARRAY);
-		
+	public BooleanArrayField(String strName,boolean[] bsValue){
+		super(strName);		
+		setFieldType(type.BOOLEAN_ARRAY);		
 		if(bsValue==null)
 		{
 			bsValue=new boolean[0];
@@ -195,14 +172,9 @@ public class BooleanArrayField extends ArrayFieldImpl
 		allocate(bsValue);
 	}
 	 
-	public BooleanArrayField(String strName,ByteBuffer buffer)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strName);
-		
-		setType(Data.BOOLEAN_ARRAY);
-		
+	public BooleanArrayField(String strName,ByteBuffer buffer){
+		super(strName);		
+		setFieldType(type.BOOLEAN_ARRAY);		
 		this.buffer=buffer;
 	}
 }

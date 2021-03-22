@@ -14,9 +14,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cdoframework.cdolib.base.DateTime;
-import com.cdoframework.cdolib.base.Utility;
 import com.cdoframework.cdolib.data.cdo.CDO;
+import com.cdoframework.cdolib.util.Utility;
 public class SQLUtil {
 		private static String strSystemCharset=System.getProperty("sun.jnu.encoding");
 		/**
@@ -283,10 +282,13 @@ public class SQLUtil {
 					{
 						try
 						{
-							String strValue="";
-							DateTime dtValue=new DateTime(rs.getTimestamp(i+1));
-							strValue=dtValue.toString("yyyy-MM-dd HH:mm:ss");
-							cdoRecord.setDateTimeValue(strFieldName,strValue);						
+							java.sql.Timestamp temp=rs.getTimestamp(i+1);
+							if(temp!=null){
+								//String strValue="";
+								//java.util.Date dtValue=new java.util.Date(temp.getTime());
+								//strValue=dtValue.toString("yyyy-MM-dd HH:mm:ss");
+								cdoRecord.setDateTimeValue(strFieldName,temp.getTime());	
+							}					
 						}
 						catch(Exception e)
 						{						

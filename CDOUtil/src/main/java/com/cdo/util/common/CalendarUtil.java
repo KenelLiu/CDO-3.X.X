@@ -4,7 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import com.cdoframework.cdolib.base.DataType;
+import com.cdo.field.FieldType;
+import com.cdo.pattern.Pattern;
 
 public class CalendarUtil {
 	/**
@@ -13,7 +14,7 @@ public class CalendarUtil {
 	 * @throws ParseException 
 	 */
 	public static String getFirstDayOfMonth(String strDate) throws ParseException{
-	      return getFirstDay(strDate,0,DataType.PATTERN_DATE); 
+	      return getFirstDay(strDate,0,Pattern.PATTERN_DATE); 
 	}		
 	/**
 	 * 获取当前日期几个月后的所属月份的第一天日期
@@ -36,7 +37,7 @@ public class CalendarUtil {
 	 * @throws ParseException 
 	 */
 	public static String getLastDayOfMonth(String strDate) throws ParseException{
-	      return getLastDay(strDate,0,DataType.PATTERN_DATE);
+	      return getLastDay(strDate,0,Pattern.PATTERN_DATE);
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class CalendarUtil {
 	 * @throws ParseException
 	 */
 	public static String getAddYear(String strDate,int year) throws ParseException{    	      
-	      return getAddYear(strDate,year,DataType.PATTERN_DATE);
+	      return getAddYear(strDate,year,Pattern.PATTERN_DATE);
 	}
 	/**
 	 * 当前日期 +year后的日期
@@ -82,7 +83,7 @@ public class CalendarUtil {
 	 * @throws ParseException
 	 */
 	public static String getAddMonth(String strDate,int month) throws ParseException{    	      
-	      return getAddMonth(strDate,month,DataType.PATTERN_DATE);
+	      return getAddMonth(strDate,month,Pattern.PATTERN_DATE);
 	}
 	/**
 	 * 当前日期 +month后的日期
@@ -102,7 +103,7 @@ public class CalendarUtil {
 	 * @throws ParseException
 	 */
 	public static String getAddDay(String strDate,int days) throws ParseException{    	      
-	      return getAddDay(strDate,days,DataType.PATTERN_DATE);
+	      return getAddDay(strDate,days,Pattern.PATTERN_DATE);
 	}
 	/**
 	 * 当前日期 +days后的日期

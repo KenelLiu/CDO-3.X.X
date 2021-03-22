@@ -25,13 +25,11 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.IntegerField;
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.CycleList;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.base.Return;
-import com.cdoframework.cdolib.base.SortedSet;
-import com.cdoframework.cdolib.base.Utility;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
 import com.cdoframework.cdolib.database.xsd.BlockType;
@@ -129,71 +127,71 @@ public class BigTableEngine
 			{
 				continue;
 			}
-			int nType=object.getType().getDataType();
+			int nType=object.getFieldType().getType();
 			Object objValue=object.getObjectValue();
 			switch(nType)
 			{
-				case DataType.BYTE_TYPE:
+				case FieldType.BYTE_TYPE:
 				{
 					cdoResponse.setByteValue(strFieldId,((Byte)objValue).byteValue());
 					break;
 				}
-				case DataType.SHORT_TYPE:
+				case FieldType.SHORT_TYPE:
 				{
 					cdoResponse.setShortValue(strFieldId,((Short)objValue).shortValue());
 					break;
 				}
-				case DataType.INTEGER_TYPE:
+				case FieldType.INTEGER_TYPE:
 				{
 					cdoResponse.setIntegerValue(strFieldId,((Integer)objValue).intValue());
 					break;
 				}
-				case DataType.LONG_TYPE:
+				case FieldType.LONG_TYPE:
 				{
 					cdoResponse.setLongValue(strFieldId,((Long)objValue).longValue());
 					break;
 				}
-				case DataType.FLOAT_TYPE:
+				case FieldType.FLOAT_TYPE:
 				{
 					cdoResponse.setFloatValue(strFieldId,((Float)objValue).floatValue());
 					break;
 				}
-				case DataType.DOUBLE_TYPE:
+				case FieldType.DOUBLE_TYPE:
 				{
 					cdoResponse.setDoubleValue(strFieldId,((Double)objValue).doubleValue());
 					break;
 				}
-				case DataType.STRING_TYPE:
+				case FieldType.STRING_TYPE:
 				{
 					cdoResponse.setStringValue(strFieldId,((String)objValue));
 					break;
 				}
-				case DataType.DATE_TYPE:
+				case FieldType.DATE_TYPE:
 				{
 					cdoResponse.setDateValue(strFieldId,((String)objValue));
 					break;
 				}
-				case DataType.TIME_TYPE:
+				case FieldType.TIME_TYPE:
 				{
 					cdoResponse.setTimeValue(strFieldId,((String)objValue));
 					break;
 				}
-				case DataType.DATETIME_TYPE:
+				case FieldType.DATETIME_TYPE:
 				{
 					cdoResponse.setDateTimeValue(strFieldId,((String)objValue));
 					break;
 				}
-				case DataType.BYTE_ARRAY_TYPE:
+				case FieldType.BYTE_ARRAY_TYPE:
 				{
 					cdoResponse.setByteArrayValue(strFieldId,((byte[])objValue));
 					break;
 				}
-				case DataType.CDO_TYPE:
+				case FieldType.CDO_TYPE:
 				{
 					cdoResponse.setCDOValue(strFieldId,(CDO)objValue);
 					break;
 				}
-				case DataType.CDO_ARRAY_TYPE:
+				case FieldType.CDO_ARRAY_TYPE:
 				{
 					cdoResponse.setCDOListValue(strFieldId,(List<CDO>)objValue);
 //					cdoResponse.setCDOArrayValue(strFieldId,(CDO[])objValue);
@@ -940,64 +938,64 @@ public class BigTableEngine
 				{
 					continue;
 				}
-				int nType=objFieldValue.getType().getDataType();
+				int nType=objFieldValue.getFieldType().getType();
 				Object objValue=objFieldValue.getObjectValue();
 
 				String strOutputId=selectField.getOutputId();
 				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
 				switch(nType)
 				{
-					case DataType.BYTE_TYPE:
+					case FieldType.BYTE_TYPE:
 					{
 						cdoRequest.setByteValue(strOutputId,((Byte)objValue).byteValue());
 						break;
 					}
-					case DataType.SHORT_TYPE:
+					case FieldType.SHORT_TYPE:
 					{
 						cdoRequest.setShortValue(strOutputId,((Short)objValue).shortValue());
 						break;
 					}
-					case DataType.INTEGER_TYPE:
+					case FieldType.INTEGER_TYPE:
 					{
 						cdoRequest.setIntegerValue(strOutputId,((Integer)objValue).intValue());
 						break;
 					}
-					case DataType.LONG_TYPE:
+					case FieldType.LONG_TYPE:
 					{
 						cdoRequest.setLongValue(strOutputId,((Long)objValue).longValue());
 						break;
 					}
-					case DataType.FLOAT_TYPE:
+					case FieldType.FLOAT_TYPE:
 					{
 						cdoRequest.setFloatValue(strOutputId,((Float)objValue).floatValue());
 						break;
 					}
-					case DataType.DOUBLE_TYPE:
+					case FieldType.DOUBLE_TYPE:
 					{
 						cdoRequest.setDoubleValue(strOutputId,((Double)objValue).doubleValue());
 						break;
 					}
-					case DataType.STRING_TYPE:
+					case FieldType.STRING_TYPE:
 					{
 						cdoRequest.setStringValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.DATE_TYPE:
+					case FieldType.DATE_TYPE:
 					{
 						cdoRequest.setDateValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.TIME_TYPE:
+					case FieldType.TIME_TYPE:
 					{
 						cdoRequest.setTimeValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.DATETIME_TYPE:
+					case FieldType.DATETIME_TYPE:
 					{
 						cdoRequest.setDateTimeValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.BYTE_ARRAY_TYPE:
+					case FieldType.BYTE_ARRAY_TYPE:
 					{
 						cdoRequest.setByteArrayValue(strOutputId,((byte[])objValue));
 						break;

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.FileField;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.data.cdo.CDO;
 
 public class RPCFile {
@@ -41,7 +41,7 @@ public class RPCFile {
  			for(Iterator<Map.Entry<String,Field>> it=cdo.iterator();it.hasNext();){	   		 
  	   			 Map.Entry<String,Field> entry=it.next();
  	   			 Field objExt=entry.getValue();
- 	   			 if(objExt.getType().getDataType()==DataType.FILE_TYPE){
+ 	   			 if(objExt.getFieldType().getType()==FieldType.FILE_TYPE){
  	   				 File f=((FileField)entry.getValue()).getValue();
  	   				 if(!f.exists() || !f.isFile()){
  	   					 throw new FileNotFoundException("file field:"+entry.getKey()+",value:"+f.getPath()+" is not found");
@@ -69,7 +69,7 @@ public class RPCFile {
   		 while(it.hasNext()){
   			 Map.Entry<String,Field> entry=it.next();
   			 Field objExt=entry.getValue();
-  			 if(objExt.getType().getDataType()==DataType.FILE_TYPE){
+  			 if(objExt.getFieldType().getType()==FieldType.FILE_TYPE){
   				 if(listFile.size()>index){
   					 cdo.setFileValue(entry.getKey(), listFile.get(index));
   					 index++;

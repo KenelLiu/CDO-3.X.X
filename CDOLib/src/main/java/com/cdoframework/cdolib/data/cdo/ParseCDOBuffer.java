@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cdoframework.cdolib.base.DataType;
+import com.cdo.field.FieldType;
 
 public class ParseCDOBuffer extends CDOBuffer {
 	
@@ -73,7 +73,7 @@ public class ParseCDOBuffer extends CDOBuffer {
 	protected  void setCDOValue(CDO cdo,String key,ByteBuffer buffer){	
 		 int dataType=buffer.get();	
 		 buffer.clear();
-		 if(dataType<DataType.BOOLEAN_ARRAY_TYPE){
+		 if(dataType<FieldType.BOOLEAN_ARRAY_TYPE){
 			 //普通类型
 			 setCDOValue(cdo, key, dataType, buffer);
 		 }else{
@@ -84,43 +84,43 @@ public class ParseCDOBuffer extends CDOBuffer {
 	}
 	private  void setCDOValue(CDO cdo,String key,int dataType,ByteBuffer buffer){
 		switch (dataType) {		
-			case DataType.BOOLEAN_TYPE:
+			case FieldType.BOOLEAN_TYPE:
 				  setBooleanValue(cdo, key, buffer);
 				break;
-			case DataType.BYTE_TYPE:
+			case FieldType.BYTE_TYPE:
 				buffer.position(1);
 				byte b=buffer.get();	
 				buffer.clear();
 				cdo.setByteValue(key, b);
 				break;
-			case DataType.SHORT_TYPE:			
+			case FieldType.SHORT_TYPE:			
 				 setShortValue(cdo, key, buffer);
 				break;
-			case DataType.INTEGER_TYPE:
+			case FieldType.INTEGER_TYPE:
 				setIntegerValue(cdo, key, buffer);
 				break;
-			case DataType.LONG_TYPE:
+			case FieldType.LONG_TYPE:
 				setLongValue(cdo, key, buffer);
 				break;
-			case DataType.FLOAT_TYPE:
+			case FieldType.FLOAT_TYPE:
 				setFloatValue(cdo, key, buffer);
 				break;
-			case DataType.DOUBLE_TYPE:
+			case FieldType.DOUBLE_TYPE:
 				setDoubleValue(cdo, key, buffer);
 				break;
-			case DataType.STRING_TYPE:
+			case FieldType.STRING_TYPE:
 				setStringValue(cdo, key, buffer);
 				break;
-			case DataType.DATE_TYPE:
+			case FieldType.DATE_TYPE:
 				setDateValue(cdo, key, buffer);
 				break;
-			case DataType.TIME_TYPE:
+			case FieldType.TIME_TYPE:
 				setTimeValue(cdo, key, buffer);
 				break;	
-			case DataType.DATETIME_TYPE:
+			case FieldType.DATETIME_TYPE:
 				setDateTimeValue(cdo, key, buffer);
 				break;	
-			case DataType.FILE_TYPE:
+			case FieldType.FILE_TYPE:
 				setFileValue(cdo, key, buffer);
 				break;					
 			default:
@@ -132,37 +132,37 @@ public class ParseCDOBuffer extends CDOBuffer {
 	
 	private  void setCDOValueArr(CDO cdo,String key,int dataType,ByteBuffer buffer){
 		switch (dataType) {		
-			case DataType.BOOLEAN_ARRAY_TYPE:
+			case FieldType.BOOLEAN_ARRAY_TYPE:
 				setBooleanArrayValue(cdo, key, buffer);
 				break;
-			case DataType.BYTE_ARRAY_TYPE:
+			case FieldType.BYTE_ARRAY_TYPE:
 				setByteArrayValue(cdo, key, buffer);
 				break;
-			case DataType.SHORT_ARRAY_TYPE:
+			case FieldType.SHORT_ARRAY_TYPE:
 				setShortArrayValue(cdo, key, buffer);
 				break;
-			case DataType.INTEGER_ARRAY_TYPE:
+			case FieldType.INTEGER_ARRAY_TYPE:
 				setIntegerArrayValue(cdo, key, buffer);
 				break;
-			case DataType.LONG_ARRAY_TYPE:
+			case FieldType.LONG_ARRAY_TYPE:
 				setLongArrayValue(cdo, key, buffer);
 				break;
-			case DataType.FLOAT_ARRAY_TYPE:
+			case FieldType.FLOAT_ARRAY_TYPE:
 				setFloatArrayValue(cdo, key, buffer);
 				break;
-			case DataType.DOUBLE_ARRAY_TYPE:
+			case FieldType.DOUBLE_ARRAY_TYPE:
 				setDoubleArrayValue(cdo, key, buffer);
 				break;
-			case DataType.STRING_ARRAY_TYPE:
+			case FieldType.STRING_ARRAY_TYPE:
 				setStringArrayValue(cdo, key, buffer);
 				break;
-			case DataType.DATE_ARRAY_TYPE:
+			case FieldType.DATE_ARRAY_TYPE:
 				setDateArrayValue(cdo, key, buffer);
 				break;
-			case DataType.TIME_ARRAY_TYPE:
+			case FieldType.TIME_ARRAY_TYPE:
 				setTimeArrayValue(cdo, key, buffer);
 				break;	
-			case DataType.DATETIME_ARRAY_TYPE:
+			case FieldType.DATETIME_ARRAY_TYPE:
 				setDateTimeArrayValue(cdo, key, buffer);
 				break;	
 			default:

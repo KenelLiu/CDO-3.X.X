@@ -11,7 +11,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.cdoframework.cdolib.base.Utility;
+
 import com.cdoframework.cdolib.data.cdo.CDO;
 
 /**

@@ -1,16 +1,4 @@
-/**
- * www.cdoforum.com 2007版权所有
-
- * $Header: /CVSData/Frank/CVSROOT/CDOForum/CDOLib/Source/com/cdoframework/cdolib/base/Utility.java,v 1.4 2008/03/12 10:30:58 Frank Exp $
- * 
- * $Log: Utility.java,v $
- * Revision 1.4  2008/03/12 10:30:58  Frank
- * *** empty log message ***
- *
- *
- */
-
-package com.cdoframework.cdolib.base;
+package com.cdoframework.cdolib.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -33,6 +21,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -42,6 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import com.cdo.field.FieldType;
+import com.cdo.pattern.Pattern;
+import com.cdoframework.cdolib.base.Resources;
+import com.cdoframework.cdolib.base.Return;
 
 /*编码规则--------------------------------------------------------------
  1. 所有成员变量的命名必须要反映变量类型和用途
@@ -69,62 +63,6 @@ public class Utility
 	
 	static protected DecimalFormat		decFormat       =new DecimalFormat();
 	private static Logger logger=Logger.getLogger(Utility.class);
-	/**
-	 * 检查是否有相同的字符串
-	 * @param strsString
-	 * @return
-	 */
-	public static boolean hasSameString(String[] strsString)
-	{
-		HashSet<String> hsString=new HashSet<String>();
-		for(int i=0;i<strsString.length;i++)
-		{
-			if(hsString.add(strsString[i])==false)
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
-	/**
-	 * 查找字符串数组中指定字符串的位置
-	 * @param strsString
-	 * @param strValue
-	 * @return 查不到返回-1
-	 */
-	public static int findString(String[] strsString,String strValue)
-	{
-		for(int i=0;i<strsString.length;i++)
-		{
-			if(strsString[i].equals(strValue)==true)
-			{
-				return i;
-			}
-		}		
-		return -1;
-	}
-
-	/**
-	 * 用指定连接字符连接多个字符串
-	 */
-	public static String connectString(char chSeperator,String[] strsString)
-	{
-		StringBuilder strbOutput=new StringBuilder();
-		
-		for(int i=0;i<strsString.length;i++)
-		{
-			if(i>0)
-			{
-				strbOutput.append(chSeperator);
-			}
-			
-			strbOutput.append(strsString[i]);
-		}
-		
-		return strbOutput.toString();
-	}
 	
 	/**
 	 * 使用分隔符将字符串分隔
@@ -954,10 +892,6 @@ public class Utility
 			
 			return strOutput;
 		}
-		else if(Utility.IsInstanceOf(obj,"EZLib.Base.EZDateTime")==true)
-		{//DateTime Format,Format is same as java format
-			return ((DateTime)obj).toString(strFormat);
-		}
 		else
 		{//Unsupported
 			throw new Exception("Unsupported format: "+strFormat);
@@ -992,11 +926,7 @@ public class Utility
 			String[] strsObj=(String[])objArray;
 			obj=strsObj[nIndex];
 		}
-		else if(Utility.IsInstanceOf(objArray,"[LEZLib.Base.EZDateTime")==true)
-		{
-			DateTime[] dtsObj=(DateTime[])objArray;
-			obj=dtsObj[nIndex];
-		}
+		
 		else
 		{
 			throw new Exception("Unsupported array: "+objArray.getClass().getName());
@@ -1115,10 +1045,7 @@ public class Utility
 			
 			return strOutput;
 		}
-		else if(Utility.IsInstanceOf(obj,"EZLib.Base.EZDateTime")==true)
-		{//DateTime Format,Format is same as java format
-			return ((DateTime)obj).toString(strFormat);
-		}
+		
 		else
 		{//Unsupported
 			throw new Exception("Unsupported format: "+strFormat);
@@ -2006,71 +1933,71 @@ public class Utility
 		}
 		switch (nType)
 		{
-			case DataType.STRING_TYPE:
+			case FieldType.STRING_TYPE:
 			{
 				return source.toString();
 			}
-			case DataType.INTEGER_TYPE:
+			case FieldType.INTEGER_TYPE:
 			{
 				return parseIntegerValue(source);
 			}
-			case DataType.LONG_TYPE:
+			case FieldType.LONG_TYPE:
 			{
 				return parseLongValue(source);
 			}
-			case DataType.DATETIME_TYPE:
+			case  FieldType.DATETIME_TYPE:
 			{
 				return parseDateTimeValue(source);
 			}
-			case DataType.DATE_TYPE:
+			case  FieldType.DATE_TYPE:
 			{
 				return parseDateValue(source);
 			}
-			case DataType.TIME_TYPE:
+			case  FieldType.TIME_TYPE:
 			{
 				return parseTimeValue(source);
 			}
-			case DataType.FLOAT_TYPE:
+			case  FieldType.FLOAT_TYPE:
 			{
 				return parseFloatValue(source);
 			}
-			case DataType.DOUBLE_TYPE:
+			case  FieldType.DOUBLE_TYPE:
 			{
 				return parseDoubleValue(source);
 			}
-			case DataType.BOOLEAN_TYPE:
+			case  FieldType.BOOLEAN_TYPE:
 			{
 				return parseBooleanValue(source);
 			}
-			case DataType.BYTE_TYPE:
+			case  FieldType.BYTE_TYPE:
 			{
 				return parseByteValue(source);
 			}
-			case DataType.SHORT_TYPE:
+			case  FieldType.SHORT_TYPE:
 			{
 				return parseShortValue(source);
 			}
-			case DataType.BYTE_ARRAY_TYPE:
+			case  FieldType.BYTE_ARRAY_TYPE:
 			{
 				return parseByteArrayValue(source);
 			}
-			case DataType.INTEGER_ARRAY_TYPE:
+			case  FieldType.INTEGER_ARRAY_TYPE:
 				{
 					return parseIntegerArrayValue(source);
 				}
-			case DataType.LONG_ARRAY_TYPE:
+			case  FieldType.LONG_ARRAY_TYPE:
 				{
 					return parseLongArrayValue(source);
 				}
-			case DataType.BOOLEAN_ARRAY_TYPE:
+			case  FieldType.BOOLEAN_ARRAY_TYPE:
 				{
 					return parseBooleanArrayValue(source);
 				}
-			case DataType.SHORT_ARRAY_TYPE:
+			case  FieldType.SHORT_ARRAY_TYPE:
 				{
 					return parseShortArrayValue(source);
 				}
-			case DataType.STRING_ARRAY_TYPE:
+			case  FieldType.STRING_ARRAY_TYPE:
 				{
 					return parseStringArrayValue(source);
 				}				
@@ -2232,16 +2159,10 @@ public class Utility
 		else if(source instanceof java.util.Date)			
 		{
 			java.util.Date temp = (java.util.Date)source;			
-			return new DateTime(temp.getTime()).toString();
+			SimpleDateFormat sdf=new SimpleDateFormat(Pattern.PATTERN_DATETIME);
+			return sdf.format(temp);
 		}
-		else if(source instanceof DateTime)
-		{
-			return source.toString();
-		}
-		else if(source instanceof Date)
-		{
-			return ((Date)source).toString()+" 00:00:00";
-		}
+		
 		else
 		{
 			throw new RuntimeException("Invalid date format "+source);
@@ -2274,16 +2195,9 @@ public class Utility
 		else if(source instanceof java.util.Date)			
 		{
 			java.util.Date temp = (java.util.Date)source;
-			return new Date(temp.getTime()).toString();
+			SimpleDateFormat sdf=new SimpleDateFormat(Pattern.PATTERN_DATE);
+			return sdf.format(temp);
 		}		
-		else if(source instanceof Date)
-		{
-			return source.toString();
-		}
-		else if(source instanceof DateTime)
-		{
-			return source.toString().substring(0,10);
-		}
 		else
 		{
 			throw new RuntimeException("Invalid date format "+source);
@@ -2312,17 +2226,9 @@ public class Utility
 		else if(source instanceof java.util.Date)			
 		{
 			java.util.Date temp = (java.util.Date)source;
-			DateTime dateTime=new DateTime(temp.getTime());
-			return new Time(dateTime.getHour(),dateTime.getMinute(),dateTime.getSecond()).toString();
+			SimpleDateFormat sdf=new SimpleDateFormat(Pattern.PATTERN_TIME);
+			return sdf.format(temp);
 		}		
-		else if(source instanceof Time)
-		{
-			return source.toString();
-		}
-		else if(source instanceof DateTime)
-		{
-			return source.toString().substring(11);
-		}
 		else
 		{
 			throw new RuntimeException("Invalid date format "+source);

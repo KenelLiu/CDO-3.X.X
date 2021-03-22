@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
-import com.cdoframework.cdolib.base.DataType;
+import com.cdo.field.FieldType;
 import com.cdoframework.cdolib.data.cdo.CDO;
 
 public class BusinessDataEngine extends com.cdoframework.cdolib.database.DataEngine
@@ -29,8 +29,8 @@ public class BusinessDataEngine extends com.cdoframework.cdolib.database.DataEng
 			for (int i = 0; i < alParaName.size(); i++) {
 				Field object = cdoRequest.getObject(alParaName.get(i));
 				Object objValue = object.getObjectValue();
-				int nType = object.getType().getDataType();
-				sb.append(nType==DataType.BYTE_ARRAY_TYPE?new String((byte[]) objValue):objValue);
+				int nType = object.getFieldType().getType();
+				sb.append(nType==FieldType.BYTE_ARRAY_TYPE?new String((byte[]) objValue):objValue);
 				sb.append(',');
 			}
 			sb.append('}');

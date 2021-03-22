@@ -3,26 +3,15 @@ package com.cdo.field.array;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
-import com.cdoframework.cdolib.base.DataType;
-import com.cdoframework.cdolib.base.Utility;
+import com.cdo.field.FieldType;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
- * 重新构造
+ * 定义byte数组字段
  * @author KenelLiu
  *
  */
-public class ByteArrayField extends ArrayFieldImpl
-{
-
-	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
-
-	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-
-	/**
-	 * 
-	 */
+public class ByteArrayField extends ArrayFieldImpl{
 	private static final long serialVersionUID = 1390757657933478538L;
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------	
 	private final int dataIndex=1;//数据保存的起始位置
@@ -90,7 +79,7 @@ public class ByteArrayField extends ArrayFieldImpl
 	private void allocateBuffer(byte[] bsValue){
 		int len=dataIndex+bsValue.length*databuffer;
 		buffer=ByteBuffer.allocate(len);
-		buffer.put((byte)DataType.BYTE_ARRAY_TYPE);		
+		buffer.put((byte)FieldType.BYTE_ARRAY_TYPE);		
 	}
 	
 	private void allocate(byte[] bsValue){
@@ -116,12 +105,8 @@ public class ByteArrayField extends ArrayFieldImpl
 		buffer.put(bsValue);
 		buffer.flip();
 	}	
-	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
-
-	//内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
-
+	
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
-
 	@Override
 	public void toXML(StringBuilder strbXML)
 	{			
@@ -205,32 +190,18 @@ public class ByteArrayField extends ArrayFieldImpl
 		str_JSON.append("],");
 		return str_JSON.toString();
 	}
-	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	//事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	//事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
-
+	
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
-
-	public ByteArrayField(String strName)
-	{
-
+	public ByteArrayField(String strName){
 		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
 		super(strName);
-		setType(Data.BYTE_ARRAY);
-
+		setFieldType(type.BYTE_ARRAY);
 		allocate(new byte[0]);
 	}
 
-	public ByteArrayField(String strName,byte[] bysValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strName);
-		
-		setType(Data.BYTE_ARRAY);
-		
+	public ByteArrayField(String strName,byte[] bysValue){
+		super(strName);		
+		setFieldType(type.BYTE_ARRAY);		
 		if(bysValue==null)
 		{
 			bysValue=new byte[0];
@@ -239,10 +210,8 @@ public class ByteArrayField extends ArrayFieldImpl
 	}
 	
 	public ByteArrayField(String strName,ByteBuffer buffer){
-		super(strName);		
-		
-		setType(Data.BYTE_ARRAY);
-		
+		super(strName);				
+		setFieldType(type.BYTE_ARRAY);
 		this.buffer=buffer;
 	}
 	

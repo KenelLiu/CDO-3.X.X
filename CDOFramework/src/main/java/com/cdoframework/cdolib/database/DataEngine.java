@@ -23,12 +23,11 @@ import com.cdo.field.BooleanField;
 import com.cdo.field.DateField;
 import com.cdo.field.DateTimeField;
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.field.StringField;
 import com.cdo.field.TimeField;
 import com.cdo.field.array.ByteArrayField;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.base.Return;
-import com.cdoframework.cdolib.base.Utility;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
 import com.cdoframework.cdolib.database.xsd.BlockType;
@@ -57,6 +56,7 @@ import com.cdoframework.cdolib.database.xsd.Update;
 import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
  * @author Frank
@@ -402,52 +402,52 @@ public class DataEngine implements IDataEngine
 				String strParaName=anaSQL.alParaName.get(i);
 				Field  object=cdoRequest.getObject(strParaName);
 
-				int nType=object.getType().getDataType();
+				int nType=object.getFieldType().getType();
 				switch(nType)
 				{
-					case DataType.BYTE_TYPE:
-					case DataType.SHORT_TYPE:
-					case DataType.INTEGER_TYPE:
-					case DataType.LONG_TYPE:
-					case DataType.FLOAT_TYPE:
-					case DataType.DOUBLE_TYPE:						
+					case FieldType.BYTE_TYPE:
+					case FieldType.SHORT_TYPE:
+					case FieldType.INTEGER_TYPE:
+					case FieldType.LONG_TYPE:
+					case FieldType.FLOAT_TYPE:
+					case FieldType.DOUBLE_TYPE:						
 					{
 						Object objValue=object.getObjectValue();
 						ps.setObject(i+1,objValue);
 						break;
 					}
-					case DataType.STRING_TYPE:
+					case FieldType.STRING_TYPE:
 					{
 						String strValue=((StringField)object).getValue();
 						strValue=Utility.encodingText(strValue,strSystemCharset,strCharset);
 						ps.setString(i+1,strValue);
 						break;
 					}
-					case DataType.DATETIME_TYPE:
+					case FieldType.DATETIME_TYPE:
 					{
 						long value=((DateTimeField)object).getLongValue();
 						ps.setTimestamp(i+1, new java.sql.Timestamp(value));
 						break;
 					}					
-					case DataType.DATE_TYPE:
+					case FieldType.DATE_TYPE:
 					{						
 						long value=((DateField)object).getLongValue();
 						ps.setDate(i+1, new java.sql.Date(value));
 						break;
 					}
-					case DataType.TIME_TYPE:
+					case FieldType.TIME_TYPE:
 					{
 						long value=((TimeField)object).getLongValue();
 						ps.setTime(i+1, new java.sql.Time(value));
 						break;
 					}
-					case DataType.BOOLEAN_TYPE:
+					case FieldType.BOOLEAN_TYPE:
 					{
 						boolean value=((BooleanField)object).getValue();
 						ps.setBoolean(i+1,value);
 						break;
 					}
-					case DataType.BYTE_ARRAY_TYPE:
+					case FieldType.BYTE_ARRAY_TYPE:
 					{
 						byte[] bytes=((ByteArrayField)object).getValue();
 						ps.setBytes(i+1,bytes);
@@ -1296,64 +1296,64 @@ public class DataEngine implements IDataEngine
 				{
 					continue;
 				}
-				int nType=objFieldValue.getType().getDataType();
+				int nType=objFieldValue.getFieldType().getType();
 				Object objValue=objFieldValue.getObjectValue();
 
 				String strOutputId=selectField.getOutputId();
 				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
 				switch(nType)
 				{
-					case DataType.BYTE_TYPE:
+					case FieldType.BYTE_TYPE:
 					{
 						cdoRequest.setByteValue(selectField.getOutputId(),((Byte)objValue).byteValue());
 						break;
 					}
-					case DataType.SHORT_TYPE:
+					case FieldType.SHORT_TYPE:
 					{
 						cdoRequest.setShortValue(strOutputId,((Short)objValue).shortValue());
 						break;
 					}
-					case DataType.INTEGER_TYPE:
+					case FieldType.INTEGER_TYPE:
 					{
 						cdoRequest.setIntegerValue(strOutputId,((Integer)objValue).intValue());
 						break;
 					}
-					case DataType.LONG_TYPE:
+					case FieldType.LONG_TYPE:
 					{
 						cdoRequest.setLongValue(strOutputId,((Long)objValue).longValue());
 						break;
 					}
-					case DataType.FLOAT_TYPE:
+					case FieldType.FLOAT_TYPE:
 					{
 						cdoRequest.setFloatValue(strOutputId,((Float)objValue).floatValue());
 						break;
 					}
-					case DataType.DOUBLE_TYPE:
+					case FieldType.DOUBLE_TYPE:
 					{
 						cdoRequest.setDoubleValue(strOutputId,((Double)objValue).doubleValue());
 						break;
 					}
-					case DataType.STRING_TYPE:
+					case FieldType.STRING_TYPE:
 					{
 						cdoRequest.setStringValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.DATE_TYPE:
+					case FieldType.DATE_TYPE:
 					{
 						cdoRequest.setDateValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.TIME_TYPE:
+					case FieldType.TIME_TYPE:
 					{
 						cdoRequest.setTimeValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.DATETIME_TYPE:
+					case FieldType.DATETIME_TYPE:
 					{
 						cdoRequest.setDateTimeValue(strOutputId,((String)objValue));
 						break;
 					}
-					case DataType.BYTE_ARRAY_TYPE:
+					case FieldType.BYTE_ARRAY_TYPE:
 					{
 						cdoRequest.setByteArrayValue(strOutputId,((byte[])objValue));
 						break;

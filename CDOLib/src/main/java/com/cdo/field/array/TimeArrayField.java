@@ -4,24 +4,16 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 
-import com.cdoframework.cdolib.base.DataType;
-import com.cdoframework.cdolib.base.Utility;
+import com.cdo.field.FieldType;
 import com.cdoframework.cdolib.data.cdo.DataBufferUtil;
+import com.cdoframework.cdolib.util.Utility;
 
 /**
- * 重新构造
+ * 定义Time数组字段
  * @author KenelLiu
  *
  */
-public class TimeArrayField extends ArrayFieldImpl
-{
-
-	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
-
-	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-
+public class TimeArrayField extends ArrayFieldImpl{
 	private static final long serialVersionUID = -9060053020629106038L;
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 	private final int dataIndex=1;//数据保存的起始位置
@@ -34,10 +26,11 @@ public class TimeArrayField extends ArrayFieldImpl
 			strsValue=new String[0];
 		}
 		long[] lsValue=new long[strsValue.length];
+		SimpleDateFormat sdf=new SimpleDateFormat(PATTERN_TIME);	
 		for(int i=0;i<strsValue.length;i++)
 		{
 			try{
-				lsValue[i]=java.sql.Time.valueOf(strsValue[i]).getTime();
+				lsValue[i]=sdf.parse(strsValue[i]).getTime();
 			}catch(Exception ex){
 				throw new RuntimeException("arr index="+i+",["+strsValue[i]+"] Invalid date or Invalid date format,date format must is "+PATTERN_TIME);
 			}
@@ -136,7 +129,7 @@ public class TimeArrayField extends ArrayFieldImpl
 
 	private void allocate(long[] lsValue){
 
-		buffer=DataBufferUtil.allocate(lsValue.length, DataType.TIME_ARRAY_TYPE, buffer, dataIndex, databuffer);
+		buffer=DataBufferUtil.allocate(lsValue.length, FieldType.TIME_ARRAY_TYPE, buffer, dataIndex, databuffer);
 		//设置起始位置  
 		buffer.position(dataIndex);
 		for(int i=0;i<lsValue.length;i++){
@@ -198,53 +191,28 @@ public class TimeArrayField extends ArrayFieldImpl
 		str_JSON.append("],");
 		return str_JSON.toString();
 	}
-
-	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	//事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	//事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
-
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
-
-	public TimeArrayField(String strFieldName)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.TIME_ARRAY);
-		
+	public TimeArrayField(String strFieldName){
+		super(strFieldName);		
+		setFieldType(type.TIME_ARRAY);		
 		setLongValue(new long[0]);
 	}
 
-	public TimeArrayField(String strFieldName,String[] strsValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.TIME_ARRAY);
-		
+	public TimeArrayField(String strFieldName,String[] strsValue){
+		super(strFieldName);		
+		setFieldType(type.TIME_ARRAY);		
 		setValue(strsValue);
 	}
-	public TimeArrayField(String strFieldName,long[] lsValue)
-	{
-
-		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
-		super(strFieldName);
-		
-		setType(Data.TIME_ARRAY);
-		
+	
+	public TimeArrayField(String strFieldName,long[] lsValue){
+		super(strFieldName);		
+		setFieldType(type.TIME_ARRAY);		
 		setLongValue(lsValue);
 	}
 	
-	 public TimeArrayField(String strFieldName,ByteBuffer buffer)
-	 {
-			super(strFieldName);
-			
-			setType(Data.TIME_ARRAY);
-			
+	public TimeArrayField(String strFieldName,ByteBuffer buffer){
+			super(strFieldName);			
+			setFieldType(type.TIME_ARRAY);			
 			this.buffer=buffer;
 	}
 }
