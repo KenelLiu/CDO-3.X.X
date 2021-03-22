@@ -19,14 +19,9 @@ import java.util.Properties;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.log4j.Logger;
 
-import com.cdo.field.BooleanField;
-import com.cdo.field.DateField;
-import com.cdo.field.DateTimeField;
 import com.cdo.field.Field;
 import com.cdo.field.FieldType;
-import com.cdo.field.StringField;
-import com.cdo.field.TimeField;
-import com.cdo.field.array.ByteArrayField;
+import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
@@ -64,12 +59,12 @@ import com.cdoframework.cdolib.util.Utility;
 public class DataEngine implements IDataEngine
 {
 	private static final Logger log = Logger.getLogger(DataEngine.class);
-	class AnalyzedSQL
+	/**class AnalyzedSQL
 	{
 		public String strSQL;
 		public ArrayList<String> alParaName;
 	}
-
+	*/
 	// 静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	public final int RETURN_SYSTEMERROR=-1;
 
@@ -82,7 +77,7 @@ public class DataEngine implements IDataEngine
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 	protected BasicDataSource ds;   
 	protected String strSystemCharset;
-	private HashMap<String,AnalyzedSQL> hmAnalyzedSQL;
+	//private HashMap<String,AnalyzedSQL> hmAnalyzedSQL;
 
 	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 	protected String strDriver;
@@ -268,14 +263,10 @@ public class DataEngine implements IDataEngine
 
 	/**
 	 * 分析SQL语法 {}之内的为参数名，需要替换成? {{代表{字符 }}代表}字符
-	 */
+	 *
 	protected AnalyzedSQL analyzeSourceSQL(String strSourceSQL)
 	{
-		AnalyzedSQL anaSQL=null;
-		synchronized(hmAnalyzedSQL)
-		{
-			anaSQL=hmAnalyzedSQL.get(strSourceSQL);
-		}
+		AnalyzedSQL anaSQL=hmAnalyzedSQL.get(strSourceSQL);
 		if(anaSQL!=null)
 		{
 			return anaSQL;
@@ -374,10 +365,11 @@ public class DataEngine implements IDataEngine
 
 		return anaSQL;
 	}
-
+	**/
 	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
 	{
-		onSQLStatement(strSourceSQL);
+		return SQLUtil.prepareStatement(conn, strSourceSQL, cdoRequest, strCharset);
+		/**onSQLStatement(strSourceSQL);
 
 		PreparedStatement ps=null;
 
@@ -459,7 +451,6 @@ public class DataEngine implements IDataEngine
 					}
 				}
 			}
-//			logExecutedSql(cdoRequest, anaSQL);
 			onExecuteSQL(anaSQL.strSQL, anaSQL.alParaName, cdoRequest);
 		}
 		catch(SQLException e)
@@ -469,6 +460,7 @@ public class DataEngine implements IDataEngine
 		}
 
 		return ps;
+		**/
 	}
 
 
@@ -641,9 +633,8 @@ public class DataEngine implements IDataEngine
 						bysValue=new byte[stream.available()];
 						stream.read(bysValue);
 					}
-					finally
-					{
-						Utility.closeStream(stream);
+					finally{
+						if(stream!=null)try{stream.close();}catch(Exception ex){}
 					}
 
 					cdoRecord.setByteArrayValue(strFieldName,bysValue);
@@ -665,179 +656,6 @@ public class DataEngine implements IDataEngine
 		return 1;
 	}
 
-//	public Object[] readRecord(ResultSet rs,int[] naFieldType,int[] nsPrecision,int[] nsScale) throws SQLException,IOException
-//	{
-//		Object[] objsRecord=new Object[naFieldType.length];
-//
-//		if(readRecord(rs,naFieldType,nsPrecision,nsScale,objsRecord)==0)
-//		{
-//			return null;
-//		}
-//		
-//		return objsRecord;
-//	}
-
-//	/**
-//	 * 读取当前的记录数据
-//	 * 
-//	 * @param rs
-//	 */
-//	public int readRecord(ResultSet rs,int[] naFieldType,int[] nsPrecision,int[] nsScale,Object[] objsRecord) throws SQLException,IOException
-//	{
-//		if(rs.next()==false)
-//		{
-//			return 0;
-//		}
-//		
-//		for(int i=0;i<naFieldType.length;i++)
-//		{
-//			Object obj=rs.getObject(i);
-//			if(obj==null)
-//			{
-//				continue;
-//			}
-//
-//			int nFieldType=naFieldType[i];
-//			switch(nFieldType)
-//			{
-//				case Types.BIT:
-//				{
-//					byte byValue=rs.getByte(i);
-//					if(byValue==0)
-//					{
-//						obj=new Boolean(false);
-//					}
-//					else
-//					{
-//						obj=new Boolean(true);
-//					}
-//					objsRecord[i]=obj;
-//					
-//					break;
-//				}
-//				case Types.TINYINT:
-//				case Types.SMALLINT:
-//				case Types.INTEGER:
-//				case Types.BIGINT:
-//				{
-//					objsRecord[i]=obj;
-//					break;
-//				}
-//				case Types.REAL:
-//				{
-//					objsRecord[i]=rs.getFloat(i);
-//					break;
-//				}
-//				case Types.DOUBLE:
-//				case Types.FLOAT:
-//				{
-//					objsRecord[i]=rs.getDouble(i);
-//					break;
-//				}
-//				case Types.DECIMAL:
-//				case Types.NUMERIC:
-//				{
-//					if(nsScale[i]==0)
-//					{// 整数
-//						if(nsPrecision[i]<3)
-//						{
-//							objsRecord[i]=rs.getByte(i);
-//						}
-//						else if(nsPrecision[i]<5)
-//						{
-//							objsRecord[i]=rs.getShort(i);
-//						}
-//						else if(nsPrecision[i]<10)
-//						{
-//							objsRecord[i]=rs.getInt(i);
-//						}
-//						else if(nsPrecision[i]<20)
-//						{
-//							objsRecord[i]=rs.getLong(i);
-//						}
-//						else
-//						{
-//							objsRecord[i]=rs.getDouble(i);
-//						}
-//					}
-//					else
-//					{// 小数
-//						objsRecord[i]=rs.getDouble(i);
-//					}
-//					break;
-//				}
-//				case Types.VARCHAR:
-//				case Types.LONGVARCHAR:
-//				case Types.CHAR:
-//				{
-//					String strValue=rs.getString(i);
-//					strValue=Utility.encodingText(strValue,strCharset,strSystemCharset);
-//
-//					objsRecord[i]=strValue;
-//					break;
-//				}
-//				case Types.CLOB:
-//				{
-//					String strValue="";
-//					Clob clobValue=rs.getClob(i);
-//					char[] chsValue=new char[(int)clobValue.length()];
-//					clobValue.getCharacterStream().read(chsValue);
-//					strValue=new String(chsValue);
-//					strValue=Utility.encodingText(strValue,strCharset,strSystemCharset);
-//					objsRecord[i]=strValue.trim();
-//					break;
-//				}
-//				case Types.DATE:
-//				case Types.TIME:
-//				case Types.TIMESTAMP:
-//				{
-//					String strValue="";
-//					DateTime dtValue=new DateTime(rs.getTimestamp(i));
-//					try
-//					{
-//						strValue=dtValue.toString("yyyy-MM-dd HH:mm:ss");
-//					}
-//					catch(Exception e)
-//					{
-//					}
-//					objsRecord[i]=strValue;
-//					break;
-//				}
-//				case Types.BINARY:
-//				case Types.LONGVARBINARY:
-//				{
-//					byte[] bysValue=null;
-//					InputStream stream=null;
-//					try
-//					{
-//						stream=rs.getBinaryStream(i);
-//						bysValue=new byte[stream.available()];
-//						stream.read(bysValue);
-//					}
-//					finally
-//					{
-//						Utility.closeStream(stream);
-//					}
-//
-//					objsRecord[i]=bysValue;
-//					break;
-//				}
-//				case Types.BLOB:
-//				{
-//					byte[] bysValue=null;
-//					Blob blobValue=rs.getBlob(i);
-//					bysValue=blobValue.getBytes(1,(int)blobValue.length());
-//					objsRecord[i]=bysValue;
-//					break;
-//				}
-//				default:
-//					throw new SQLException("Unsupported sql data type "+nFieldType);
-//			}
-//		}
-//		return 1;
-//	}
-
-	
 
 	
 
@@ -1591,11 +1409,12 @@ public class DataEngine implements IDataEngine
 			}
 			ds=null;
 		}
-		
+		SQLUtil.closeAnalyzedSQL();
+		/**
 		synchronized(this.hmAnalyzedSQL)
 		{
 			this.hmAnalyzedSQL.clear();
-		}
+		}**/
 	}
 
 	/**
@@ -2394,7 +2213,7 @@ public class DataEngine implements IDataEngine
 		strPassword="";
 		strSystemCharset=System.getProperty("sun.jnu.encoding");
 
-		hmAnalyzedSQL	=new HashMap<String,AnalyzedSQL>(100);
+		//hmAnalyzedSQL	=new HashMap<String,AnalyzedSQL>(100);
 	}
 	
 }

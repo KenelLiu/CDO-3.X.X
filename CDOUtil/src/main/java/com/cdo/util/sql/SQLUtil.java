@@ -14,6 +14,14 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cdo.field.BooleanField;
+import com.cdo.field.DateField;
+import com.cdo.field.DateTimeField;
+import com.cdo.field.Field;
+import com.cdo.field.FieldType;
+import com.cdo.field.StringField;
+import com.cdo.field.TimeField;
+import com.cdo.field.array.ByteArrayField;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.util.Utility;
 public class SQLUtil {
@@ -63,6 +71,9 @@ public class SQLUtil {
 			try{conn.close();}catch(Exception e){}
 		}	
 		
+		public static void closeAnalyzedSQL(){
+			Analyzed.hmAnalyzedSQL.clear();
+		}
 
 		/**
 		 * 读取数据放入  cdoField中
@@ -284,7 +295,6 @@ public class SQLUtil {
 						{
 							java.sql.Timestamp temp=rs.getTimestamp(i+1);
 							if(temp!=null){
-								//String strValue="";
 								//java.util.Date dtValue=new java.util.Date(temp.getTime());
 								//strValue=dtValue.toString("yyyy-MM-dd HH:mm:ss");
 								cdoRecord.setDateTimeValue(strFieldName,temp.getTime());	
@@ -307,12 +317,9 @@ public class SQLUtil {
 							stream=rs.getBinaryStream(i+1);
 							bysValue=new byte[stream.available()];
 							stream.read(bysValue);
+						}finally{							
+							if(stream!=null){try{stream.close();}catch(Exception e){}}
 						}
-						finally
-						{
-							Utility.closeStream(stream);
-						}
-
 						cdoRecord.setByteArrayValue(strFieldName,bysValue);
 						break;
 					}
@@ -331,8 +338,115 @@ public class SQLUtil {
 			}
 			return 1;
 		}
-		
-	
+		/**
+		 * 
+		 * @param ps 不能为null
+		 * @param strSourceSQL 含{} 变量的字符SQL
+		 * @param cdoRequest
+		 * @param strCharset
+		 * @return
+		 * @throws SQLException
+		 */
+		public static PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest,String strCharset) throws SQLException{
+			
+			Analyzed.onSQLStatement(strSourceSQL);
+
+			PreparedStatement ps=null;
+
+			// 分析原始SQL语句，得到其中的变量
+			AnalyzedSQL anaSQL=Analyzed.analyzeSourceSQL(strSourceSQL);
+			if(anaSQL==null)
+			{
+				throw new SQLException("Analyze source SQL exception: "+strSourceSQL);
+			}
+
+			// 准备JDBC语句
+			try
+			{
+				if(ps==null)
+				{
+					ps=conn.prepareStatement(anaSQL.strSQL);
+				}
+
+				int nParaCount=anaSQL.alParaName.size();
+				for(int i=0;i<nParaCount;i++)
+				{
+					String strParaName=anaSQL.alParaName.get(i);
+					Field  object=cdoRequest.getObject(strParaName);
+
+					int nType=object.getFieldType().getType();
+					switch(nType)
+					{
+						case FieldType.BYTE_TYPE:
+						case FieldType.SHORT_TYPE:
+						case FieldType.INTEGER_TYPE:
+						case FieldType.LONG_TYPE:
+						case FieldType.FLOAT_TYPE:
+						case FieldType.DOUBLE_TYPE:						
+						{
+							Object objValue=object.getObjectValue();
+							ps.setObject(i+1,objValue);
+							break;
+						}
+						case FieldType.STRING_TYPE:
+						{
+							String strValue=((StringField)object).getValue();
+							strValue=Utility.encodingText(strValue,strSystemCharset,strCharset);
+							ps.setString(i+1,strValue);
+							break;
+						}
+						case FieldType.DATETIME_TYPE:
+						{
+							long value=((DateTimeField)object).getLongValue();
+							ps.setTimestamp(i+1, new java.sql.Timestamp(value));
+							break;
+						}					
+						case FieldType.DATE_TYPE:
+						{						
+							long value=((DateField)object).getLongValue();
+							ps.setDate(i+1, new java.sql.Date(value));
+							break;
+						}
+						case FieldType.TIME_TYPE:
+						{
+							long value=((TimeField)object).getLongValue();
+							ps.setTime(i+1, new java.sql.Time(value));
+							break;
+						}
+						case FieldType.BOOLEAN_TYPE:
+						{
+							boolean value=((BooleanField)object).getValue();
+							ps.setBoolean(i+1,value);
+							break;
+						}
+						case FieldType.BYTE_ARRAY_TYPE:
+						{
+							byte[] bytes=((ByteArrayField)object).getValue();
+							ps.setBytes(i+1,bytes);
+							break;
+						}
+						default:
+						{
+							throw new SQLException("SQL Unsupported type's object ["+object+"],type="+nType+",key="+strParaName);
+						}
+					}
+				}
+				Analyzed.onExecuteSQL(anaSQL.strSQL, anaSQL.alParaName, cdoRequest);
+			}
+			catch(SQLException e)
+			{
+				closeStatement(ps);
+				throw e;
+			}
+			return ps;						
+		}		
+	/**
+	 * 	
+	 * @param pst 不能为null
+	 * @param _params 参数值对象
+	 * @return
+	 * @throws SQLException
+	 */
 	public static  PreparedStatement getPreparedStatement(PreparedStatement pst, List<Object> _params) throws SQLException {			
 			if (_params != null) {
 				for (int i = 1; i <= _params.size(); i++) {
