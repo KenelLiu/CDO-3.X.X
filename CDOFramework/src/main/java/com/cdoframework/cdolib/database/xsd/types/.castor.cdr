@@ -1,0 +1,7 @@
+#Wed Apr 17 10:55:19 CST 2019
+com.cdoframework.cdolib.database.xsd.types.IfOperatorType=com.cdoframework.cdolib.database.xsd.types.descriptors.IfOperatorTypeDescriptor
+com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType=com.cdoframework.cdolib.database.xsd.types.descriptors.SQLTransTransFlagTypeDescriptor
+com.cdoframework.cdolib.database.xsd.types.IfTypeType=com.cdoframework.cdolib.database.xsd.types.descriptors.IfTypeTypeDescriptor
+com.cdoframework.cdolib.database.xsd.types.SetVarTypeType=com.cdoframework.cdolib.database.xsd.types.descriptors.SetVarTypeTypeDescriptor
+com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType=com.cdoframework.cdolib.database.xsd.types.descriptors.SQLIfTypeTypeDescriptor
+com.cdoframework.cdolib.database.xsd.types.SQLIfOperatorType=com.cdoframework.cdolib.database.xsd.types.descriptors.SQLIfOperatorTypeDescriptor
