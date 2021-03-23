@@ -15,17 +15,31 @@ import com.cdoframework.cdolib.data.cdo.CDO;
 public class Analyzed {
 
 	private static Logger logger=Logger.getLogger(Analyzed.class);
-	static Map<String,AnalyzedSQL> hmAnalyzedSQL=new HashMap<String,AnalyzedSQL>();
+	Map<String,AnalyzedSQL> hmAnalyzedSQL=new HashMap<String,AnalyzedSQL>();
 	
-	static  AnalyzedSQL analyzeSourceSQL(String strSourceSQL)
-	{
+	//============内部类,简单定义一个结构=========//
+	class AnalyzedSQL {
+		String strSQL;
+		ArrayList<String> alParaName;
+	}
+	
+	final static Analyzed instance=new Analyzed();
+	
+	private Analyzed(){
+		
+	}
+	
+	public static Analyzed getInstance(){
+		return instance;
+	}
+	 
+	AnalyzedSQL analyzeSourceSQL(String strSourceSQL){
 		AnalyzedSQL anaSQL=hmAnalyzedSQL.get(strSourceSQL);		
 		if(anaSQL!=null){
 			return anaSQL;
 		}
-
+	
 		ArrayList<String> alParaName=new ArrayList<String>();
-
 		StringBuilder strbSQL=new StringBuilder();
 
 		int nState=0;// 0 : {} 之外的字符, 1: {}之内字符.

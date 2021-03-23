@@ -58,13 +58,7 @@ import com.cdoframework.cdolib.util.Utility;
  */
 public class DataEngine implements IDataEngine
 {
-	private static final Logger log = Logger.getLogger(DataEngine.class);
-	/**class AnalyzedSQL
-	{
-		public String strSQL;
-		public ArrayList<String> alParaName;
-	}
-	*/
+	
 	// 静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	public final int RETURN_SYSTEMERROR=-1;
 
@@ -77,7 +71,6 @@ public class DataEngine implements IDataEngine
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 	protected BasicDataSource ds;   
 	protected String strSystemCharset;
-	//private HashMap<String,AnalyzedSQL> hmAnalyzedSQL;
 
 	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 	protected String strDriver;
@@ -236,12 +229,9 @@ public class DataEngine implements IDataEngine
 	
 	public boolean isOpened()
 	{
-		if(ds==null)
-		{
+		if(ds==null){
 			return false;
-		}
-		else
-		{
+		}else{
 			return true;
 		}
 	}
@@ -261,111 +251,7 @@ public class DataEngine implements IDataEngine
 		}
 	}
 
-	/**
-	 * 分析SQL语法 {}之内的为参数名，需要替换成? {{代表{字符 }}代表}字符
-	 *
-	protected AnalyzedSQL analyzeSourceSQL(String strSourceSQL)
-	{
-		AnalyzedSQL anaSQL=hmAnalyzedSQL.get(strSourceSQL);
-		if(anaSQL!=null)
-		{
-			return anaSQL;
-		}
-
-		ArrayList<String> alParaName=new ArrayList<String>();
-
-		StringBuilder strbSQL=new StringBuilder();
-
-		int nState=0;// 0 : {} 之外的字符, 1: {}之内字符.
-		int nLength=strSourceSQL.length();
-
-		StringBuilder strbParaName=new StringBuilder(nLength);
-		int i=0;
-		while(i<nLength)
-		{
-			char ch=strSourceSQL.charAt(i);
-			switch(ch)
-			{
-				case '{':
-					if(nState==0)
-					{// 在{}之外
-						if(i+1<nLength&&strSourceSQL.charAt(i+1)=='{')
-						{// 为普通字符
-							strbSQL.append("{");
-							i+=2;
-						}
-						else
-						{// 字段开始
-							nState=1;
-							i++;
-						}
-					}
-					else
-					{// 在{}之内，语法错误
-						callOnException("analyzeSQL error",new Exception("SQL syntax Error: "+strSourceSQL));
-						return null;
-					}
-					break;
-				case '}':
-					if(nState==0)
-					{// 在{}之外
-						if(i+1<nLength&&strSourceSQL.charAt(i+1)=='}')
-						{// 为普通字符
-							strbSQL.append("}");
-							i++;
-						}
-						else
-						{// 语法错误
-							callOnException("analyzeSQL error",new Exception("SQL syntax Error: "+strSourceSQL));
-							return null;
-						}
-					}
-					else
-					{// 在{}之内，字段结束
-						if(strbParaName.length()==0)
-						{
-							callOnException("analyzeSQL error",new Exception("SQL syntax Error: "+strSourceSQL));
-							return null;
-						}
-						nState=0;
-						strbSQL.append("?");
-						alParaName.add(strbParaName.toString());
-						strbParaName.setLength(0);
-					}
-					i++;
-					break;
-				default:
-					if(nState==0)
-					{// 在{}之外
-						strbSQL.append(ch);
-					}
-					else
-					{
-						strbParaName.append(ch);
-					}
-					i++;
-					break;
-			}
-		}
-
-		if(nState==1)
-		{
-			callOnException("analyzeSQL error",new Exception("SQL syntax Error: "+strSourceSQL));
-			return null;
-		}
-
-		anaSQL=new AnalyzedSQL();
-		anaSQL.strSQL=strbSQL.toString();
-		anaSQL.alParaName=alParaName;
-
-		synchronized(hmAnalyzedSQL)
-		{
-			hmAnalyzedSQL.put(strSourceSQL,anaSQL);
-		}
-
-		return anaSQL;
-	}
-	**/
+	
 	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
 	{
 		return SQLUtil.prepareStatement(conn, strSourceSQL, cdoRequest, strCharset);

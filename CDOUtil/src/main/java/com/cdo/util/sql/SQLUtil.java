@@ -22,13 +22,13 @@ import com.cdo.field.FieldType;
 import com.cdo.field.StringField;
 import com.cdo.field.TimeField;
 import com.cdo.field.array.ByteArrayField;
+import com.cdo.util.sql.Analyzed.AnalyzedSQL;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.util.Utility;
 public class SQLUtil {
 		private static String strSystemCharset=System.getProperty("sun.jnu.encoding");
 		/**
 		 * 关闭结果集
-		 * 
 		 * @param rs
 		 */
 		public static void closeResultSet(ResultSet rs){
@@ -38,31 +38,25 @@ public class SQLUtil {
 		}
 
 		/**
-		 * 关闭Statement
-		 * 
-		 * @param stat
+		 * 关闭PreparedStatement
+		 * @param psmt
 		 */
-		public  static void closePreparedStatement(PreparedStatement stat){
-			if(stat==null)
+		public  static void closePreparedStatement(PreparedStatement psmt){
+			if(psmt==null)
 				return;
-
-			try{stat.close();}catch(Exception e){}
-		}
-		
+			try{psmt.close();}catch(Exception e){}
+		}		
 		/**
-		 * 关闭Statement
-		 * 
+		 * 关闭stmt 
 		 * @param stat
 		 */
-		public static void closeStatement(Statement stat){
-			if(stat==null)
+		public static void closeStatement(Statement stmt){
+			if(stmt==null)
 				return;
-
-			try{stat.close();}catch(Exception e){}
+			try{stmt.close();}catch(Exception e){}
 		}
 		/**
 		 * 关闭Connection
-		 * 
 		 * @param conn
 		 */
 		public static void closeConnection(Connection conn){
@@ -70,16 +64,18 @@ public class SQLUtil {
 				return;
 			try{conn.close();}catch(Exception e){}
 		}	
-		
+		/**
+		 * 数据库连接池关闭时,清理分析SQL的缓存
+		 */
 		public static void closeAnalyzedSQL(){
-			Analyzed.hmAnalyzedSQL.clear();
+			Analyzed.getInstance().hmAnalyzedSQL.clear();
 		}
 
 		/**
-		 * 读取数据放入  cdoField中
+		 * 读取rs一条数据 读取放入到cdoField中
 		 * @param rs
 		 * @param cdoResponse
-		 * @param strCharset
+		 * @param strDBCharset
 		 * @throws SQLException
 		 * @throws IOException
 		 */
@@ -102,10 +98,10 @@ public class SQLUtil {
 		
 		}
 		/**
-		 * 
+		 * 读取rs所有数据 放入到cdoResponse中,其中key=cdosKey
 		 * @param rs
 		 * @param cdoResponse 放入cdo数组
-		 * @param cdosKey
+		 * @param cdosKey 
 		 * @param strDBCharset
 		 * @throws SQLException
 		 * @throws IOException
@@ -126,15 +122,12 @@ public class SQLUtil {
 				nsPrecision[i]=meta.getPrecision(i+1);
 				nsScale[i]=meta.getScale(i+1);
 			}
-
 			// 读取记录
 			ArrayList<CDO> alRecord=new ArrayList<CDO>();
-			while(true)
-			{
+			while(true){
 				// 读取记录信息
 				CDO cdoRecord=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale,strDBCharset);
-				if(cdoRecord==null)
-				{
+				if(cdoRecord==null){
 					break;
 				}
 				alRecord.add(cdoRecord);
@@ -156,49 +149,36 @@ public class SQLUtil {
 		private  static CDO readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,String strCharset) throws SQLException,IOException
 		{
 			CDO cdoRecord=new CDO();
-
-			if(readRecord(rs,strsFieldName,naFieldType,nsPrecision,nsScale,cdoRecord,strCharset)==0)
-			{
+			if(readRecord(rs,strsFieldName,naFieldType,nsPrecision,nsScale,cdoRecord,strCharset)==0){
 				return null;
-			}
-			
+			}			
 			return cdoRecord;
 		}	
 		
 		private static int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord,String strCharset) throws SQLException,IOException
 		{
-			if(rs.next()==false)
-			{
+			if(rs.next()==false){
 				return 0;
-			}
-			
-			for(int i=0;i<strsFieldName.length;i++)
-			{
-				String strFieldName=strsFieldName[i];
-				
-				try
-				{
-					if(rs.getObject(i+1)==null)
-					{
+			}			
+			for(int i=0;i<strsFieldName.length;i++){
+				String strFieldName=strsFieldName[i];				
+				try{
+					if(rs.getObject(i+1)==null){
 						continue;
 					}
-				}catch(Exception e)
-				{//已反序列化对象,getObject应该是绝对安全的,不应该有异常,但有的driver处理空时会抛出异常,此处做兼容性处理,不需要抛出异常
+				}catch(Exception e){
+					//已反序列化对象,getObject应该是绝对安全的,不应该有异常,但有的driver处理空时会抛出异常,此处做兼容性处理,不需要抛出异常
 					continue;				
 				}
 
 				int nFieldType=naFieldType[i];
-				switch(nFieldType)
-				{
+				switch(nFieldType){
 					case Types.BIT:
 					{
 						byte byValue=rs.getByte(i+1);
-						if(byValue==0)
-						{
+						if(byValue==0){
 							cdoRecord.setBooleanValue(strFieldName,false);
-						}
-						else
-						{
+						}else{
 							cdoRecord.setBooleanValue(strFieldName,true);
 						}
 						break;
@@ -291,19 +271,8 @@ public class SQLUtil {
 					case Types.TIME:
 					case Types.TIMESTAMP:
 					{
-						try
-						{
-							java.sql.Timestamp temp=rs.getTimestamp(i+1);
-							if(temp!=null){
-								//java.util.Date dtValue=new java.util.Date(temp.getTime());
-								//strValue=dtValue.toString("yyyy-MM-dd HH:mm:ss");
-								cdoRecord.setDateTimeValue(strFieldName,temp.getTime());	
-							}					
-						}
-						catch(Exception e)
-						{						
-						}
-						
+						java.sql.Timestamp temp=rs.getTimestamp(i+1);
+						cdoRecord.setDateTimeValue(strFieldName,temp.getTime());						
 						break;
 					}
 					case Types.BINARY:
@@ -340,7 +309,7 @@ public class SQLUtil {
 		}
 		/**
 		 * 
-		 * @param ps 不能为null
+		 * @param conn 不能为null
 		 * @param strSourceSQL 含{} 变量的字符SQL
 		 * @param cdoRequest
 		 * @param strCharset
@@ -354,20 +323,16 @@ public class SQLUtil {
 			PreparedStatement ps=null;
 
 			// 分析原始SQL语句，得到其中的变量
-			AnalyzedSQL anaSQL=Analyzed.analyzeSourceSQL(strSourceSQL);
+			AnalyzedSQL anaSQL=Analyzed.getInstance().analyzeSourceSQL(strSourceSQL);
 			if(anaSQL==null)
 			{
 				throw new SQLException("Analyze source SQL exception: "+strSourceSQL);
 			}
-
 			// 准备JDBC语句
 			try
 			{
-				if(ps==null)
-				{
-					ps=conn.prepareStatement(anaSQL.strSQL);
-				}
-
+				ps=conn.prepareStatement(anaSQL.strSQL);
+				
 				int nParaCount=anaSQL.alParaName.size();
 				for(int i=0;i<nParaCount;i++)
 				{
@@ -439,7 +404,7 @@ public class SQLUtil {
 				throw e;
 			}
 			return ps;						
-		}		
+		}				
 	/**
 	 * 	
 	 * @param pst 不能为null
