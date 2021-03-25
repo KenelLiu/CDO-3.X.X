@@ -55,6 +55,15 @@ public class CalendarUtil {
 	      cale.set(Calendar.DAY_OF_MONTH, 0);    	      
 	      return format.format(cale.getTime()); 
 	}
+	
+	public static void main(String[] args){
+		try {
+			System.out.println(getLastDay("2021-03-01",-1,"yyyy-MM-dd"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * 当前日期 +year后的日期
 	 * @param strDate 日期

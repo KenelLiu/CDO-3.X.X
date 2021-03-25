@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.cdo.field.FieldType;
 import com.cdoframework.cdolib.data.cdo.CDO;
 
 /**
@@ -151,7 +153,7 @@ public class JsonUtil {
 		return CDOArr;
 	}
 	/**
-	 * CDO数组转换成json 数组
+	 * CDO数组转换成json 数组字符
 	 * @param cdos
 	 * @return
 	 */
@@ -170,6 +172,226 @@ public class JsonUtil {
 		buf.append("]");
 		return buf.toString();
 	}
+	/**
+	 * CDO数组转换成JSONArray数组
+	 * @param dataList
+	 * @return
+	 */
+	public static JSONArray CDOArray2JSONArray(CDO[] dataList){
+		JSONArray arr=new JSONArray();
+		if(dataList==null)
+			return arr;
+		for(int i=0;i<dataList.length;i++){
+			CDO data=dataList[i];	
+			JSONObject json=new JSONObject();
+			for(Iterator<Map.Entry<String,com.cdo.field.Field>> it=data.iterator();it.hasNext();){
+					String field=it.next().getKey();
+					CDO2JSON(field, json, data);
+			 }
+			 arr.put(json);
+		}
+		return  arr;
+	}
+	/**
+	 * 把CDO数组转换成JSONArray数组
+	 * @param fields 仅换化指定字段
+	 * @param dataList
+	 * @return
+	 */
+	public static JSONArray CDOArray2JSONArray(String[] fields,CDO[] dataList){
+		JSONArray arr=new JSONArray();
+		if(fields==null || dataList==null)
+			return arr;	
+		for(int i=0;i<dataList.length;i++){
+			CDO data=dataList[i];				
+			JSONObject json=new JSONObject();
+			for(int k=0;k<fields.length;k++){
+				String field=fields[k];
+				if(field==null)
+					continue;
+				if(data.exists(field)){
+					CDO2JSON(field, json, data);
+				}
+			}
+			 arr.put(json);
+		}
+		return  arr;
+	}
+	/**
+	 * 将CDO转换成JSONObject
+	 * @param fields 仅换化指定字段
+	 * @param cdoData
+	 * @return
+	 */
+	public static JSONObject CDO2JSONObject(String[] fields,CDO cdoData){
+		JSONObject json=new JSONObject();
+		if(cdoData==null)
+			return json;
+		if(fields==null)
+			return json;
+		for(int i=0;i<fields.length;i++){
+			if(fields[i]==null) continue;
+			if(cdoData.exists(fields[i])){
+				CDO2JSON(fields[i], json, cdoData);
+			}
+		}
+		return  json;
+	}
+	/**
+	 * 将CDO转换成JSONObject
+	 * @param cdoData
+	 * @return
+	 */
+	public static JSONObject CDO2JSONObject(CDO cdoData){		
+		JSONObject json=new JSONObject();
+		if(cdoData==null)
+			return json;
+		for(Iterator<Map.Entry<String,com.cdo.field.Field>> it=cdoData.iterator();it.hasNext();){
+			String field=it.next().getKey();
+			CDO2JSON(field, json, cdoData);
+	    }
+		return  json;
+	}
+	
+	static void CDO2JSON(String field,JSONObject json,CDO data){
+		byte type=data.getField(field).getFieldType().getType();
+		switch(type){
+			case FieldType.BOOLEAN_TYPE: 
+				json.put(field, data.getBooleanValue(field));
+				break;
+			case FieldType.BYTE_TYPE:	
+			case FieldType.SHORT_TYPE:
+			case FieldType.INTEGER_TYPE:
+			case FieldType.LONG_TYPE:	
+				json.put(field, data.getLongValue(field));
+				break;
+			case FieldType.FLOAT_TYPE: 
+				json.put(field, data.getFloatValue(field));
+				break;		
+			case FieldType.STRING_TYPE: 
+				json.put(field, data.getStringValue(field));
+				break;	
+			case FieldType.DATE_TYPE: 
+				json.put(field, data.getDateValue(field));
+				break;	
+			case FieldType.TIME_TYPE: 
+				json.put(field, data.getTimeValue(field));
+				break;	
+			case FieldType.DATETIME_TYPE: 
+				json.put(field, data.getDateTimeValue(field));
+				break;								
+			case FieldType.BOOLEAN_ARRAY_TYPE: 
+				JSONArray arr1=new JSONArray();
+				boolean[] vals1=data.getBooleanArrayValue(field);
+				for(int m=0;m<vals1.length;m++){
+					arr1.put(vals1[m]);
+				}
+				json.put(field,arr1);
+				break;
+			case FieldType.BYTE_ARRAY_TYPE:
+				arr1=new JSONArray();
+				byte[] vals2=data.getByteArrayValue(field);
+				for(int m=0;m<vals2.length;m++){
+					arr1.put(vals2[m]);
+				}
+				json.put(field,arr1);							
+				break;
+			case FieldType.SHORT_ARRAY_TYPE:
+				arr1=new JSONArray();
+				short[] vals3=data.getShortArrayValue(field);
+				for(int m=0;m<vals3.length;m++){
+					arr1.put(vals3[m]);
+				}
+				json.put(field,arr1);							
+				break;
+			case FieldType.INTEGER_ARRAY_TYPE:
+				arr1=new JSONArray();
+				int[] vals4=data.getIntegerArrayValue(field);
+				for(int m=0;m<vals4.length;m++){
+					arr1.put(vals4[m]);
+				}
+				json.put(field,arr1);							
+				break;							
+			case FieldType.LONG_ARRAY_TYPE:	
+				arr1=new JSONArray();
+				long[] vals5=data.getLongArrayValue(field);
+				for(int m=0;m<vals5.length;m++){
+					arr1.put(vals5[m]);
+				}
+				json.put(field,arr1);
+			case FieldType.FLOAT_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				float[] vals6=data.getFloatArrayValue(field);
+				for(int m=0;m<vals6.length;m++){
+					arr1.put(vals6[m]);
+				}
+				json.put(field,arr1);
+				break;
+			case FieldType.DOUBLE_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				double[] vals7=data.getDoubleArrayValue(field);
+				for(int m=0;m<vals7.length;m++){
+					arr1.put(vals7[m]);
+				}
+				json.put(field,arr1);
+				break;							
+			case FieldType.STRING_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				String[] vals8=data.getStringArrayValue(field);
+				for(int m=0;m<vals8.length;m++){
+					arr1.put(vals8[m]);
+				}
+				json.put(field,arr1);
+				break;	
+			case FieldType.DATE_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				String[] vals9=data.getDateArrayValue(field);
+				for(int m=0;m<vals9.length;m++){
+					arr1.put(vals9[m]);
+				}
+				json.put(field,arr1);
+				break;	
+			case FieldType.TIME_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				String[] vals10=data.getTimeArrayValue(field);
+				for(int m=0;m<vals10.length;m++){
+					arr1.put(vals10[m]);
+				}
+				json.put(field,arr1);
+				break;	
+			case FieldType.DATETIME_ARRAY_TYPE: 
+				arr1=new JSONArray();
+				String[] vals11=data.getDateTimeArrayValue(field);
+				for(int m=0;m<vals11.length;m++){
+					arr1.put(vals11[m]);
+				}
+				json.put(field,arr1);
+				break;	
+			case FieldType.CDO_TYPE:
+				CDO tmpCDO=data.getCDOValue(field);
+				JSONObject tmpJSON=new JSONObject();
+				for(Iterator<Map.Entry<String,com.cdo.field.Field>> it=tmpCDO.iterator();it.hasNext();){
+					String tmpField=it.next().getKey();
+					CDO2JSON(tmpField, tmpJSON, tmpCDO);
+				}
+				json.put(field,tmpJSON);
+				break;
+			case FieldType.CDO_ARRAY_TYPE:	
+				CDO[] cdoList=data.getCDOArrayValue(field);
+				JSONArray tmpArr=new JSONArray();
+				for(int k=0;k<cdoList.length;k++){
+					 tmpCDO=cdoList[k];
+					 tmpJSON=new JSONObject();
+					 for(Iterator<Map.Entry<String,com.cdo.field.Field>> it=tmpCDO.iterator();it.hasNext();){
+							String tmpField=it.next().getKey();
+							CDO2JSON(tmpField, tmpJSON, tmpCDO);
+					 }
+					 tmpArr.put(tmpJSON);					 
+				}
+				json.put(field,tmpArr);
+				break;				
+		}
+	 }
 	/**
 	 * 
 	 * @param strJSON
