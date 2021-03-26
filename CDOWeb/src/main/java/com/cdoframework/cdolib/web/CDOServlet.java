@@ -32,15 +32,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.cdo.business.BusinessService;
+import com.cdo.field.Field;
+import com.cdo.field.FieldType;
+import com.cdo.field.FileField;
 import com.cdo.util.constants.Constants;
 import com.cdo.util.serial.Serializable;
-import com.cdoframework.cdolib.base.DataType;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.data.cdo.Field;
-import com.cdoframework.cdolib.data.cdo.FileField;
 import com.cdoframework.cdolib.servicebus.IServiceBus;
-//import com.cdoframework.cdolib.servicebus.ITransService;
 /**
  * 
  * @author KenelLiu
@@ -194,9 +193,9 @@ public  class CDOServlet extends HttpServlet
 	    		 Iterator<Map.Entry<String,Field>> it=cdoResponse.entrySet().iterator();    		 
 	    		 while(it.hasNext()){
 	    			 Map.Entry<String,Field> entry=it.next();
-	    			 Field objExt=entry.getValue();
-	    			 if(objExt.getType().getDataType()==DataType.FILE_TYPE){  
-	    				 FileField f=(FileField)objExt;
+	    			 Field field=entry.getValue();
+	    			 if(field.getFieldType().getType()==FieldType.FILE_TYPE){  
+	    				 FileField f=(FileField)field;
 	    				 sbFieldName.append(","+entry.getKey());
 	    				 sbLength.append(","+f.getValue().length());
 	    				 sbFileName.append(","+f.getValue().getName());
