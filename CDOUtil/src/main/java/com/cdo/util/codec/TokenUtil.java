@@ -2,6 +2,7 @@ package com.cdo.util.codec;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.AlgorithmParameterGenerator;
+import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.concurrent.TimeoutException;
@@ -93,7 +94,7 @@ public class TokenUtil {
         RSAPrivateKey priKey = (RSAPrivateKey) keyPair.getPrivate();
         System.out.println(" priKey:"+priKey);
         System.out.println(" pubKey:"+pubKey);
-        **/
+        **/       
     	//--------RSA 算法------------------//
     	
     	String apiKey = "LTMXW2OkF0XG5Qx2TlKWIA;"+System.currentTimeMillis();
@@ -113,28 +114,18 @@ public class TokenUtil {
 	    	System.err.println("RSA 加解密时间:\t" + (System.currentTimeMillis()-start));
 	    	System.err.println("\r\n");
     	}
-    	
-     	//---------AES 算法----------//
-//    	byte[] AES_Key=AES.initKey();	
-    	byte[] AES_Key=Base64.decodeBase64("mKG9N3J40uC0eWoEOEfqyw==");
-    	System.err.println("ASE 密钥:\t" + Base64.encodeBase64String(AES_Key));    	    	
-    	for(int i=0;i<3;i++){      		
-	    	start=System.currentTimeMillis();      	
-			encode=genAESEncrypt(apiKey,AES_Key);
-			String base64Str=Base64.encodeBase64URLSafeString(encode.getBytes());			
-			System.out.println("AES BASE64URL 加密后:\t"+base64Str+",length="+base64Str.length());
-			System.out.println("AES 加密时间:\t" + (System.currentTimeMillis()-start));
-			
-			start=System.currentTimeMillis();  
-			base64Str=new String(Base64.decodeBase64(base64Str));
-			decode=genAESDecrypt(base64Str,AES_Key);			
-			System.out.println("AES BASE64URL 解密后:\t" + decode);		
-			System.out.println("AES 解密时间:\t" + (System.currentTimeMillis()-start));
-			System.out.println("\r\n");
-    	}	
-//    	AlgorithmParameterGenerator alg=AlgorithmParameterGenerator.getInstance("AES");
-//    	alg.init(56);
-//    	System.out.println(new BigInteger(alg.generateParameters().getEncoded()).toString());
+    	//============sun rsa===========//
+    	 KeyPair keyPair = RSA.generateKeyPair();      
+         String publicKey=RSA.getPublicKey(keyPair);
+         String privateKey=RSA.getPrivateKey(keyPair);
+         System.out.println(" priKey:"+privateKey);
+         System.out.println(" pubKey:"+publicKey);
+         String str="code_crc";
+         
+         String encodedData=RSA.encryptBASE64(RSA.encryptByPrivateKey(str.getBytes(), privateKey));
+         System.out.println(" encodedData:"+encodedData);        
+         String decodedData=new String(RSA.decryptByPublicKey(RSA.decryptBASE64(encodedData), publicKey));
+         System.out.println(" decodedData:"+decodedData);
 		
     }
 }
