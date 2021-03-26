@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.json.JSONException;
 import org.junit.Test;
 
-import com.cdo.example.ExampleCDO;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.util.JsonUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
