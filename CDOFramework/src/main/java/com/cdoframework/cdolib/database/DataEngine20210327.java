@@ -56,8 +56,18 @@ import com.cdoframework.cdolib.util.Utility;
 /**
  * @author Frank
  */
-public class DataEngine implements IDataEngine{
+public class DataEngine20210327 implements IDataEngine
+{
 	
+	// 静态对象,所有static在此声明并初始化------------------------------------------------------------------------
+	public final int RETURN_SYSTEMERROR=-1;
+
+	// 定义数据库类型
+	public static final String SQLSERVER="SQLServer";
+	public static final String ORACLE="Oracle";
+	public static final String DB2="DB2";
+	public static final String MYSQL="MySQL";
+
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 	protected BasicDataSource ds;   
 	protected String strSystemCharset;
@@ -245,7 +255,98 @@ public class DataEngine implements IDataEngine{
 	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
 	{
 		return SQLUtil.prepareStatement(conn, strSourceSQL, cdoRequest, strCharset);
-		
+		/**onSQLStatement(strSourceSQL);
+
+		PreparedStatement ps=null;
+
+		// 分析原始SQL语句，得到其中的变量
+		AnalyzedSQL anaSQL=analyzeSourceSQL(strSourceSQL);
+		if(anaSQL==null)
+		{
+			throw new SQLException("Analyze source SQL exception: "+strSourceSQL);
+		}
+
+		// 准备JDBC语句
+		try
+		{
+			if(ps==null)
+			{
+				ps=conn.prepareStatement(anaSQL.strSQL);
+			}
+
+			int nParaCount=anaSQL.alParaName.size();
+			for(int i=0;i<nParaCount;i++)
+			{
+				String strParaName=anaSQL.alParaName.get(i);
+				Field  object=cdoRequest.getObject(strParaName);
+
+				int nType=object.getFieldType().getType();
+				switch(nType)
+				{
+					case FieldType.BYTE_TYPE:
+					case FieldType.SHORT_TYPE:
+					case FieldType.INTEGER_TYPE:
+					case FieldType.LONG_TYPE:
+					case FieldType.FLOAT_TYPE:
+					case FieldType.DOUBLE_TYPE:						
+					{
+						Object objValue=object.getObjectValue();
+						ps.setObject(i+1,objValue);
+						break;
+					}
+					case FieldType.STRING_TYPE:
+					{
+						String strValue=((StringField)object).getValue();
+						strValue=Utility.encodingText(strValue,strSystemCharset,strCharset);
+						ps.setString(i+1,strValue);
+						break;
+					}
+					case FieldType.DATETIME_TYPE:
+					{
+						long value=((DateTimeField)object).getLongValue();
+						ps.setTimestamp(i+1, new java.sql.Timestamp(value));
+						break;
+					}					
+					case FieldType.DATE_TYPE:
+					{						
+						long value=((DateField)object).getLongValue();
+						ps.setDate(i+1, new java.sql.Date(value));
+						break;
+					}
+					case FieldType.TIME_TYPE:
+					{
+						long value=((TimeField)object).getLongValue();
+						ps.setTime(i+1, new java.sql.Time(value));
+						break;
+					}
+					case FieldType.BOOLEAN_TYPE:
+					{
+						boolean value=((BooleanField)object).getValue();
+						ps.setBoolean(i+1,value);
+						break;
+					}
+					case FieldType.BYTE_ARRAY_TYPE:
+					{
+						byte[] bytes=((ByteArrayField)object).getValue();
+						ps.setBytes(i+1,bytes);
+						break;
+					}
+					default:
+					{
+						throw new SQLException("SQL Unsupported type's object ["+object+"],type="+nType+",key="+strParaName);
+					}
+				}
+			}
+			onExecuteSQL(anaSQL.strSQL, anaSQL.alParaName, cdoRequest);
+		}
+		catch(SQLException e)
+		{
+			closeStatement(strSourceSQL,ps);
+			throw e;
+		}
+
+		return ps;
+		**/
 	}
 
 
@@ -268,9 +369,177 @@ public class DataEngine implements IDataEngine{
 	 */
 	public int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord) throws SQLException,IOException
 	{
+		if(rs.next()==false)
+		{
+			return 0;
+		}
 		
-		return SQLUtil.readRecord(rs, strsFieldName, naFieldType, nsPrecision, nsScale, cdoRecord, strCharset);
-		
+		for(int i=0;i<strsFieldName.length;i++)
+		{
+			String strFieldName=strsFieldName[i];
+			
+			try
+			{
+				if(rs.getObject(i+1)==null)
+				{
+					continue;
+				}
+			}catch(Exception e)
+			{//已反序列化对象,getObject应该是绝对安全的,不应该有异常,但有的driver处理空时会抛出异常,此处做兼容性处理,不需要抛出异常
+				continue;				
+			}
+
+			int nFieldType=naFieldType[i];
+			switch(nFieldType)
+			{
+				case Types.BIT:
+				{
+					byte byValue=rs.getByte(i+1);
+					if(byValue==0)
+					{
+						cdoRecord.setBooleanValue(strFieldName,false);
+					}
+					else
+					{
+						cdoRecord.setBooleanValue(strFieldName,true);
+					}
+					break;
+				}
+				case Types.TINYINT:
+				{
+					cdoRecord.setByteValue(strFieldName,rs.getByte(i+1));
+					break;
+				}
+				case Types.SMALLINT:
+				{
+					cdoRecord.setShortValue(strFieldName,rs.getShort(i+1));
+					break;
+				}
+				case Types.INTEGER:
+				{
+					cdoRecord.setIntegerValue(strFieldName,rs.getInt(i+1));
+					break;
+				}
+				case Types.BIGINT:
+				{
+					cdoRecord.setLongValue(strFieldName,rs.getLong(i+1));
+					break;
+				}
+				case Types.REAL:
+				{
+					cdoRecord.setFloatValue(strFieldName,rs.getFloat(i+1));
+					break;
+				}
+				case Types.DOUBLE:
+				case Types.FLOAT:
+				{
+					cdoRecord.setDoubleValue(strFieldName,rs.getDouble(i+1));
+					break;
+				}
+				case Types.DECIMAL:
+				case Types.NUMERIC:
+				{
+					if(nsScale[i]==0)
+					{// 整数
+						if(nsPrecision[i]<3)
+						{
+							cdoRecord.setByteValue(strFieldName,rs.getByte(i+1));
+						}
+						else if(nsPrecision[i]<5)
+						{
+							cdoRecord.setShortValue(strFieldName,rs.getShort(i+1));
+						}
+						else if(nsPrecision[i]<10)
+						{
+							cdoRecord.setIntegerValue(strFieldName,rs.getInt(i+1));
+						}
+						else if(nsPrecision[i]<20)
+						{
+							cdoRecord.setLongValue(strFieldName,rs.getLong(i+1));
+						}
+						else
+						{
+							cdoRecord.setDoubleValue(strFieldName,rs.getDouble(i+1));
+						}
+					}
+					else
+					{// 小数
+						cdoRecord.setDoubleValue(strFieldName,rs.getDouble(i+1));
+					}
+					break;
+				}
+				case Types.VARCHAR:
+				case Types.LONGVARCHAR:
+				case Types.CHAR:
+				{
+					String strValue=rs.getString(i+1);
+					strValue=Utility.encodingText(strValue,strCharset,strSystemCharset);
+
+					cdoRecord.setStringValue(strFieldName,strValue);
+					break;
+				}
+				case Types.CLOB:
+				{
+					String strValue="";
+					Clob clobValue=rs.getClob(i+1);
+					char[] chsValue=new char[(int)clobValue.length()];
+					clobValue.getCharacterStream().read(chsValue);
+					strValue=new String(chsValue);
+					strValue=Utility.encodingText(strValue,strCharset,strSystemCharset);
+					cdoRecord.setStringValue(strFieldName,strValue.trim());
+					break;
+				}
+				case Types.DATE:
+				{
+					 java.sql.Date date=rs.getDate(i+1);
+					 cdoRecord.setDateValue(strFieldName, date.getTime());					
+					break;
+				}				
+				case Types.TIME:
+				{
+					java.sql.Time time=rs.getTime(i+1);
+					cdoRecord.setTimeValue(strFieldName, time.getTime());	
+					break;
+				}	
+				case Types.TIMESTAMP:
+				{
+					java.sql.Timestamp dateTime=rs.getTimestamp(i+1);
+					cdoRecord.setDateTimeValue(strFieldName, dateTime.getTime());
+					break;
+				}
+				case Types.BINARY:
+				case Types.VARBINARY:	
+				case Types.LONGVARBINARY:
+				{
+					byte[] bysValue=null;
+					InputStream stream=null;
+					try
+					{
+						stream=rs.getBinaryStream(i+1);
+						bysValue=new byte[stream.available()];
+						stream.read(bysValue);
+					}
+					finally{
+						if(stream!=null)try{stream.close();}catch(Exception ex){}
+					}
+
+					cdoRecord.setByteArrayValue(strFieldName,bysValue);
+					break;
+				}
+			
+				case Types.BLOB:
+				{
+					byte[] bysValue=null;
+					Blob blobValue=rs.getBlob(i+1);
+					bysValue=blobValue.getBytes(1,(int)blobValue.length());
+					cdoRecord.setByteArrayValue(strFieldName,bysValue);
+					break;
+				}
+				default:
+					throw new SQLException("Unsupported sql data type "+nFieldType+" on field "+strFieldName);
+			}
+		}
+		return 1;
 	}
 
 
@@ -1338,9 +1607,11 @@ public class DataEngine implements IDataEngine{
 	{
 		// 准备JDBC语句 执行sql查询记录
 		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
+
 		// 输出查询结果
 		ResultSet rs=null;
-		try{
+		try
+		{
 			// 执行查询
 			rs=ps.executeQuery();
 			ResultSetMetaData meta=rs.getMetaData();
@@ -1364,10 +1635,14 @@ public class DataEngine implements IDataEngine{
 				nCount=nRecordCount;
 			return nCount;
 			
-		}catch(SQLException e){
+		}
+		catch(SQLException e)
+		{
 			callOnException("executeQueryRecord Exception: "+strSQL,e);
 			throw e;
-		}finally{
+		}
+		finally
+		{
 			this.closeResultSet(rs);
 			this.closeStatement(strSQL,ps);
 		}
@@ -1527,14 +1802,15 @@ public class DataEngine implements IDataEngine{
 	 * @return
 	 * @throws Exception
 	 */
-	public int executeQueryRecordSet(Connection conn,String strSQL,CDO cdoRequest,CDOArrayField cdoArrayField)
+	public int executeQueryRecordSet(Connection conn,String strSQL,CDO cdoRequest,CDOArrayField cafRecordSet)
 					throws SQLException,IOException
 	{
 		// 准备JDBC语句 执行记录查询
 		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);		
 		// 输出查询结果
 		ResultSet rs=null;
-		try{
+		try
+		{
 			// 执行查询
 			rs=ps.executeQuery();
 			// 读取Meta信息
@@ -1544,13 +1820,15 @@ public class DataEngine implements IDataEngine{
 			int[] nsPrecision=new int[strsFieldName.length];
 			int[] nsScale=new int[strsFieldName.length];
 		
-			for(int i=0;i<strsFieldName.length;i++){
+			for(int i=0;i<strsFieldName.length;i++)
+			{
 				
 				strsFieldName[i]=meta.getColumnLabel(i+1);
 				nsFieldType[i]=meta.getColumnType(i+1);
 				nsPrecision[i]=meta.getPrecision(i+1);
 				nsScale[i]=meta.getScale(i+1);
 			}
+
 			// 读取记录
 			ArrayList<CDO> alRecord=new ArrayList<CDO>();
 			while(true)
@@ -1564,17 +1842,29 @@ public class DataEngine implements IDataEngine{
 				alRecord.add(cdoRecord);
 			}
 
-			cdoArrayField.setValue(alRecord);		
+			// 输出记录
+//			CDO[] cdosRecord=new CDO[alRecord.size()];
+//			for(int i=0;i<cdosRecord.length;i++)
+//			{
+//				cdosRecord[i]=(CDO)alRecord.get(i);
+//			}
+//			cafRecordSet.setValue(cdosRecord);
+			cafRecordSet.setValue(alRecord);
+			
 			//统计总数量查询
 			int nCount=executeCount(conn, strSQL, cdoRequest);
 			if(nCount==0)
 				nCount=alRecord.size();
 			
 			return nCount;
-		}catch(SQLException e){
+		}
+		catch(SQLException e)
+		{
 			callOnException("executeQueryRecordSet Exception: "+strSQL,e);
 			throw e;
-		}finally{
+		}
+		finally
+		{
 			this.closeResultSet(rs);
 			this.closeStatement(strSQL,ps);
 		}
@@ -1593,14 +1883,23 @@ public class DataEngine implements IDataEngine{
 	{
 		// 准备JDBC语句
 		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
+
 		// 输出查询结果
-		try{
-			return ps.executeUpdate();
-		}catch(SQLException e){
+		try
+		{
+			// 执行查询
+			int nCount=ps.executeUpdate();
+
+			return nCount;
+		}
+		catch(SQLException e)
+		{
 			callOnException("executeUpdate Exception: "+strSQL,e);
 			throw e;
-		}finally{
-			SQLUtil.closePreparedStatement(ps);
+		}
+		finally
+		{
+			this.closeStatement(strSQL,ps);
 		}
 	}
 
@@ -1748,7 +2047,7 @@ public class DataEngine implements IDataEngine{
 		}
 		catch(SQLException e)
 		{
-			ret=Return.valueOf(-1,"Cannot obtain database connection","System.Error");
+			ret=Return.valueOf(RETURN_SYSTEMERROR,"Cannot obtain database connection","System.Error");
 			return ret;
 		}
 
@@ -1786,7 +2085,7 @@ public class DataEngine implements IDataEngine{
 
 	// 构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
-	public DataEngine()
+	public DataEngine20210327()
 	{
 		// 请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
 		strDriver="";

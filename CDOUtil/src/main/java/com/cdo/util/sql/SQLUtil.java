@@ -154,8 +154,20 @@ public class SQLUtil {
 			}			
 			return cdoRecord;
 		}	
-		
-		private static int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord,String strCharset) throws SQLException,IOException
+		/**
+		 * 
+		 * @param rs
+		 * @param strsFieldName
+		 * @param naFieldType
+		 * @param nsPrecision
+		 * @param nsScale
+		 * @param cdoRecord
+		 * @param strCharset
+		 * @return
+		 * @throws SQLException
+		 * @throws IOException
+		 */
+		public static int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord,String strCharset) throws SQLException,IOException
 		{
 			if(rs.next()==false){
 				return 0;
@@ -268,13 +280,23 @@ public class SQLUtil {
 						break;
 					}
 					case Types.DATE:
+					{
+						 java.sql.Date date=rs.getDate(i+1);
+						 cdoRecord.setDateValue(strFieldName, date.getTime());					
+						break;
+					}				
 					case Types.TIME:
+					{
+						java.sql.Time time=rs.getTime(i+1);
+						cdoRecord.setTimeValue(strFieldName, time.getTime());	
+						break;
+					}	
 					case Types.TIMESTAMP:
 					{
-						java.sql.Timestamp temp=rs.getTimestamp(i+1);
-						cdoRecord.setDateTimeValue(strFieldName,temp.getTime());						
+						java.sql.Timestamp dateTime=rs.getTimestamp(i+1);
+						cdoRecord.setDateTimeValue(strFieldName, dateTime.getTime());
 						break;
-					}
+					}					
 					case Types.BINARY:
 					case Types.VARBINARY:	
 					case Types.LONGVARBINARY:

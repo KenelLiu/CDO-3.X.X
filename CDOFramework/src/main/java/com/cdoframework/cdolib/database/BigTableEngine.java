@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
-import com.cdo.field.FieldType;
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
@@ -49,7 +48,6 @@ public class BigTableEngine
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	Logger logger  = Logger.getLogger(BigTableEngine.class);
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 
 	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException{
 		int nReturnItemCount=returnObject.getReturnItemCount();
@@ -86,7 +84,6 @@ public class BigTableEngine
 	}
 	/**
 	 * 检查If的条件
-	 * 
 	 * @param strValue1
 	 * @param strOperator
 	 * @param strValue2
@@ -259,14 +256,14 @@ public class BigTableEngine
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	private int handleIf(IDataEngine dataEngine ,Connection connection,SQLTrans trans,If ifItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleIf(IDataEngine dataEngine ,Connection connection,If ifItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
 	{
 		// 检查执行条件
 		boolean bCondition=checkCondition(ifItem.getValue1(),ifItem.getOperator().toString(),ifItem.getValue2(),ifItem.getType(),ifItem.getType().toString(),cdoRequest);
 		if(bCondition==true)
 		{// Handle Then
 			Then thenItem=ifItem.getThen();
-			return handleBlock(dataEngine,connection,trans,thenItem,cdoRequest,cdoResponse,ret);
+			return handleBlock(dataEngine,connection,thenItem,cdoRequest,cdoResponse,ret);
 		}
 		else
 		{// handle Else
@@ -275,7 +272,7 @@ public class BigTableEngine
 			{// 没有else模块，当作自然执行完毕处理???
 				return 0;
 			}
-			return handleBlock(dataEngine,connection,trans,elseItem,cdoRequest,cdoResponse,ret);
+			return handleBlock(dataEngine,connection,elseItem,cdoRequest,cdoResponse,ret);
 		}
 	}
 	/**
@@ -287,7 +284,7 @@ public class BigTableEngine
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	private int handleFor(IDataEngine dataEngine ,Connection connection,SQLTrans trans,For forItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleFor(IDataEngine dataEngine ,Connection connection,For forItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
 	{
 		// 获取循环数据
 		int nFromIndex=0;
@@ -310,7 +307,7 @@ public class BigTableEngine
 			cdoRequest.setIntegerValue(strIndexId,i);
 
 			// 执行Block
-			int nResult=handleBlock(dataEngine,connection,trans,forItem,cdoRequest,cdoResponse,ret);
+			int nResult=handleBlock(dataEngine,connection,forItem,cdoRequest,cdoResponse,ret);
 			if(nResult==0)
 			{// 自然执行完毕
 				continue;
@@ -354,13 +351,12 @@ public class BigTableEngine
 	}
 
 	/*
-	 * 处理一个Block
+	 * 处理每个block内容
 	 * 
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 */
-	private int handleBlock(IDataEngine dataEngine,Connection connection,SQLTrans trans,BlockType block,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleBlock(IDataEngine dataEngine,Connection connection,BlockType block,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
 	{
-//		String strDefaultDataGroupId = trans.getDataGroupId();
 		int nItemCount=block.getBlockTypeItemCount();
 		for(int i=0;i<nItemCount;i++)
 		{
@@ -515,7 +511,7 @@ public class BigTableEngine
 			}
 			else if(blockItem.getIf()!=null)
 			{
-				int nResult=this.handleIf(dataEngine,connection,trans,(If)blockItem.getIf(),cdoRequest,cdoResponse,ret);
+				int nResult=this.handleIf(dataEngine,connection,(If)blockItem.getIf(),cdoRequest,cdoResponse,ret);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -527,7 +523,7 @@ public class BigTableEngine
 			}
 			else if(blockItem.getFor()!=null)
 			{
-				int nResult=this.handleFor(dataEngine,connection,trans,(For)blockItem.getFor(),cdoRequest,cdoResponse,ret);
+				int nResult=this.handleFor(dataEngine,connection,(For)blockItem.getFor(),cdoRequest,cdoResponse,ret);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -572,12 +568,10 @@ public class BigTableEngine
 		}
 	}
 
-	protected Return executeTrans(HashMap<String,IDataEngine> hmDataGroup,SQLTrans trans,CDO cdoRequest,CDO cdoResponse)
-	{
-   	//检查是否能处理该请求
+	protected Return executeTrans(HashMap<String,IDataEngine> hmDataGroup,SQLTrans trans,CDO cdoRequest,CDO cdoResponse){
+	 //检查是否能处理该请求
    	String strTransName=cdoRequest.getStringValue("strTransName");
-   	if(trans==null)
-   	{//不能处理该请求
+   	if(trans==null){//不能处理该请求
    		return null;
    	}
    	//可以处理该请求
@@ -587,24 +581,20 @@ public class BigTableEngine
 
    	String strDataGroupId=trans.getDataGroupId();
    	IDataEngine dataEngine=hmDataGroup.get(strDataGroupId);
-		Connection connection=null;
-		try
-		{
+	Connection connection=null;
+	try{
 			if(dataEngine==null){//DataGroupId错误
 				throw new SQLException("Invalid datagroup id: "+strDataGroupId);
 			}
 			//创建Connection	
 			connection=dataEngine.getConnection();
-			if(connection==null)
-			{
+			if(connection==null){
 				throw new SQLException("datagroup id: "+strDataGroupId+",Invalid Connection,Connection is null");
 			}
-			if(!trans.getTransFlag().value().equals(0))
-			{
+			if(!trans.getTransFlag().value().equals(0)){
 				connection.setAutoCommit(false);
 			}
-			
-			
+
 			// 生成Block对象
 			BlockType block=new BlockType();
 			int nTransItemCount=trans.getSQLTransChoice().getSQLTransChoiceItemCount();
@@ -663,9 +653,9 @@ public class BigTableEngine
 			}
 
 			// 处理事务
-			int nResult=handleBlock(dataEngine,connection,trans,block,cdoRequest,cdoResponse,ret);
-			if(nResult!=2)
-			{// Break或自然执行完毕退出
+			int nResult=handleBlock(dataEngine,connection,block,cdoRequest,cdoResponse,ret);
+			if(nResult!=2){
+				// Break或自然执行完毕退出
 				com.cdoframework.cdolib.database.xsd.Return returnObject=trans.getReturn();
 				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
 			}
@@ -673,58 +663,36 @@ public class BigTableEngine
 			if(!trans.getTransFlag().value().equals(0)){
 				connection.commit();
 			}
-		}
-		catch(SQLException e)
-		{
+		}catch(SQLException e){
 			try{this.executeRollback(connection);}catch(Exception ex){};
 			callOnException("executeTrans Exception: "+strTransName,e);
-			
 			ret=null;
-
 			OnException onException=trans.getOnException();
 			int nErrorCount=onException.getOnErrorCount();
-			for(int i=0;i<nErrorCount;i++)
-			{
+			for(int i=0;i<nErrorCount;i++){
 				OnError onError=onException.getOnError(i);
-				if(onError.getCode()==e.getErrorCode())
-				{
+				if(onError.getCode()==e.getErrorCode()){
 					ret=Return.valueOf(onError.getReturn().getCode(),onError.getReturn().getText(),onError.getReturn().getInfo(),e);
 					break;
 				}
 			}
-			if(ret==null)
-			{// 没有定义OnError
+			if(ret==null){
+				// 没有定义OnError
 				String strText = onException.getReturn().getText();
-				if("OK".equalsIgnoreCase(strText))
-				{
+				if("OK".equalsIgnoreCase(strText)){
 					strText="系统服务器故障";
 				}
 				ret=Return.valueOf(onException.getReturn().getCode(),strText,onException.getReturn().getInfo(),e);
 			}
-
 			return ret;
-		}
-		catch(IOException e)
-		{
-			try{this.executeRollback(connection);}catch(Exception ex){};
-			callOnException("executeTrans Exception: "+strTransName,e);
-
-			OnException onException=trans.getOnException();
-			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
-
-			return ret;
-		}
-		catch(Exception e)
-		{
+		}catch(Exception e){
 			try{this.executeRollback(connection);}catch(Exception ex){};
 			callOnException("executeTrans Exception: "+strTransName,e);
 			OnException onException=trans.getOnException();
 			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
 
 			return ret;
-		}
-		finally
-		{
+		}finally{
 			//关闭连接
 			SQLUtil.closeConnection(connection);
 		}		
