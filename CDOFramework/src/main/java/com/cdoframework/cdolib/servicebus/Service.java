@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.database.BigTableEngine;
+import com.cdoframework.cdolib.database.DataServiceParse;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.cdolib.database.TransDefine;
 
@@ -38,7 +38,7 @@ public class Service implements IService
 	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
 	private String strServiceName;
 	private String ZkProducerId;
-	private BigTableEngine btEngin;
+	private DataServiceParse btEngin;
 	private IServicePlugin servicePlugin;
 	private IServiceBus serviceBus;
 	// 存放所有的普通的transService 和 动态 activeService 对象
@@ -56,7 +56,7 @@ public class Service implements IService
 	{
 		return ZkProducerId;
 	}
-	public void setBigTableEngine(BigTableEngine btEngin)
+	public void setBigTableEngine(DataServiceParse btEngin)
 	{
 		this.btEngin = btEngin;
 	}

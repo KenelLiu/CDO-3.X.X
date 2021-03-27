@@ -1,60 +1,25 @@
 package com.cdoframework.cdolib.database;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.log4j.Logger;
-
 import com.cdo.field.Field;
-import com.cdo.field.FieldType;
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
-import com.cdoframework.cdolib.database.xsd.BlockType;
-import com.cdoframework.cdolib.database.xsd.BlockTypeItem;
-import com.cdoframework.cdolib.database.xsd.Delete;
-import com.cdoframework.cdolib.database.xsd.Else;
-import com.cdoframework.cdolib.database.xsd.For;
-import com.cdoframework.cdolib.database.xsd.If;
-import com.cdoframework.cdolib.database.xsd.Insert;
-import com.cdoframework.cdolib.database.xsd.OnError;
-import com.cdoframework.cdolib.database.xsd.OnException;
-import com.cdoframework.cdolib.database.xsd.SQLBlockType;
-import com.cdoframework.cdolib.database.xsd.SQLBlockTypeItem;
-import com.cdoframework.cdolib.database.xsd.SQLElse;
-import com.cdoframework.cdolib.database.xsd.SQLFor;
-import com.cdoframework.cdolib.database.xsd.SQLIf;
-import com.cdoframework.cdolib.database.xsd.SQLThen;
-import com.cdoframework.cdolib.database.xsd.SQLTrans;
-import com.cdoframework.cdolib.database.xsd.SQLTransChoiceItem;
-import com.cdoframework.cdolib.database.xsd.SelectField;
-import com.cdoframework.cdolib.database.xsd.SelectRecord;
-import com.cdoframework.cdolib.database.xsd.SelectRecordSet;
-import com.cdoframework.cdolib.database.xsd.SetVar;
-import com.cdoframework.cdolib.database.xsd.Then;
-import com.cdoframework.cdolib.database.xsd.Update;
-import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
-import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
-import com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType;
-import com.cdoframework.cdolib.util.Utility;
 
 /**
- * @author Frank
+ * 
+ * @author Kenel
+ *
  */
 public class DataEngine implements IDataEngine{
 	
@@ -62,7 +27,7 @@ public class DataEngine implements IDataEngine{
 	protected BasicDataSource ds;   
 	protected String strSystemCharset;
 
-	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
+	//==============================连接池相关========================//
 	protected String strDriver;
 
 	public void setDriver(String strDriver)
@@ -226,743 +191,6 @@ public class DataEngine implements IDataEngine{
 		}
 	}
 
-
-	// 引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
-
-	// 内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
-	protected void callOnException(String strText,Exception e)
-	{
-		try
-		{
-			onException(strText,e);
-		}
-		catch(Exception ex)
-		{
-		}
-	}
-
-	
-	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
-	{
-		return SQLUtil.prepareStatement(conn, strSourceSQL, cdoRequest, strCharset);
-		
-	}
-
-
-	public CDO readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale) throws SQLException,IOException
-	{
-		CDO cdoRecord=new CDO();
-
-		if(readRecord(rs,strsFieldName,naFieldType,nsPrecision,nsScale,cdoRecord)==0)
-		{
-			return null;
-		}
-		
-		return cdoRecord;
-	}
-
-	/**
-	 * 读取当前的记录数据
-	 * 
-	 * @param rs
-	 */
-	public int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord) throws SQLException,IOException
-	{
-		
-		return SQLUtil.readRecord(rs, strsFieldName, naFieldType, nsPrecision, nsScale, cdoRecord, strCharset);
-		
-	}
-
-
-	
-
-	protected Object getFieldValue(String strFieldId,CDO cdoRequest)
-	{
-		if(strFieldId.indexOf('{')>=0)
-		{
-			strFieldId=getFieldId(strFieldId,cdoRequest);
-		}
-		return cdoRequest.getObjectValue(strFieldId);
-	}
-
-	/**
-	 * 根据FieldId text获得FieldId，允许嵌套
-	 * 
-	 * @param strFieldIdText
-	 * @return
-	 */
-	protected String getFieldId(String strFieldIdText,CDO cdoRequest)
-	{
-		int nStartIndex=strFieldIdText.indexOf('{');
-		if(nStartIndex<0)
-		{
-			return strFieldIdText;
-		}
-
-		// 存在{}
-		int nEndIndex=Utility.findMatchedChar(nStartIndex,strFieldIdText);
-		String strSubFieldId=strFieldIdText.substring(nStartIndex+1,nEndIndex);
-		String strSubFieldValue=getFieldValue(strSubFieldId,cdoRequest).toString();
-
-		return getFieldId(strFieldIdText.substring(0,nStartIndex)+strSubFieldValue
-						+strFieldIdText.substring(nEndIndex+1),cdoRequest);
-	}
-
-
-
-	/**
-	 * 检查If的条件
-	 * 
-	 * @param strValue1
-	 * @param strOperator
-	 * @param strValue2
-	 * @param strType
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean checkCondition(String strValue1,String strOperator,String strValue2,IfTypeType ifType,String strType,
-					CDO cdoRequest)
-	{
-		return DataEngineHelp.checkCondition(strValue1, strOperator, strValue2, ifType, strType, cdoRequest);
-	}
-
-	/**
-	 * 检查If的条件
-	 * 
-	 * @param strValue1
-	 * @param strOperator
-	 * @param strValue2
-	 * @param strType
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean checkCondition(String strValue1,String strOperator,String strValue2,SQLIfTypeType sqlIfType,String strType,
-					CDO cdoRequest)
-	{
-		return DataEngineHelp.checkCondition(strValue1, strOperator, strValue2, sqlIfType, strType, cdoRequest);
-	}	
-	/**
-	 * 处理SQL语句中的If语句
-	 * 
-	 * @param sqlIf
-	 * @param cdoRequest
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 * @throws Exception
-	 */
-	protected int handleSQLIf(SQLIf sqlIf,CDO cdoRequest,StringBuilder strbSQL)
-	{
-		// 检查执行条件
-		boolean bCondition=checkCondition(sqlIf.getValue1(),sqlIf.getOperator().toString(),sqlIf.getValue2(),sqlIf
-						.getType(),sqlIf.getType().toString(),cdoRequest);
-		if(bCondition==true)
-		{// Handle Then
-			SQLThen sqlThen=sqlIf.getSQLThen();
-			return handleSQLBlock(sqlThen,cdoRequest,strbSQL);
-		}
-		else
-		{// handle Else
-			SQLElse sqlElse=sqlIf.getSQLElse();
-			if(sqlElse==null)
-			{// 自然完成
-				return 0;
-			}
-			return handleSQLBlock(sqlElse,cdoRequest,strbSQL);
-		}
-	}
-
-	/**
-	 * 处理SQL语句中的For语句
-	 * 
-	 * @param sqlFor
-	 * @param cdoRequest
-	 * @param strbSQL
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 * @throws Exception
-	 */
-	protected int handleSQLFor(SQLFor sqlFor,CDO cdoRequest,StringBuilder strbSQL)
-	{
-		// 获取循环数据
-		int nFromIndex=0;
-		int nCount=DataEngineHelp.getArrayLength(sqlFor.getArrKey(), cdoRequest);
-		if(sqlFor.getFromIndex()!=null)
-			nFromIndex=DataEngineHelp.getIntegerValue(sqlFor.getFromIndex(),cdoRequest);
-		if(sqlFor.getCount()!=null)
-			nCount=DataEngineHelp.getIntegerValue(sqlFor.getCount(),cdoRequest);	
-		
-		String strIndexId=sqlFor.getIndexId();
-		strIndexId=strIndexId.substring(1,strIndexId.length()-1);
-		// 执行循环
-		for(int i=nFromIndex;i<nFromIndex+nCount;i++)
-		{
-			// 设置IndexId
-			cdoRequest.setIntegerValue(strIndexId,i);
-
-			// 执行Block
-			int nResult=handleSQLBlock(sqlFor,cdoRequest,strbSQL);
-			if(nResult==0)
-			{// 自然执行完毕
-				continue;
-			}
-			else if(nResult==1)
-			{// 碰到Break
-				break;
-			}
-			else
-			{// 碰到Return
-				return nResult;
-			}
-		}
-
-		return 0;
-	}
-
-	/**
-	 * 处理SQLBlock对象，得到输出的SQL语句
-	 * 
-	 * @param sqlBlock
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 */
-	protected int handleSQLBlock(SQLBlockType sqlBlock,CDO cdoRequest,StringBuilder strbSQL)
-	{
-		// 依次处理各个Item
-		int nItemCount=sqlBlock.getSQLBlockTypeItemCount();
-		for(int i=0;i<nItemCount;i++)
-		{
-			// 在相邻Item之间加入空格
-//			if(i>0)
-//			{
-//				strbSQL.append(' ');
-//			}
-
-			// 处理当前的Item
-			SQLBlockTypeItem item=sqlBlock.getSQLBlockTypeItem(i);
-			if(item.getOutputSQL()!=null)
-			{// OutputSQL,直接输出源文本
-				strbSQL.append(item.getOutputSQL());
-			}
-			else if(item.getOutputField()!=null)
-			{// OutputField，输出文本代表的字段值
-				String strOutputFieldId=item.getOutputField();
-				strOutputFieldId=strOutputFieldId.substring(1,strOutputFieldId.length()-1);
-				strbSQL.append(cdoRequest.getStringValue(strOutputFieldId));
-			}
-			else if(item.getSQLIf()!=null)
-			{// SQLIf
-				int nResult=handleSQLIf(item.getSQLIf(),cdoRequest,strbSQL);
-				if(nResult==0)
-				{// 自然执行完毕
-					continue;
-				}
-				else
-				{// 碰到Break或Return
-					return nResult;
-				}
-			}
-			else if(item.getSQLFor()!=null)
-			{// SQLFor
-				int nResult=handleSQLFor(item.getSQLFor(),cdoRequest,strbSQL);
-				if(nResult==0)
-				{// 自然执行完毕
-					continue;
-				}
-				else
-				{// 碰到Break或Return
-					return nResult;
-				}
-			}
-			else
-			{
-				continue;
-			}
-		}
-
-		// 自然执行完毕
-		return 0;
-	}
-
-	/**
-	 * 处理If语句
-	 * 
-	 * @param ifItem
-	 * @param cdoRequest
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 * @throws Exception
-	 */
-	protected int handleIf(Connection conn,HashMap<String,SQLTrans> hmTrans,If ifItem,CDO cdoRequest,
-					boolean bUseTransFlag,CDO cdoResponse,Return ret) throws SQLException,IOException
-	{
-		// 检查执行条件
-		boolean bCondition=checkCondition(ifItem.getValue1(),ifItem.getOperator().toString(),ifItem.getValue2(),ifItem
-						.getType(),ifItem.getType().toString(),cdoRequest);
-		if(bCondition==true)
-		{// Handle Then
-			Then thenItem=ifItem.getThen();
-			return handleBlock(conn,hmTrans,thenItem,cdoRequest,bUseTransFlag,cdoResponse,ret);
-		}
-		else
-		{// handle Else
-			Else elseItem=ifItem.getElse();
-			if(elseItem==null)
-			{// 没有else模块，当作自然执行完毕处理???
-				return 0;
-			}
-			return handleBlock(conn,hmTrans,elseItem,cdoRequest,bUseTransFlag,cdoResponse,ret);
-		}
-	}
-
-	/**
-	 * 处理For语句
-	 * 
-	 * @param sqlFor
-	 * @param cdoRequest
-	 * @param strbSQL
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 * @throws Exception
-	 */
-	protected int handleFor(Connection conn,HashMap<String,SQLTrans> hmTrans,For forItem,CDO cdoRequest,
-					boolean bUseTransFlag,CDO cdoResponse,Return ret) throws SQLException,IOException
-	{
-		// 获取循环数据
-		int nFromIndex=0;
-		int nCount=DataEngineHelp.getArrayLength(forItem.getArrKey(), cdoRequest);
-		if(forItem.getFromIndex()!=null)
-			nFromIndex=DataEngineHelp.getIntegerValue(forItem.getFromIndex(),cdoRequest);
-		if(forItem.getCount()!=null)
-			nCount=DataEngineHelp.getIntegerValue(forItem.getCount(),cdoRequest);	
-			
-		String strIndexId=forItem.getIndexId();
-		strIndexId=strIndexId.substring(1,strIndexId.length()-1);
-
-		// 执行循环
-		for(int i=nFromIndex;i<nFromIndex+nCount;i++)
-		{
-			// 设置IndexId
-			cdoRequest.setIntegerValue(strIndexId,i);
-
-			// 执行Block
-			int nResult=handleBlock(conn,hmTrans,forItem,cdoRequest,bUseTransFlag,cdoResponse,ret);
-			if(nResult==0)
-			{// 自然执行完毕
-				continue;
-			}
-			else if(nResult==1)
-			{// 碰到Break
-				break;
-			}
-			else
-			{// 碰到Return
-				return nResult;
-			}
-		}
-
-		return 0;
-	}
-
-	protected void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException
-	{
-		int nReturnItemCount=returnObject.getReturnItemCount();
-		for(int j=0;j<nReturnItemCount;j++)
-		{
-			String strFieldId=returnObject.getReturnItem(j).getFieldId();
-			String strValueId=returnObject.getReturnItem(j).getValueId();
-			strFieldId=strFieldId.substring(1,strFieldId.length()-1);
-			strValueId=strValueId.substring(1,strValueId.length()-1);
-			Field object=null;
-			try
-			{
-				object=cdoRequest.getObject(strValueId);
-				cdoResponse.setObjectExt(strFieldId,object);
-			}
-			catch(Exception e)
-			{
-				continue;
-			}
-		}
-		ret.setCode(returnObject.getCode());
-		ret.setInfo(returnObject.getInfo());
-		ret.setText(returnObject.getText());
-	}
-	
-	/*
-	 * 处理一个Block
-	 * 
-	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
-	 */
-	protected int handleBlock(Connection conn,HashMap<String,SQLTrans> hmTrans,BlockType block,CDO cdoRequest,
-					boolean bUseTransFlag,CDO cdoResponse,Return ret) throws SQLException,IOException
-	{
-		int nItemCount=block.getBlockTypeItemCount();
-		for(int i=0;i<nItemCount;i++)
-		{
-			BlockTypeItem blockItem=block.getBlockTypeItem(i);
-			if(blockItem.getInsert()!=null)
-			{// Insert
-				// 获得将要执行的SQL
-				Insert insert=(Insert)blockItem.getInsert();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(insert,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-				// 执行SQL
-				this.executeUpdate(conn,strSQL,cdoRequest);
-			}
-			else if(blockItem.getUpdate()!=null)
-			{// Update
-				// 获得将要执行的SQL
-				Update update=(Update)blockItem.getUpdate();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(update,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-
-				// 执行SQL
-				int nRecordCount=this.executeUpdate(conn,strSQL,cdoRequest);
-				String strRecordCountId=update.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{// 输出受影响的记录数
-					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
-					cdoRequest.setIntegerValue(strRecordCountId,nRecordCount);
-				}
-			}
-			else if(blockItem.getDelete()!=null)
-			{// Delete
-				// 获得将要执行的SQL
-				Delete delete=(Delete)blockItem.getDelete();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(delete,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-
-				// 执行SQL
-				int nRecordCount=this.executeUpdate(conn,strSQL,cdoRequest);
-				String strRecordCountId=delete.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{// 输出受影响的记录数
-					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
-					cdoRequest.setIntegerValue(strRecordCountId,nRecordCount);
-				}
-			}
-			else if(blockItem.getSelectRecordSet()!=null)
-			{// SelectRecordSet
-				// 获得将要执行的SQL
-				SelectRecordSet selectRecordSet=(SelectRecordSet)blockItem.getSelectRecordSet();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectRecordSet,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-
-				// 执行SQL
-				CDOArrayField cdoArrayField=new CDOArrayField("");
-				String strRecordCountId=selectRecordSet.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{//表示要 获取SQL查询条件中的总数量					
-					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
-				}
-				int nRecordCount=this.executeQueryRecordSet(conn,strSQL,cdoRequest,cdoArrayField);				
-				if(strRecordCountId.length()>0)
-				{// 输出受影响的记录数
-					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
-					cdoRequest.setIntegerValue(strRecordCountId,nRecordCount);
-				}
-
-				String strOutputId=selectRecordSet.getOutputId();
-				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
-				String strKeyFieldName=selectRecordSet.getKeyFieldName();
-				if(strKeyFieldName.length()==0)
-				{// RecordSet输出到数组
-//					cdoRequest.setCDOArrayValue(strOutputId,cdoArrayField.getValue());
-					cdoRequest.setCDOListValue(strOutputId,cdoArrayField.getValue());
-				}
-				else
-				{// RecordSet输出到HashMap
-//					CDO[] cdosRecordSet=cdoArrayField.getValue();
-//					CDO cdoRecordSet=new CDO();
-//					for(int j=0;j<cdosRecordSet.length;j++)
-//					{
-//						cdoRecordSet.setCDOValue(cdosRecordSet[j].getObjectValue(strKeyFieldName).toString(),
-//										cdosRecordSet[j]);
-//					}
-//					cdoRequest.setCDOValue(strOutputId,cdoRecordSet);
-					List<CDO> cdosRecordSet=cdoArrayField.getValue();
-					CDO cdoRecordSet=new CDO();
-					for(int j=0;j<cdosRecordSet.size();j++)
-					{
-						cdoRecordSet.setCDOValue(cdosRecordSet.get(j).getObjectValue(strKeyFieldName).toString(),
-										cdosRecordSet.get(j));
-					}
-					cdoRequest.setCDOValue(strOutputId,cdoRecordSet);					
-				}
-			}
-			else if(blockItem.getSelectRecord()!=null)
-			{
-				// 获得将要执行的SQL
-				SelectRecord selectRecord=(SelectRecord)blockItem.getSelectRecord();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectRecord,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-
-				// 执行SQL
-				CDO cdo=new CDO();
-				String strRecordCountId=selectRecord.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{//表示要 获取SQL查询条件中的总数量					
-					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
-				}
-				int nRecordCount=this.executeQueryRecord(conn,strSQL,cdoRequest,cdo);				
-				if(strRecordCountId.length()>0)
-				{// 输出受影响的记录数
-					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
-					cdoRequest.setIntegerValue(strRecordCountId,nRecordCount);
-				}
-
-				String strOutputId=selectRecord.getOutputId();
-				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
-				cdoRequest.setCDOValue(strOutputId,cdo);
-			}
-			else if(blockItem.getSelectField()!=null)
-			{
-				// 获得将要执行的SQL
-				SelectField selectField=(SelectField)blockItem.getSelectField();
-				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectField,cdoRequest,strbSQL);
-				String strSQL=strbSQL.toString();
-
-				// 执行SQL
-				Field objFieldValue=this.executeQueryFieldExt(conn,strSQL,cdoRequest);
-				if(objFieldValue==null)
-				{
-					continue;
-				}
-				int nType=objFieldValue.getFieldType().getType();
-				Object objValue=objFieldValue.getObjectValue();
-
-				String strOutputId=selectField.getOutputId();
-				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
-				switch(nType)
-				{
-					case FieldType.BYTE_TYPE:
-					{
-						cdoRequest.setByteValue(selectField.getOutputId(),((Byte)objValue).byteValue());
-						break;
-					}
-					case FieldType.SHORT_TYPE:
-					{
-						cdoRequest.setShortValue(strOutputId,((Short)objValue).shortValue());
-						break;
-					}
-					case FieldType.INTEGER_TYPE:
-					{
-						cdoRequest.setIntegerValue(strOutputId,((Integer)objValue).intValue());
-						break;
-					}
-					case FieldType.LONG_TYPE:
-					{
-						cdoRequest.setLongValue(strOutputId,((Long)objValue).longValue());
-						break;
-					}
-					case FieldType.FLOAT_TYPE:
-					{
-						cdoRequest.setFloatValue(strOutputId,((Float)objValue).floatValue());
-						break;
-					}
-					case FieldType.DOUBLE_TYPE:
-					{
-						cdoRequest.setDoubleValue(strOutputId,((Double)objValue).doubleValue());
-						break;
-					}
-					case FieldType.STRING_TYPE:
-					{
-						cdoRequest.setStringValue(strOutputId,((String)objValue));
-						break;
-					}
-					case FieldType.DATE_TYPE:
-					{
-						cdoRequest.setDateValue(strOutputId,((String)objValue));
-						break;
-					}
-					case FieldType.TIME_TYPE:
-					{
-						cdoRequest.setTimeValue(strOutputId,((String)objValue));
-						break;
-					}
-					case FieldType.DATETIME_TYPE:
-					{
-						cdoRequest.setDateTimeValue(strOutputId,((String)objValue));
-						break;
-					}
-					case FieldType.BYTE_ARRAY_TYPE:
-					{
-						cdoRequest.setByteArrayValue(strOutputId,((byte[])objValue));
-						break;
-					}
-					default:
-					{
-						throw new SQLException("Unsupported type "+nType);
-					}
-				}
-			}
-			else if(blockItem.getSetVar()!=null)
-			{
-				SetVar sv=blockItem.getSetVar();
-				DataEngineHelp.setVar(sv, cdoRequest);
-			}
-			else if(blockItem.getIf()!=null)
-			{
-				int nResult=handleIf(conn,hmTrans,(If)blockItem.getIf(),cdoRequest,bUseTransFlag,cdoResponse,ret);
-				if(nResult==0)
-				{// 自然执行完毕
-					continue;
-				}
-				else
-				{// 碰到Break或Return
-					return nResult;
-				}
-			}
-			else if(blockItem.getFor()!=null)
-			{
-				int nResult=handleFor(conn,hmTrans,(For)blockItem.getFor(),cdoRequest,bUseTransFlag,cdoResponse,ret);
-				if(nResult==0)
-				{// 自然执行完毕
-					continue;
-				}
-				else
-				{// 碰到Break或Return
-					return nResult;
-				}
-			}
-			else if(blockItem.getReturn()!=null)
-			{
-				com.cdoframework.cdolib.database.xsd.Return returnObject=(com.cdoframework.cdolib.database.xsd.Return)blockItem.getReturn();
-				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
-
-				return 2;
-			}
-			else if(blockItem.getBreak()!=null)
-			{// Break退出
-				return 1;
-			}
-			else if(blockItem.getCommit()!=null)
-			{
-				conn.commit();
-			}
-			else if(blockItem.getRollback()!=null)
-			{
-				conn.rollback();
-			}
-		}
-		return 0;
-	}
-
-	// 处理一个Trans
-	protected Return handleTrans(Connection conn,HashMap<String,SQLTrans> hmTrans,SQLTrans trans,CDO cdoRequest,
-					CDO cdoResponse,boolean bUseTransFlag) throws SQLException,IOException
-	{
-		Return ret=new Return();
-
-		// 开始执行事务
-//		int nTransFlag=trans.getTransFlag().getType();
-		int nTransFlag=trans.getTransFlag().value().equals(SQLTransTransFlagType.VALUE_1.value())?1:0;
-
-		try
-		{
-			if(bUseTransFlag==true)
-			{// 设置事务
-				conn.setAutoCommit(false);
-			}
-
-			// 生成Block对象
-			BlockType block=new BlockType();
-//			int nTransItemCount=trans.getSQLTransChoice(0).getSQLTransChoiceItemCount();
-			int nTransItemCount=trans.getSQLTransChoice().getSQLTransChoiceItemCount();
-			for(int i=0;i<nTransItemCount;i++)
-			{
-//				SQLTransChoiceItem transItem=trans.getSQLTransChoice(0).getSQLTransChoiceItem(i);
-				SQLTransChoiceItem transItem=trans.getSQLTransChoice().getSQLTransChoiceItem(i);
-				BlockTypeItem blockItem=null;
-				if(transItem.getInsert()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setInsert(transItem.getInsert());
-				}
-				else if(transItem.getUpdate()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setUpdate(transItem.getUpdate());
-				}
-				else if(transItem.getDelete()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setDelete(transItem.getDelete());
-				}
-				else if(transItem.getSelectRecordSet()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setSelectRecordSet(transItem.getSelectRecordSet());
-				}
-				else if(transItem.getSelectRecord()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setSelectRecord(transItem.getSelectRecord());
-				}
-				else if(transItem.getSelectField()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setSelectField(transItem.getSelectField());
-				}
-				else if(transItem.getIf()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setIf(transItem.getIf());
-				}
-				else if(transItem.getFor()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setFor(transItem.getFor());
-				}
-				else if(transItem.getDelete()!=null)
-				{
-					blockItem=new BlockTypeItem();
-					blockItem.setDelete(transItem.getDelete());
-				}
-
-				if(blockItem!=null)
-				{
-					block.addBlockTypeItem(blockItem);
-				}
-			}
-
-			// 处理事务
-			int nResult=handleBlock(conn,hmTrans,block,cdoRequest,bUseTransFlag,cdoResponse,ret);
-			if(nResult!=2)
-			{// Break或自然执行完毕退出
-				com.cdoframework.cdolib.database.xsd.Return returnObject=trans.getReturn();
-				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
-			}
-
-			return ret;
-		}
-		finally
-		{
-			if(ret.getCode()==0)
-			{//提交事务
-				if((nTransFlag&0x1)==0x1)
-				{//事务处理
-					conn.commit();
-				}
-			}
-			else
-			{//回滚事务
-				if((nTransFlag&0x1)==0x1)
-				{//事务处理
-					conn.rollback();
-					conn.setAutoCommit(true);
-				}
-			}
-		}
-	}
-
-	// 公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
-	/**
-	 * 打开数据库
-	 */
 	public synchronized Return open()
 	{
 		if(ds!=null)
@@ -994,10 +222,9 @@ public class DataEngine implements IDataEngine{
 		try
 		{
 			Connection conn=ds.getConnection();
-			closeConnection(conn);
-		}
-		catch(Exception e)
-		{
+			SQLUtil.closeConnection(conn);
+			
+		}catch(Exception e){
 			callOnException("Open database error: "+e.getMessage(),e);
 
 			Return ret=Return.valueOf(-1,e.getMessage(),"System.Error");
@@ -1027,11 +254,6 @@ public class DataEngine implements IDataEngine{
 			ds=null;
 		}
 		SQLUtil.closeAnalyzedSQL();
-		/**
-		synchronized(this.hmAnalyzedSQL)
-		{
-			this.hmAnalyzedSQL.clear();
-		}**/
 	}
 
 	/**
@@ -1041,173 +263,109 @@ public class DataEngine implements IDataEngine{
 	 */
 	public Connection getConnection() throws SQLException
 	{
-		Return ret=this.open();
-		if(ret.getCode()!=0)
-		{
+		if(!isOpened()){
 			return null;
 		}
-
 		return ds.getConnection();
 	}
 
-	public void commit(Connection conn) throws SQLException
-	{
+	public void commit(Connection conn) throws SQLException{
 		conn.commit();
 	}
 
-	public void rollback(Connection conn)
-	{
+	public void rollback(Connection conn){
 		try
 		{
 			if(conn.getAutoCommit()==false)
 			{
 				conn.rollback();
 			}
+		}catch(Exception e){
 		}
-		catch(Exception e)
+	}
+	
+  //==============================连接池相关 END========================//
+	
+	
+	// 引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
+
+	// 内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
+	protected void callOnException(String strText,Exception e)
+	{
+		try
+		{
+			onException(strText,e);
+		}
+		catch(Exception ex)
 		{
 		}
 	}
-
 	/**
-	 * 关闭结果集
 	 * 
+	 * @param conn
+	 * @param strSourceSQL 含有{}变量符的原始SQL
+	 * @param cdoRequest
+	 * @return
+	 * @throws SQLException
+	 */
+	@Override
+	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException{
+		return SQLUtil.prepareStatement(conn, strSourceSQL, cdoRequest, strCharset);
+	}
+	
+	/**
+	 * 读取当前的记录数据
 	 * @param rs
+	 * @param strsFieldName 字段名 @ResultSetMetaData.getColumnLabel(i+1)
+	 * @param naFieldType 字段类型 @ResultSetMetaData..getColumnType(i+1)
+	 * @param nsPrecision @ResultSetMetaData.getPrecision(i+1)
+	 * @param nsScale @ResultSetMetaData.getScale(i+1);
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
 	 */
-	public void closeResultSet(ResultSet rs)
-	{
-		if(rs==null)
-		{
-			return;
-		}
+	public CDO readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale) throws SQLException,IOException{
+		CDO cdoRecord=new CDO();
 
-		try
+		if(readRecord(rs,strsFieldName,naFieldType,nsPrecision,nsScale,cdoRecord)==0)
 		{
-			rs.close();
+			return null;
 		}
-		catch(Exception e)
-		{
-		}
+		
+		return cdoRecord;
 	}
 
 	/**
-	 * 关闭Statement
-	 * 
-	 * @param stat
+	 * 读取当前的记录数据
+	 * @param rs
+	 * @param strsFieldName 字段名 @ResultSetMetaData.getColumnLabel(i+1)
+	 * @param naFieldType 字段类型 @ResultSetMetaData..getColumnType(i+1)
+	 * @param nsPrecision @ResultSetMetaData.getPrecision(i+1)
+	 * @param nsScale @ResultSetMetaData.getScale(i+1);
+	 * @param cdoRecord
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
 	 */
-	public void closeStatement(String strSQL,PreparedStatement stat)
+	public int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord) throws SQLException,IOException
 	{
-		if(stat==null)
-		{
-			return;
-		}
-
-		try
-		{
-			stat.close();
-		}
-		catch(Exception e)
-		{
-		}
+		
+		return SQLUtil.readRecord(rs, strsFieldName, naFieldType, nsPrecision, nsScale, cdoRecord, strCharset);
+		
 	}
 
 	/**
-	 * 关闭Statement
-	 * 
-	 * @param stat
-	 */
-	public void closeStatement(Statement stat)
-	{
-		if(stat==null)
-		{
-			return;
-		}
-
-		try
-		{
-			stat.close();
-		}
-		catch(Exception e)
-		{
-		}
-	}
-
-	/**
-	 * 关闭Connection
-	 * 
+	 * 查询并输出第一条记录的第一个字段
 	 * @param conn
-	 */
-	public void closeConnection(Connection conn)
-	{
-		if(conn==null)
-		{
-			return;
-		}
-		try
-		{
-			if(conn.getAutoCommit()==false)
-			{
-				conn.setAutoCommit(true);
-			}
-		}
-		catch(SQLException e1)
-		{
-		}
-
-		try
-		{
-			conn.close();
-		}
-		catch(Exception e)
-		{
-		}
-	}
-
-	/**
-	 * 关闭Connection
-	 * 
-	 * @param conn
-	 */
-	public void closeConnection(Connection conn,boolean bAutoCommit)
-	{
-		if(conn==null)
-		{
-			return;
-		}
-
-		try
-		{
-			if(conn.getAutoCommit()!=bAutoCommit)
-			{
-				conn.setAutoCommit(bAutoCommit);
-			}
-		}
-		catch(Exception e)
-		{
-		}
-		try
-		{
-			conn.close();
-		}
-		catch(Exception e)
-		{
-		}
-	}
-
-	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录的第一个字段
-	 * 
-	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public Field executeQueryField(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException
-	{
+	public Field executeQueryField(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException{
 		// 准备JDBC语句
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
+		PreparedStatement ps=prepareStatement(conn,strSourceSQL,cdoRequest);
 
 		// 输出查询结果
 		ResultSet rs=null;
@@ -1215,7 +373,6 @@ public class DataEngine implements IDataEngine{
 		{
 			// 执行查询
 			rs=ps.executeQuery();
-
 			// 读取记录信息
 			ResultSetMetaData meta=rs.getMetaData();
 			String[] strsFieldName=new String[1];
@@ -1231,11 +388,9 @@ public class DataEngine implements IDataEngine{
 			}
 
 			CDO cdoRecord=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale);
-			if(cdoRecord==null)
-			{
+			if(cdoRecord==null){
 				return null;
 			}
-
 			// 输出
 			if(cdoRecord.exists(strsFieldName[0]))
 			{
@@ -1248,31 +403,29 @@ public class DataEngine implements IDataEngine{
 		}
 		catch(SQLException e)
 		{
-			callOnException("executeQueryField Exception: "+strSQL,e);
+			callOnException("executeQueryField Exception: "+strSourceSQL,e);
 			throw e;
 		}
 		finally
 		{
-			this.closeResultSet(rs);
-			this.closeStatement(strSQL,ps);
+			SQLUtil.closeResultSet(rs);
+			SQLUtil.closePreparedStatement(ps);
 		}
 	}
 
 	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录的第一个字段(含类型)
+	 * 查询并输出第一条记录的第一个字段(含类型)
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public Field executeQueryFieldExt(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException
-	{
+	public Field executeQueryFieldExt(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException{
 		// 准备JDBC语句
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
-
+		PreparedStatement ps=prepareStatement(conn,strSourceSQL,cdoRequest);
 		// 输出查询结果
 		ResultSet rs=null;
 		try
@@ -1286,7 +439,6 @@ public class DataEngine implements IDataEngine{
 			int[] nsScale=new int[1];
 			for(int i=0;i<strsFieldName.length;i++)
 			{
-//				strsFieldName[i]=meta.getColumnName(i+1);
 				strsFieldName[i]=meta.getColumnLabel(i+1);
 				nsFieldType[i]=meta.getColumnType(i+1);
 				nsPrecision[i]=meta.getPrecision(i+1);
@@ -1299,12 +451,10 @@ public class DataEngine implements IDataEngine{
 			{
 				return null;
 			}
-
 			// 输出
 			if(cdoRecord.exists(strsFieldName[0]))
 			{
 				return cdoRecord.getObject(strsFieldName[0]);
-//				return new ObjectExt(cdoRecord.getObject(strsFieldName[0]).getType(), cdoRecord.getObject(strsFieldName[0]).getObjectValue());
 			}
 			else
 			{
@@ -1313,31 +463,31 @@ public class DataEngine implements IDataEngine{
 		}
 		catch(SQLException e)
 		{
-			callOnException("executeQueryField Exception: "+strSQL,e);
+			callOnException("executeQueryField Exception: "+strSourceSQL,e);
 			throw e;
 		}
 		finally
 		{
-			this.closeResultSet(rs);
-			this.closeStatement(strSQL,ps);
+			SQLUtil.closeResultSet(rs);
+			SQLUtil.closePreparedStatement(ps);
 		}
-	}
-
+	}	
+	
 	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录
+	 * 查询并输出第一条记录
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public int executeQueryRecord(Connection conn,String strSQL,CDO cdoRequest,CDO cdoResponse) throws SQLException,
+	public int executeQueryRecord(Connection conn,String strSourceSQL,CDO cdoRequest,CDO cdoResponse) throws SQLException,
 					IOException
 	{
 		// 准备JDBC语句 执行sql查询记录
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
+		PreparedStatement ps=prepareStatement(conn,strSourceSQL,cdoRequest);
 		// 输出查询结果
 		ResultSet rs=null;
 		try{
@@ -1359,20 +509,147 @@ public class DataEngine implements IDataEngine{
 			// 读取记录信息
 			int nRecordCount=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale,cdoResponse);
 			//统计查询
-			int nCount=executeCount(conn, strSQL, cdoRequest);
+			int nCount=executeCount(conn, strSourceSQL, cdoRequest);
 			if(nCount==0)
 				nCount=nRecordCount;
 			return nCount;
 			
 		}catch(SQLException e){
-			callOnException("executeQueryRecord Exception: "+strSQL,e);
+			callOnException("executeQueryRecord Exception: "+strSourceSQL,e);
 			throw e;
 		}finally{
-			this.closeResultSet(rs);
-			this.closeStatement(strSQL,ps);
+			SQLUtil.closeResultSet(rs);
+			SQLUtil.closePreparedStatement(ps);
 		}
 	}
 
+	/**
+	 * 查询并输出所有记录
+	 * 
+	 * @param conn
+	 * @param strSourceSQL 含有{}变量符的原始SQL
+	 * @param cdoRequest
+	 * @param cafRecordSet
+	 * @return
+	 * @throws Exception
+	 */
+	public int executeQueryRecordSet(Connection conn,String strSQL,CDO cdoRequest,CDOArrayField cdoArrayField)
+					throws SQLException,IOException
+	{
+		// 准备JDBC语句 执行记录查询
+		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);		
+		// 输出查询结果
+		ResultSet rs=null;
+		try{
+			// 执行查询
+			rs=ps.executeQuery();
+			// 读取Meta信息
+			ResultSetMetaData meta=rs.getMetaData();
+			String[] strsFieldName=new String[meta.getColumnCount()];
+			int[] nsFieldType=new int[strsFieldName.length];
+			int[] nsPrecision=new int[strsFieldName.length];
+			int[] nsScale=new int[strsFieldName.length];
+		
+			for(int i=0;i<strsFieldName.length;i++){
+				
+				strsFieldName[i]=meta.getColumnLabel(i+1);
+				nsFieldType[i]=meta.getColumnType(i+1);
+				nsPrecision[i]=meta.getPrecision(i+1);
+				nsScale[i]=meta.getScale(i+1);
+			}
+			// 读取记录
+			ArrayList<CDO> alRecord=new ArrayList<CDO>();
+			while(true)
+			{
+				// 读取记录信息
+				CDO cdoRecord=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale);
+				if(cdoRecord==null)
+				{
+					break;
+				}
+				alRecord.add(cdoRecord);
+			}
+
+			cdoArrayField.setValue(alRecord);		
+			//统计总数量查询
+			int nCount=executeCount(conn, strSQL, cdoRequest);
+			if(nCount==0)
+				nCount=alRecord.size();
+			
+			return nCount;
+		}catch(SQLException e){
+			callOnException("executeQueryRecordSet Exception: "+strSQL,e);
+			throw e;
+		}finally{
+			SQLUtil.closeResultSet(rs);
+			SQLUtil.closePreparedStatement(ps);
+		}
+	}	
+	
+	/**
+	 *  执行数据库插入,更新,删除语句
+	 * 
+	 * @param conn
+	 * @param strSourceSQL 含有{}变量符的原始SQL
+	 * @param cdoRequest
+	 * @return
+	 * @throws Exception
+	 */
+	public int executeUpdate(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
+	{
+		// 准备JDBC语句
+		PreparedStatement ps=prepareStatement(conn,strSourceSQL,cdoRequest);
+		// 输出查询结果
+		try{
+			return ps.executeUpdate();
+		}catch(SQLException e){
+			callOnException("executeUpdate Exception: "+strSourceSQL,e);
+			throw e;
+		}finally{
+			SQLUtil.closePreparedStatement(ps);
+		}
+	}
+	
+	/**
+	 * 执行数据库插入,更新,删除语句
+	 * 
+	 * @param conn
+	 * @param strSourceSQL 含有{}变量符的原始SQL
+	 * @param cdoRequest
+	 * @return
+	 * @throws Exception
+	 */
+	public void executeSQL(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException
+	{
+		// 准备JDBC语句
+		PreparedStatement ps=prepareStatement(conn,strSourceSQL,cdoRequest);
+		try{
+			// 执行查询
+			ps.execute();
+		}catch(SQLException e){
+			callOnException("executeUpdate Exception: "+strSourceSQL,e);
+			throw e;
+		}
+		finally{
+			SQLUtil.closePreparedStatement(ps);
+		}
+	}	
+
+	
+	// 事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
+	public void onException(String strText,Exception e)
+	{
+	}
+
+	public void onSQLStatement(String strSQL)
+	{
+		
+	}
+	
+	public void onExecuteSQL(String strSQL,ArrayList<String> alParaName,CDO cdoRequest){
+		
+	}
+	
 	private int executeCount(Connection conn,String strSQL,CDO cdoRequest){
 		if(!cdoRequest.exists("$$nRecordCountId$$") || !cdoRequest.getBooleanValue("$$nRecordCountId$$"))
 			return 0;
@@ -1470,8 +747,8 @@ public class DataEngine implements IDataEngine{
 			nCount=0;
 			callOnException("executeQueryRecord Count Exception: "+strSQL,e);			
 		}finally{
-			this.closeResultSet(rs);
-			this.closeStatement(strSQL,ps);
+			SQLUtil.closeResultSet(rs);
+			SQLUtil.closePreparedStatement(ps);
 		}
 		return nCount;
 		
@@ -1517,272 +794,8 @@ public class DataEngine implements IDataEngine{
 		}	
 	}
 	
-	/**
-	 * 通过一个传入的数据库连接查询并输出所有记录
-	 * 
-	 * @param conn
-	 * @param strSQL
-	 * @param cdoRequest
-	 * @param cafRecordSet
-	 * @return
-	 * @throws Exception
-	 */
-	public int executeQueryRecordSet(Connection conn,String strSQL,CDO cdoRequest,CDOArrayField cdoArrayField)
-					throws SQLException,IOException
-	{
-		// 准备JDBC语句 执行记录查询
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);		
-		// 输出查询结果
-		ResultSet rs=null;
-		try{
-			// 执行查询
-			rs=ps.executeQuery();
-			// 读取Meta信息
-			ResultSetMetaData meta=rs.getMetaData();
-			String[] strsFieldName=new String[meta.getColumnCount()];
-			int[] nsFieldType=new int[strsFieldName.length];
-			int[] nsPrecision=new int[strsFieldName.length];
-			int[] nsScale=new int[strsFieldName.length];
-		
-			for(int i=0;i<strsFieldName.length;i++){
-				
-				strsFieldName[i]=meta.getColumnLabel(i+1);
-				nsFieldType[i]=meta.getColumnType(i+1);
-				nsPrecision[i]=meta.getPrecision(i+1);
-				nsScale[i]=meta.getScale(i+1);
-			}
-			// 读取记录
-			ArrayList<CDO> alRecord=new ArrayList<CDO>();
-			while(true)
-			{
-				// 读取记录信息
-				CDO cdoRecord=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale);
-				if(cdoRecord==null)
-				{
-					break;
-				}
-				alRecord.add(cdoRecord);
-			}
-
-			cdoArrayField.setValue(alRecord);		
-			//统计总数量查询
-			int nCount=executeCount(conn, strSQL, cdoRequest);
-			if(nCount==0)
-				nCount=alRecord.size();
-			
-			return nCount;
-		}catch(SQLException e){
-			callOnException("executeQueryRecordSet Exception: "+strSQL,e);
-			throw e;
-		}finally{
-			this.closeResultSet(rs);
-			this.closeStatement(strSQL,ps);
-		}
-	}
-
-	/**
-	 * 执行数据库更新语句
-	 * 
-	 * @param conn
-	 * @param strSQL
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	public int executeUpdate(Connection conn,String strSQL,CDO cdoRequest) throws SQLException
-	{
-		// 准备JDBC语句
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
-		// 输出查询结果
-		try{
-			return ps.executeUpdate();
-		}catch(SQLException e){
-			callOnException("executeUpdate Exception: "+strSQL,e);
-			throw e;
-		}finally{
-			SQLUtil.closePreparedStatement(ps);
-		}
-	}
-
-	/**
-	 * 执行数据库更新语句
-	 * 
-	 * @param conn
-	 * @param strSQL
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	public void executeSQL(Connection conn,String strSQL,CDO cdoRequest) throws SQLException
-	{
-		// 准备JDBC语句
-		PreparedStatement ps=prepareStatement(conn,strSQL,cdoRequest);
-
-		// 输出查询结果
-		try
-		{
-			// 执行查询
-			ps.execute();
-		}
-		catch(SQLException e)
-		{
-			callOnException("executeUpdate Exception: "+strSQL,e);
-			throw e;
-		}
-		finally
-		{
-			this.closeStatement(strSQL,ps);
-		}
-	}
-
-	/**
-	 * 使用指定的连接执行数据库事务
-	 * 
-	 * @param conn
-	 * @param cdoRequest
-	 * @return
-	 */
-	public Return executeTrans(Connection conn,HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse,boolean bUseTransFlag)
-	{
-		Return ret=null;
-
-		// 得到TransName
-		String strTransName="";
-		try
-		{
-			strTransName=cdoRequest.getStringValue("strTransName");
-		}
-		catch(Exception e)
-		{
-			return null;
-		}
-
-		// 查找Trans对象
-		SQLTrans trans=(SQLTrans)hmTrans.get(strTransName);
-		if(trans==null)
-		{// 未找到
-			return null;
-		}
-
-		// Trans找到，开始执行事务
-		try
-		{
-			return handleTrans(conn,hmTrans,trans,cdoRequest,cdoResponse,bUseTransFlag);
-		}
-		catch(SQLException e)
-		{
-			callOnException("executeTrans Exception: "+strTransName,e);
-
-			ret=null;
-
-			OnException onException=trans.getOnException();
-			int nErrorCount=onException.getOnErrorCount();
-			for(int i=0;i<nErrorCount;i++)
-			{
-				OnError onError=onException.getOnError(i);
-				if(onError.getCode()==e.getErrorCode())
-				{
-					ret=Return.valueOf(onError.getReturn().getCode(),onError.getReturn().getText(),onError.getReturn()
-									.getInfo());
-					break;
-				}
-			}
-			if(ret==null)
-			{// 没有定义OnError
-				ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException
-								.getReturn().getInfo());
-			}
-
-			return ret;
-		}
-		catch(IOException e)
-		{
-			callOnException("executeTrans Exception: "+strTransName,e);
-
-			OnException onException=trans.getOnException();
-			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException
-							.getReturn().getInfo());
-
-			return ret;
-		}
-		catch(Exception e)
-		{
-			callOnException("executeTrans Exception: "+strTransName,e);
-
-			OnException onException=trans.getOnException();
-			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException
-							.getReturn().getInfo());
-
-			return ret;
-		}
-	}
-
-	/**
-	 * 使用指定的连接执行数据库事务，启用TransFlag
-	 * 
-	 * @param conn
-	 * @param cdoRequest
-	 * @return
-	 */
-	public Return executeTrans(Connection conn,HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse)
-	{
-		return executeTrans(conn,hmTrans,cdoRequest,cdoResponse,true);
-	}
-
-	/**
-	 * 执行数据库事务
-	 * 
-	 * @param cdoRequest
-	 * @param cdoResponse
-	 * @return
-	 */
-	public Return executeTrans(HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse)
-	{
-		Return ret=null;
-
-		// 获取数据库联接
-		Connection conn=null;
-		try
-		{
-			conn=this.getConnection();
-		}
-		catch(SQLException e)
-		{
-			ret=Return.valueOf(-1,"Cannot obtain database connection","System.Error");
-			return ret;
-		}
-
-		// 执行数据库事务
-		try
-		{
-			ret=executeTrans(conn,hmTrans,cdoRequest,cdoResponse);
-		}
-		finally
-		{
-			closeConnection(conn);
-		}
-
-		return ret;
-	}
-
-
-	// 接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
-
-	// 事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
-
-	// 事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
-	public void onException(String strText,Exception e)
-	{
-	}
-
-	public void onSQLStatement(String strSQL)
-	{
-		
-	}
 	
-	public void onExecuteSQL(String strSQL,ArrayList<String> alParaName,CDO cdoRequest){
-		
-	}
+
 
 	// 构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 

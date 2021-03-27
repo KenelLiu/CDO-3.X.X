@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
+import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.IActiveObject;
 import com.cdoframework.cdolib.base.Return;
@@ -99,10 +100,7 @@ public class ClusterController extends ThreadGroup
 		}
 		finally
 		{
-			if(dataEngine!=null)
-			{
-				dataEngine.closeConnection(conn);
-			}
+			SQLUtil.closeConnection(conn);
 		}
 		
 		return 1;
@@ -163,10 +161,8 @@ public class ClusterController extends ThreadGroup
 		}
 		finally
 		{
-			if(dataEngine!=null)
-			{
-				dataEngine.closeConnection(conn);
-			}
+
+			SQLUtil.closeConnection(conn);
 		}
 		
 		return 1;
@@ -239,10 +235,7 @@ public class ClusterController extends ThreadGroup
 		}
 		finally
 		{
-			if(dataEngine!=null)
-			{
-				dataEngine.closeConnection(conn);
-			}
+			SQLUtil.closeConnection(conn);
 		}
 	}
 	private void initServiceRecord(String strServerIP) throws Exception

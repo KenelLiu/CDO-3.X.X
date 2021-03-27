@@ -41,13 +41,13 @@ import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 /**
 * @author KenelLiu
 */
-public class BigTableEngine
+public class DataServiceParse
 {
 
 	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-	Logger logger  = Logger.getLogger(BigTableEngine.class);
+	Logger logger  = Logger.getLogger(DataServiceParse.class);
 
 	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException{
 		int nReturnItemCount=returnObject.getReturnItemCount();
@@ -714,7 +714,7 @@ public class BigTableEngine
 
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
-	public BigTableEngine(){
+	public DataServiceParse(){
 		
 	}
 	

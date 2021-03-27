@@ -57,7 +57,7 @@ public class BigTableEngine20210327{
 	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-	Logger logger  = Logger.getLogger(BigTableEngine.class);
+	Logger logger  = Logger.getLogger(DataServiceParse.class);
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 
 	//private HashMap<String,ParsedSQL> hmParsedSQL;

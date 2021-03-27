@@ -88,20 +88,15 @@ public interface IDataEngine
 	public void setPoolPreparedStatements(boolean bPoolPreparedStatements);
 	public void setRemoveAbandonedOnMaintenance(boolean bRemoveAbandonedOnMaintenance);
 	public void setLogAbandoned(boolean bLogAbandoned);
-
 	
 	public boolean isOpened();
-	
-
-	// 公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	/**
-	 * 打开数据库
+	 * 初始连接池
 	 */
 	public Return open();
 
 	/**
-	 * 关闭数据库
-	 * 
+	 * 关闭连接池
 	 */
 	public void close();
 
@@ -116,150 +111,113 @@ public interface IDataEngine
 
 	public void rollback(Connection conn);
 
-	/**
-	 * 关闭结果集
-	 * 
-	 * @param rs
-	 */
-	public void closeResultSet(ResultSet rs);
 
 	/**
-	 * 关闭Statement
-	 * 
-	 * @param stat
-	 */
-	public void closeStatement(Statement stat);
-
-	/**
-	 * 关闭Statement
-	 * 
-	 * @param stat
-	 */
-	public void closeStatement(String strSQL,PreparedStatement stat);
-
-	/**
-	 * 关闭Connection
 	 * 
 	 * @param conn
+	 * @param strSourceSQL 含有{}变量符的原始SQL
+	 * @param cdoRequest
+	 * @return
+	 * @throws SQLException
 	 */
-	public void closeConnection(Connection conn);
-
-	/**
-	 * 关闭Connection
-	 * 
-	 * @param conn
-	 */
-	public void closeConnection(Connection conn,boolean bAutoCommit);
-
 	public PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException;
 	
 	/**
 	 * 读取当前的记录数据
-	 * 
 	 * @param rs
+	 * @param strsFieldName 字段名 @ResultSetMetaData.getColumnLabel(i+1)
+	 * @param naFieldType 字段类型 @ResultSetMetaData..getColumnType(i+1)
+	 * @param nsPrecision @ResultSetMetaData.getPrecision(i+1)
+	 * @param nsScale @ResultSetMetaData.getScale(i+1);
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
 	 */
 	public CDO readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale) throws SQLException,IOException;
+	/**
+	 * 读取当前的记录数据
+	 * @param rs
+	 * @param strsFieldName 字段名 @ResultSetMetaData.getColumnLabel(i+1)
+	 * @param naFieldType 字段类型 @ResultSetMetaData..getColumnType(i+1)
+	 * @param nsPrecision @ResultSetMetaData.getPrecision(i+1)
+	 * @param nsScale @ResultSetMetaData.getScale(i+1);
+	 * @param cdoRecord
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
 	public int readRecord(ResultSet rs,String[] strsFieldName,int[] naFieldType,int[] nsPrecision,int[] nsScale,CDO cdoRecord) throws SQLException,IOException;
 
 	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录的第一个字段
-	 * 
+	 * 查询并输出第一条记录的第一个字段
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public Field executeQueryField(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException;
+	public Field executeQueryField(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException;
 
 	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录的第一个字段(含类型)
+	 * 接查询并输出第一条记录的第一个字段(含类型)
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public Field executeQueryFieldExt(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException;
+	public Field executeQueryFieldExt(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException;
 
 	/**
-	 * 通过一个传入的数据库连接查询并输出第一条记录
+	 * 查询并输出第一条记录
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cdoResponse
 	 * @return
 	 * @throws Exception
 	 */
-	public int executeQueryRecord(Connection conn,String strSQL,CDO cdoRequest,CDO cdoResponse) throws SQLException,
+	public int executeQueryRecord(Connection conn,String strSourceSQL,CDO cdoRequest,CDO cdoResponse) throws SQLException,
 					IOException;
 
 	/**
-	 * 通过一个传入的数据库连接查询并输出所有记录
+	 * 查询并输出所有记录
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @param cafRecordSet
 	 * @return
 	 * @throws Exception
 	 */
-	public int executeQueryRecordSet(Connection conn,String strSQL,CDO cdoRequest,CDOArrayField cafRecordSet)
+	public int executeQueryRecordSet(Connection conn,String strSourceSQL,CDO cdoRequest,CDOArrayField cdoArrayField)
 					throws SQLException,IOException;
 
 	/**
-	 * 执行数据库更新语句
+	 * 执行数据库插入,更新,删除语句,并返回影响的数据行
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @return
 	 * @throws Exception
 	 */
-	public int executeUpdate(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException;
+	public int executeUpdate(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException;
 
 	/**
-	 * 执行数据库更新语句
+	 * 执行数据库插入,更新,删除语句
 	 * 
 	 * @param conn
-	 * @param strSQL
+	 * @param strSourceSQL 含有{}变量符的原始SQL
 	 * @param cdoRequest
 	 * @return
 	 * @throws Exception
 	 */
-	public void executeSQL(Connection conn,String strSQL,CDO cdoRequest) throws SQLException,IOException;
-
-	/**
-	 * 使用指定的连接执行数据库事务
-	 * 
-	 * @param conn
-	 * @param cdoRequest
-	 * @return
-	 */
-	public Return executeTrans(Connection conn,HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse,
-					boolean bUseTransFlag);
-
-	/**
-	 * 使用指定的连接执行数据库事务，启用TransFlag
-	 * 
-	 * @param conn
-	 * @param cdoRequest
-	 * @return
-	 */
-	public Return executeTrans(Connection conn,HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse);
-
-	/**
-	 * 执行数据库事务
-	 * 
-	 * @param cdoRequest
-	 * @param cdoResponse
-	 * @return
-	 */
-	public Return executeTrans(HashMap<String,SQLTrans> hmTrans,CDO cdoRequest,CDO cdoResponse);
+	public void executeSQL(Connection conn,String strSourceSQL,CDO cdoRequest) throws SQLException,IOException;
 
 	// 接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
 

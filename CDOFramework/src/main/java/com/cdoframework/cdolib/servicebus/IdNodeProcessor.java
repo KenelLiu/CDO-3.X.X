@@ -4,6 +4,7 @@ package com.cdoframework.cdolib.servicebus;
 import java.sql.Connection;
 import java.util.List;
 
+import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.IdGeneratorFactory;
 import com.cdoframework.cdolib.base.Return;
@@ -57,9 +58,8 @@ public class IdNodeProcessor
 		{
 			return Return.valueOf(-1,"cdosObjectIdList");
 		}
-		finally
-		{
-			dataEngine.closeConnection(conn);
+		finally{
+			SQLUtil.closeConnection(conn);
 		}
 		return Return.OK;
 	}

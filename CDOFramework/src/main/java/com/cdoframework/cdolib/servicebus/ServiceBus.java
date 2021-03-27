@@ -27,7 +27,7 @@ import com.cdo.util.exception.ZookeeperException;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.database.BigTableEngine;
+import com.cdoframework.cdolib.database.DataServiceParse;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.cdolib.framework.ClusterController;
 import com.cdoframework.cdolib.servicebus.xsd.DataGroup;
@@ -49,7 +49,7 @@ public class ServiceBus implements IServiceBus
 	private HashMap<String,IDataEngine> hmDataGroup;
 	private ServicePlugin[] plugins;
 	private ClusterController clusterController;
-	private BigTableEngine btEngine=new BigTableEngine();
+	private DataServiceParse btEngine=new DataServiceParse();
 	private HashMap<String,Object> hmSharedData;
 	private ReentrantReadWriteLock lockSharedData;		
 	private HashMap<String,IService> hmService;
@@ -70,7 +70,7 @@ public class ServiceBus implements IServiceBus
 	{
 		return this.eventProcessor;
 	}
-	public BigTableEngine getBigTableEngine()
+	public DataServiceParse getBigTableEngine()
 	{
 		return this.btEngine;
 	}
@@ -433,7 +433,7 @@ public class ServiceBus implements IServiceBus
 		lockSharedData			=new ReentrantReadWriteLock();
 		hmService 				= new LinkedHashMap<String,IService>(20);
 		hmParameterMap			= new HashMap<String,String>(10);	
-		btEngine				=new BigTableEngine();//去掉分库分表
+		btEngine				=new DataServiceParse();//去掉分库分表
 		
 	}
 	/**
