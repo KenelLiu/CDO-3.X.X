@@ -38,9 +38,9 @@ public class Service implements IService
 	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
 	private String strServiceName;
 	private String ZkProducerId;
-	private DataServiceParse btEngin;
-	private IServicePlugin servicePlugin;
-	private IServiceBus serviceBus;
+	private DataServiceParse dataServiceParse;
+//	private IServicePlugin servicePlugin;
+//	private IServiceBus serviceBus; 
 	// 存放所有的普通的transService 和 动态 activeService 对象
 	private Map<String, List<ITransService>> hmServiceMap;
 
@@ -56,9 +56,9 @@ public class Service implements IService
 	{
 		return ZkProducerId;
 	}
-	public void setBigTableEngine(DataServiceParse btEngin)
+	public void setDataServiceParse(DataServiceParse dataServiceParse)
 	{
-		this.btEngin = btEngin;
+		this.dataServiceParse = dataServiceParse;
 	}
 	public Map<String, List<ITransService>> getTransServiceMap(){
 		return this.hmServiceMap;
@@ -82,7 +82,7 @@ public class Service implements IService
 			return null;
 		}		
 		try{    
-			return this.btEngin.handleTrans(hmAllDataGroup,sqlTrans,cdoRequest,cdoResponse);
+			return this.dataServiceParse.handleTrans(hmAllDataGroup,sqlTrans,cdoRequest,cdoResponse);
 		}
 		catch(Exception e)
 		{
@@ -133,8 +133,8 @@ public class Service implements IService
 	{
 		this.strServiceName = strServiceName;
 		this.ZkProducerId = ZkProducerId;
-		this.servicePlugin = servicePlugin;
-		this.serviceBus = serviceBus;
+//		this.servicePlugin = servicePlugin;
+//		this.serviceBus = serviceBus;
 		return Return.OK;
 	}
 	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------

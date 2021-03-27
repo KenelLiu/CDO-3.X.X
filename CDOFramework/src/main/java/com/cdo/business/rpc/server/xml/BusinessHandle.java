@@ -78,13 +78,7 @@ public class BusinessHandle {
 		Return ret=null;
 		try{							
 			//处理业务
-			if(cdoRequest.exists(ITransService.PACKAGE_KEY)){
-				String classPath=cdoRequest.getStringValue(ITransService.PACKAGE_KEY)+"."+cdoRequest.getStringValue(ITransService.SERVICENAME_KEY);					
-				ITransService transService=(ITransService)Class.forName(classPath).newInstance();
-				ret=transService.processTrans(cdoRequest, cdoResponse);	
-			}else{
-				ret=BusinessService.getInstance().handleTrans(cdoRequest, cdoResponse);
-			}
+			ret=BusinessService.getInstance().handleTrans(cdoRequest, cdoResponse);
 			if(ret==null){			
 				setFailOutCDO(cdoOutput," ret is null,Request method :strServiceName="+strServiceName+",strTransName="+strTransName);	
 				logger.error("ret is null,Request method:strServiceName="+strServiceName+",strTransName="+strTransName);

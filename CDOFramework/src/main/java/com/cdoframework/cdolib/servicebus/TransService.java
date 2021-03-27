@@ -72,6 +72,16 @@ public abstract class TransService implements ITransService
 			}
 		}
 	}
+	
+	@Override
+	public Return handleTrans(CDO cdoRequest, CDO cdoResponse) {
+		Return validateReturn = validate(cdoRequest);
+		if (!Return.OK.equals(validateReturn)) {
+			return validateReturn;
+		}
+		return null;
+	}
+		
 	/**
 	 * 设置服务名
 	 * @param strServiceName
@@ -131,6 +141,7 @@ public abstract class TransService implements ITransService
 	}
 	@Override
 	public String getDBCharset(String strDataGroupId){
+	
 		IDataEngine dataEngine=this.serviceBus.getHMDataGroup().get(strDataGroupId);
 		return dataEngine.getCharset();
 	}

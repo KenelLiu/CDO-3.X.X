@@ -38,7 +38,7 @@ public class ServicePlugin implements IServicePlugin
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 
 	private HashMap<String,String> hmParameterMap;//配置参数
-	private HashMap<String,IDataEngine> hmLocalDataGroup;//关系数据库引擎容器
+	//private HashMap<String,IDataEngine> hmLocalDataGroup;//关系数据库引擎容器 不再使用插件配置数据源======//
 	private HashMap<String,IDataEngine> hmAllDataGroup;//关系数据库引擎容器
 	private HashMap<String,Service> hmService;
 
@@ -80,11 +80,6 @@ public class ServicePlugin implements IServicePlugin
 
 	// 公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
-	public boolean testServerState()
-	{
-		//TODO
-		return true;
-	}
 	
 	public void init(String strPluginName,ServiceBus serviceBus,com.cdoframework.cdolib.servicebus.xsd.ServicePlugin pluginDefine)
 					throws Exception
@@ -105,7 +100,8 @@ public class ServicePlugin implements IServicePlugin
 			this.hmParameterMap.put(para.getName(),para.getValue());
 		}
 
-		// 加载和初始化插件DataGroup
+		//==== 不再使用插件配置数据源,加载和初始化插件DataGroup=======//
+		/**
 		DataGroup[] dgs=pluginDefine.getDataGroup();
 		for(int i=0;i<dgs.length;i++)
 		{
@@ -113,7 +109,7 @@ public class ServicePlugin implements IServicePlugin
 			this.hmLocalDataGroup.put(dgs[i].getId(),dgs[i].init());
 			this.hmAllDataGroup.put(dgs[i].getId(),dgs[i].init());
 		}
-
+		**/
 		
 		ServiceConfig[] serviceConfigs = pluginDefine.getServiceConfig();
 		//保存每一个plugin.xml插件里的使用 zk 的service
@@ -122,19 +118,17 @@ public class ServicePlugin implements IServicePlugin
 		for(ServiceConfig sc:serviceConfigs)
 		{
 			Service service = new Service();
-			service.setBigTableEngine(serviceBus.getBigTableEngine());
+			service.setDataServiceParse(serviceBus.getDataServiceParse());
 			service.setPublicDataGroup(this.hmAllDataGroup);
 			if(logger.isInfoEnabled()){logger.info("init service: "+ sc.getId());}
 			Return ret = service.init(sc.getId(),sc.getZkId(),this,serviceBus);
-			if(ret.getCode()!=0)
-			{
+			if(ret.getCode()!=Return.OK.getCode()){
 				//TODO 清除对象
 				throw new Exception("init service error : "+ret.getText());
 			}
 			IService oldService = this.hmService.put(sc.getId(),service);
 			IService oldService2 = serviceBus.addService(service);
-			if(oldService!=null || oldService2!=null)
-			{
+			if(oldService!=null || oldService2!=null){
 				//TODO 清除对象
 				throw new Exception("duplicate serviceId :" + service.getServiceName());
 			}
@@ -149,7 +143,7 @@ public class ServicePlugin implements IServicePlugin
 		
 		
 		
-		// 初始化DataService
+		// =============初始化DataService====================//
 		int nDataServiceCount=pluginDefine.getDataServiceCount();
 		try
 		{
@@ -167,32 +161,26 @@ public class ServicePlugin implements IServicePlugin
 				try
 				{
 					dataService=DataService.fromXML(strSQLTransXML);
-				}
-				catch(Exception e)
-				{
+				}catch(Exception e){
 					logger.error(e.getMessage(), e); 
 					throw new Exception("SQL XML parse error: "+dataServiceDefine.getId());
 				}
 				Service service = this.hmService.get(dataServiceDefine.getId());
-				if(service==null)
-				{
+				if(service==null){
 					throw new Exception("init service error : can not find service id "+dataServiceDefine.getId());
 				}
 				Return ret = dataService.init(dataServiceDefine.getId(),service,this,serviceBus);
-				if(ret.getCode()!=0)
-				{
+				if(ret.getCode()!=Return.OK.getCode()){
 					//TODO 清除对象
 					throw new Exception("init service error : "+ret.getText());
 				}
 			}
-		}
-		catch(Exception e)
-		{
+		}catch(Exception e){
 			//TODO 清除对象
 			throw e;
 		}
 
-		// 初始化TransService
+		//=================== 初始化TransService================//
 		int nTransServiceCount=pluginDefine.getTransServiceCount();
 		try
 		{
@@ -215,7 +203,7 @@ public class ServicePlugin implements IServicePlugin
 				transServiceObject.setService(service);
 				
 				Return ret=transServiceObject.init();
-				if(ret.getCode()!=0)
+				if(ret.getCode()!=Return.OK.getCode())
 				{
 					throw new Exception("Init service object failed: "+transService.getId());
 				}
@@ -243,11 +231,11 @@ public class ServicePlugin implements IServicePlugin
 		}
 		catch(Exception e)
 		{
-			//TODO 清除对象
+			
 			throw e;
 		}
 
-		// 初始化ActiveService
+		// =================初始化ActiveService=================//
 		int nActiveServiceCount=pluginDefine.getActiveServiceCount();
 		try
 		{
@@ -389,9 +377,9 @@ public class ServicePlugin implements IServicePlugin
 
 	public ServicePlugin()
 	{
-		hmService 			= new HashMap<String,Service>(3);
+		hmService 			= new HashMap<String,Service>(5);
 		hmParameterMap			= new HashMap<String,String>(10);
-		hmLocalDataGroup		= new HashMap<String,IDataEngine>(4);
-		hmAllDataGroup			= new HashMap<String,IDataEngine>(4);	
+		//hmLocalDataGroup		= new HashMap<String,IDataEngine>(1);
+		hmAllDataGroup			= new HashMap<String,IDataEngine>(6);	
 	}
 }

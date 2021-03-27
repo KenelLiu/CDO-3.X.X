@@ -5,17 +5,12 @@
 
 package com.cdoframework.cdolib.servicebus;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
@@ -24,7 +19,6 @@ import com.cdo.business.rpc.zk.ZKClientManager;
 import com.cdo.business.rpc.zk.ZkParameter;
 import com.cdo.business.rpc.zk.ZookeeperServer;
 import com.cdo.util.exception.ZookeeperException;
-import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.DataServiceParse;
@@ -49,7 +43,7 @@ public class ServiceBus implements IServiceBus
 	private HashMap<String,IDataEngine> hmDataGroup;
 	private ServicePlugin[] plugins;
 	private ClusterController clusterController;
-	private DataServiceParse btEngine=new DataServiceParse();
+	private DataServiceParse dataServiceParse=new DataServiceParse();
 	private HashMap<String,Object> hmSharedData;
 	private ReentrantReadWriteLock lockSharedData;		
 	private HashMap<String,IService> hmService;
@@ -70,9 +64,9 @@ public class ServiceBus implements IServiceBus
 	{
 		return this.eventProcessor;
 	}
-	public DataServiceParse getBigTableEngine()
+	public DataServiceParse getDataServiceParse()
 	{
-		return this.btEngine;
+		return this.dataServiceParse;
 	}
 	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
 	private String strDefaultDataGroupId;
@@ -106,16 +100,13 @@ public class ServiceBus implements IServiceBus
 		try
 		{
 			serviceBus=com.cdoframework.cdolib.servicebus.xsd.ServiceBus.fromXML(strServiceBusXML);
-		}
-		catch(Exception e)
-		{
+		}catch(Exception e){
 			logger.error("When parse serviceBus.xml , caught exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
 		}
 		// 初始化插件参数
 		int nParameterCount=serviceBus.getParameterCount();
-		for(int i=0;i<nParameterCount;i++)
-		{
+		for(int i=0;i<nParameterCount;i++){
 			Parameter para=serviceBus.getParameter(i);
 			this.hmParameterMap.put(para.getName(),para.getValue());
 		}
@@ -136,8 +127,7 @@ public class ServiceBus implements IServiceBus
 
 		//初始化ClusterController
 		com.cdoframework.cdolib.servicebus.xsd.ClusterController ccDefine=serviceBus.getClusterController();
-		if(ccDefine!=null)
-		{
+		if(ccDefine!=null){
 			if(logger.isInfoEnabled()){logger.info("Staring initialize  cluster controller ....................");}
 			clusterController	=new ClusterController();
 			IDataEngine clDataEngine=hmDataGroup.get(ccDefine.getDataGroupId());
@@ -154,8 +144,7 @@ public class ServiceBus implements IServiceBus
 		//初始化事件处理器
 		if(logger.isInfoEnabled()){logger.info("starting to init Event handler....................");}
 		com.cdoframework.cdolib.servicebus.xsd.EventProcessor eventProcessorDefine = serviceBus.getEventProcessor();
-		if(eventProcessorDefine != null)
-		{
+		if(eventProcessorDefine != null){
 			eventProcessor			= new EventProcessor();
 			eventProcessor.setMaxFreeThreadCount(eventProcessorDefine.getMaxIdelTreadCount());
 			eventProcessor.setMaxThreadCount(eventProcessorDefine.getMaxThreadCount());
@@ -174,8 +163,7 @@ public class ServiceBus implements IServiceBus
 				String strXMLResource=serviceBus.getPluginXMLResource(i);
 				if(logger.isInfoEnabled()){logger.info("loading "+strXMLResource+"..............................");}
 				String strXML=Utility.readTextResource(strXMLResource,"utf-8");
-				if(strXML==null)
-				{
+				if(strXML==null){
 					throw new Exception("Resource "+strXMLResource+" invalid");
 				}
 				com.cdoframework.cdolib.servicebus.xsd.ServicePlugin servicePluginDefine=com.cdoframework.cdolib.servicebus.xsd.ServicePlugin.fromXML(strXML);
@@ -186,16 +174,12 @@ public class ServiceBus implements IServiceBus
 				this.plugins[i].setPublicDataGroup(hmDataGroup);				
 				this.plugins[i].init(i+"",this,servicePluginDefine);
 			}
-		}
-		catch(Exception e)
-		{
+		}catch(Exception e){
 			plugins	=null;
-
 			logger.error("when parse plugin ,caught Exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
 		}
 		if(logger.isDebugEnabled()){logger.debug("load  plugins successfully....................");}
-		
 		
 		//将plugin.xml上服务  根据配置注册到对应的zk服务器上  
 		ZkProducer[] zkProducer=serviceBus.getZkProducer();
@@ -433,7 +417,7 @@ public class ServiceBus implements IServiceBus
 		lockSharedData			=new ReentrantReadWriteLock();
 		hmService 				= new LinkedHashMap<String,IService>(20);
 		hmParameterMap			= new HashMap<String,String>(10);	
-		btEngine				=new DataServiceParse();//去掉分库分表
+		dataServiceParse		=new DataServiceParse();
 		
 	}
 	/**

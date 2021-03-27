@@ -172,7 +172,6 @@ public class DataService implements java.io.Serializable {
   	 * @param service
   	 * @param servicePlugin
   	 * @param serviceBus
-  	 * @param hmBigTableGroupConfig  在servicebus中的initBigTableConfig 方法中初始化
   	 * @return
   	 */
       public com.cdoframework.cdolib.base.Return init(String strServiceName,Service service,com.cdoframework.cdolib.servicebus.ServicePlugin servicePlugin,com.cdoframework.cdolib.servicebus.ServiceBus serviceBus
@@ -183,8 +182,7 @@ public class DataService implements java.io.Serializable {
   		try{
 
   			DataServiceChoice[] dataServiceChoices = {this.getDataServiceChoice()};
-  			//初始设置 dataservice.xml中没有 bigtable
-  			//如果 存在bigTable 则sqlTrans至少存在一个bigTableGroupId 
+   
   			for(DataServiceChoice dataServiceChoice:dataServiceChoices)
   			{
   				DataServiceChoiceItem[] dataServiceChoiceItems = dataServiceChoice.getDataServiceChoiceItem();

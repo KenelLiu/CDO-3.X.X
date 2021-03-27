@@ -28,8 +28,8 @@ public class BusinessService
 
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 	private ServiceBus serviceBus;
-	public IServiceBus getServiceBus()
-	{
+	
+	public IServiceBus getServiceBus(){
 		return this.serviceBus;
 	}
 	private boolean bIsRunning;
@@ -61,20 +61,19 @@ public class BusinessService
 		}		
 	}
 
-	public Return start()
-	{
+	public Return start(){
+		
 		//可通过 外部初始化,若外部未初始化，使用默认初始化
 		if(GlobalResource.cdoConfig==null){
 			Return ret=getLocalEnvironment();
-			if(ret.getCode()!=0)
+			if(ret.getCode()!=Return.OK.getCode())
 				return ret;
 		}
 		String strBusResourceXmlFile=GlobalResource.cdoConfig.getString("servicebusResource.path");			
 		if(strBusResourceXmlFile==null){
 			 String confPath=GlobalResource.getCDOEnvConfigPath();
 			 String parent=new File(confPath).getParent();
-			 strBusResourceXmlFile=parent+"/servicebusResource.xml";
-			 log.info("使用配置文件:strBusResource="+strBusResourceXmlFile);
+			 strBusResourceXmlFile=parent+"/servicebusResource.xml";		
 			 File file=new File(strBusResourceXmlFile);
 			 if(!file.exists()||!file.isFile())
 				 strBusResourceXmlFile=null;			 
@@ -89,79 +88,61 @@ public class BusinessService
 		return start(strBusResourceXmlFile,"pluginsConfig.xml");
 	}
 	
-	public Return start(String strBusResourceXmlFile,String pluginsConfigXmlFile)
-	{
-			
+	public Return start(String strBusResourceXmlFile,String pluginsConfigXmlFile){
 		return start(strBusResourceXmlFile,pluginsConfigXmlFile,"UTF-8");
 	}
 	
-	public Return start(String strServiceBusResouceXMLFile,String strPluginsConfigXMLFile,String encoding)
-	{
-		if(this.bIsRunning==true)
-		{
+	public Return start(String strServiceBusResouceXMLFile,String strPluginsConfigXMLFile,String encoding){
+		if(this.bIsRunning==true){
 			return Return.OK;
 		}
-
-		//根据PluginCOnfig.xml和ServerbusResource.xml拼装 ServiceBus.xml
+		//=======根据PluginCOnfig.xml和ServerbusResource.xml拼装 ServiceBus.xml=======//
 		StringBuilder strBusinessServiceBusXML= new StringBuilder();
 		String strServiceBusResouceXML = Utility.readTextResource(strServiceBusResouceXMLFile,encoding,false);
 		String strPluginsConfigXML = Utility.readTextResource(strPluginsConfigXMLFile,encoding);
 		
-		if (strPluginsConfigXML.indexOf("<PluginXMLResource>")!=-1)
-		{
+		if (strPluginsConfigXML.indexOf("<PluginXMLResource>")!=-1){
 			strPluginsConfigXML = strPluginsConfigXML.substring(strPluginsConfigXML.indexOf("<PluginXMLResource>"), strPluginsConfigXML.lastIndexOf("</PluginXMLResource>")+"</PluginXMLResource>".length());
-		}
-		else
-		{
+		}else{
 			strPluginsConfigXML="";
 		}
 		strServiceBusResouceXML=strServiceBusResouceXML.replaceAll("ServiceBusResource", "ServiceBus");
 		strBusinessServiceBusXML.append(strServiceBusResouceXML.replaceAll("</ServiceBus>", "")).append(strPluginsConfigXML).append("</ServiceBus>");
 				
-		Return ret=serviceBus.init(strBusinessServiceBusXML.toString());
-		
-		if(ret.getCode()!=0)
-		{
+		Return ret=serviceBus.init(strBusinessServiceBusXML.toString());	
+		if(ret.getCode()!=Return.OK.getCode()){
 			return ret;
 		}
 		
 		ret=serviceBus.start();
-		if(ret.getCode()!=0)
-		{
+		if(ret.getCode()!=Return.OK.getCode()){
 			serviceBus.destroy();
 			return ret;
 		}
 		
 		this.bIsRunning=true;
-
+		
 		return Return.OK;
 	}
 	
-	public void stop()
-	{
-		if(this.bIsRunning==false)
-		{
+	public void stop(){
+		if(this.bIsRunning==false){
 			return;
 		}
 		serviceBus.stop();
 		serviceBus.destroy();
-		
 		this.bIsRunning=false;
 	}
 
-	public Return handleTrans(CDO cdoRequest,CDO cdoResponse)
-	{
+	public Return handleTrans(CDO cdoRequest,CDO cdoResponse){
 		Return ret=serviceBus.handleTrans(cdoRequest,cdoResponse);
-		if(ret==null)
-		{
+		if(ret==null){
 			return Return.valueOf(-1,"Invalid request","System.Error");
 		}
-		
 		return ret;
 	}
 	
-	private BusinessService()
-	{		
+	private BusinessService(){		
 		serviceBus=new ServiceBus();
 	}
 	
