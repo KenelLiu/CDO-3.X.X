@@ -1,5 +1,8 @@
 package com.cdoframework.cdolib.database;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import com.cdo.field.BooleanField;
@@ -42,7 +45,7 @@ public class DataEngineHelp {
 		
 		StringBuilder strbText1=new StringBuilder();
 		StringBuilder strbText2=new StringBuilder();
-		boolean bIsFieldId1=handleFieldIdText(strVarId,strbText1);
+		handleFieldIdText(strVarId,strbText1);
 		boolean bIsFieldId2=handleFieldIdText(strValue,strbText2);
 		
 		String strFieldId=strbText1.toString();
@@ -1185,4 +1188,80 @@ public class DataEngineHelp {
 		logger.warn(field.getFieldType().getName()+" Type is not array");	
 		return 0;
 	}
+	
+	static void setFieldValue(CDO cdoData,FieldType.type fieldType,String strOutputId,Object objValue) throws SQLException{
+		switch(fieldType.getType())
+		{
+			case FieldType.BYTE_TYPE:
+			{
+				cdoData.setByteValue(strOutputId,((Byte)objValue).byteValue());
+				break;
+			}
+			case FieldType.SHORT_TYPE:
+			{
+				cdoData.setShortValue(strOutputId,((Short)objValue).shortValue());
+				break;
+			}
+			case FieldType.INTEGER_TYPE:
+			{
+				cdoData.setIntegerValue(strOutputId,((Integer)objValue).intValue());
+				break;
+			}
+			case FieldType.LONG_TYPE:
+			{
+				cdoData.setLongValue(strOutputId,((Long)objValue).longValue());
+				break;
+			}
+			case FieldType.FLOAT_TYPE:
+			{
+				cdoData.setFloatValue(strOutputId,((Float)objValue).floatValue());
+				break;
+			}
+			case FieldType.DOUBLE_TYPE:
+			{
+				cdoData.setDoubleValue(strOutputId,((Double)objValue).doubleValue());
+				break;
+			}
+			case FieldType.STRING_TYPE:
+			{
+				cdoData.setStringValue(strOutputId,((String)objValue));
+				break;
+			}
+			case FieldType.DATE_TYPE:
+			{
+				cdoData.setDateValue(strOutputId,((String)objValue));
+				break;
+			}
+			case FieldType.TIME_TYPE:
+			{
+				cdoData.setTimeValue(strOutputId,((String)objValue));
+				break;
+			}
+			case FieldType.DATETIME_TYPE:
+			{
+				cdoData.setDateTimeValue(strOutputId,((String)objValue));
+				break;
+			}
+			case FieldType.BYTE_ARRAY_TYPE:
+			{
+				cdoData.setByteArrayValue(strOutputId,((byte[])objValue));
+				break;
+			}
+			case FieldType.CDO_TYPE:
+			{
+				cdoData.setCDOValue(strOutputId,(CDO)objValue);
+				break;
+			}
+			case FieldType.CDO_ARRAY_TYPE:
+			{
+				cdoData.setCDOListValue(strOutputId,(List<CDO>)objValue);
+				break;
+			}
+			default:
+			{
+				throw new SQLException("Unsupported fieldType: "+fieldType.getName());
+			}
+		}
+	}
 }
+

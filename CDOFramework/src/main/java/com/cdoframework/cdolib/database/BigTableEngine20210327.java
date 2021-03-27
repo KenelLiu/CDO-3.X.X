@@ -1,3 +1,12 @@
+/**
+ * www.woyo.com 2010版权所有
+ *
+ * $Header: $
+ *
+ * $Log: $
+ *
+ */
+
 package com.cdoframework.cdolib.database;
 
 import java.io.IOException;
@@ -5,6 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
@@ -40,18 +50,51 @@ import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 
 /**
-* @author KenelLiu
-*/
-public class BigTableEngine
-{
-
+ * 删除bigtable语法分析
+ * @author KenelLiu
+ */
+public class BigTableEngine20210327{
 	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	Logger logger  = Logger.getLogger(BigTableEngine.class);
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 
-	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException{
+	//private HashMap<String,ParsedSQL> hmParsedSQL;
+
+	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
+
+	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
+	//内部方法,所有仅在本类或派生类中使用的函数在此定义为protected方法-------------------------------------------
+	/**class ParsedSQL
+	{
+		
+		public String strSQL;
+		public String strIdFieldName;
+		public ArrayList<String> alParaName;
+		public ArrayList<String> alDataGroupId;
+		public String strTableName;
+		public String strCountFieldName;
+		public String strGroupFieldName;
+		public ArrayList<String> alTableName;
+		public String strOrderBy;
+		public String strPage;
+		public String strBatchIds;
+		
+	}
+	
+
+	
+	class MetaData
+	{
+		public String[] strsFieldName;;
+		public int[] nsFieldType;
+		public int[] nsPrecision;
+		public int[] nsScale;
+	}
+	**/
+	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException
+	{
 		int nReturnItemCount=returnObject.getReturnItemCount();
 		for(int j=0;j<nReturnItemCount;j++)
 		{
@@ -75,15 +118,92 @@ public class BigTableEngine
 			{
 				continue;
 			}
-			//int nType=object.getFieldType().getType();
+			int nType=object.getFieldType().getType();
 			Object objValue=object.getObjectValue();
-			//=======设置返回数据=======//
-			DataEngineHelp.setFieldValue(cdoResponse, object.getFieldType(), strFieldId, objValue);			
+			switch(nType)
+			{
+				case FieldType.BYTE_TYPE:
+				{
+					cdoResponse.setByteValue(strFieldId,((Byte)objValue).byteValue());
+					break;
+				}
+				case FieldType.SHORT_TYPE:
+				{
+					cdoResponse.setShortValue(strFieldId,((Short)objValue).shortValue());
+					break;
+				}
+				case FieldType.INTEGER_TYPE:
+				{
+					cdoResponse.setIntegerValue(strFieldId,((Integer)objValue).intValue());
+					break;
+				}
+				case FieldType.LONG_TYPE:
+				{
+					cdoResponse.setLongValue(strFieldId,((Long)objValue).longValue());
+					break;
+				}
+				case FieldType.FLOAT_TYPE:
+				{
+					cdoResponse.setFloatValue(strFieldId,((Float)objValue).floatValue());
+					break;
+				}
+				case FieldType.DOUBLE_TYPE:
+				{
+					cdoResponse.setDoubleValue(strFieldId,((Double)objValue).doubleValue());
+					break;
+				}
+				case FieldType.STRING_TYPE:
+				{
+					cdoResponse.setStringValue(strFieldId,((String)objValue));
+					break;
+				}
+				case FieldType.DATE_TYPE:
+				{
+					cdoResponse.setDateValue(strFieldId,((String)objValue));
+					break;
+				}
+				case FieldType.TIME_TYPE:
+				{
+					cdoResponse.setTimeValue(strFieldId,((String)objValue));
+					break;
+				}
+				case FieldType.DATETIME_TYPE:
+				{
+					cdoResponse.setDateTimeValue(strFieldId,((String)objValue));
+					break;
+				}
+				case FieldType.BYTE_ARRAY_TYPE:
+				{
+					cdoResponse.setByteArrayValue(strFieldId,((byte[])objValue));
+					break;
+				}
+				case FieldType.CDO_TYPE:
+				{
+					cdoResponse.setCDOValue(strFieldId,(CDO)objValue);
+					break;
+				}
+				case FieldType.CDO_ARRAY_TYPE:
+				{
+					cdoResponse.setCDOListValue(strFieldId,(List<CDO>)objValue);
+//					cdoResponse.setCDOArrayValue(strFieldId,(CDO[])objValue);
+					break;
+				}
+				default:
+				{
+					throw new SQLException("Unsupported type "+nType);
+				}
+			}
 		}
+
 		ret.setCode(returnObject.getCode());
 		ret.setInfo(returnObject.getInfo());
 		ret.setText(returnObject.getText());
 	}
+
+	
+
+
+
 	/**
 	 * 检查If的条件
 	 * 
@@ -143,6 +263,7 @@ public class BigTableEngine
 			return handleSQLBlock(sqlElse,cdoRequest,strbSQL);
 		}
 	}
+
 	/**
 	 * 处理SQL语句中的For语句
 	 * 
@@ -278,6 +399,7 @@ public class BigTableEngine
 			return handleBlock(dataEngine,connection,trans,elseItem,cdoRequest,cdoResponse,ret);
 		}
 	}
+
 	/**
 	 * 处理For语句
 	 * 
@@ -327,6 +449,170 @@ public class BigTableEngine
 
 		return 0;
 	}
+
+
+	
+	/**
+	 * 通过一个传入的数据库连接查询并输出第一条记录
+	 * 
+	 * @param conn
+	 * @param strSQL
+	 * @param cdoRequest
+	 * @param cdoResponse
+	 * @return
+	 * @throws Exception
+	 */
+	protected int executeQueryRecord(IDataEngine dataEngine,Connection connection,SQLTrans trans,String strSQL,CDO cdoRequest,CDO cdoResponse) throws SQLException,IOException
+	{
+		/**分析原先的SQL语句
+		ParsedSQL parsedSQL=this.parseSourceSQL(strSQL);
+		if(parsedSQL==null)
+		{//SQL语句分析错误
+			throw new SQLException("Parse SQL failed: "+strSQL);
+		}	**/	
+		//执行数据库操作
+		return dataEngine.executeQueryRecord(connection,strSQL,cdoRequest,cdoResponse);
+	}
+
+	/**
+	 * 从long数组中，挑选出最小的值的数组下标，输出
+	 * @param cdosRecord
+	 * @param strValueFieldId
+	 * @return
+	 
+	private int[] getMinMaxValueIndexList(long[] lsValue,boolean bMin)
+	{
+		int[] naIndex=new int[lsValue.length];
+		int nCount=0;
+		long lMinMaxValue=-1;
+		
+		if(bMin==true)
+		{
+			for(int i=0;i<lsValue.length;i++)
+			{
+				long lValue=lsValue[i];
+				if(lValue==-1)
+				{
+					continue;
+				}
+				if(nCount==0 || lValue<lMinMaxValue)
+				{
+					naIndex[0]=i;
+					lMinMaxValue=lValue;
+					nCount=1;
+				}
+				else if(lValue==lMinMaxValue)
+				{
+					naIndex[nCount]=i;
+					nCount++;
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+		else
+		{
+			for(int i=0;i<lsValue.length;i++)
+			{
+				long lValue=lsValue[i];
+				if(lValue==-1)
+				{
+					continue;
+				}
+				if(nCount==0 || lValue>lMinMaxValue)
+				{
+					naIndex[0]=i;
+					lMinMaxValue=lValue;
+					nCount=1;
+				}
+				else if(lValue==lMinMaxValue)
+				{
+					naIndex[nCount]=i;
+					nCount++;
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+		
+		int[] naOutput=new int[nCount];
+		System.arraycopy(naIndex,0,naOutput,0,nCount);
+		
+		return naOutput;
+	}
+	*/
+	/**
+	 * 执行查询操作，输出多条记录
+	 * 
+	 * @param conn
+	 * @param strSQL
+	 * @param cdoRequest
+	 * @param cdoResponse
+	 * @return
+	 * @throws Exception
+	 */
+	protected int executeQueryRecordSet(IDataEngine dataEngine,Connection connection,SQLTrans trans,String strSQL,CDO cdoRequest,CDOArrayField cdoafOutput) throws SQLException,IOException
+	{
+		/**分析原先的SQL语句
+		ParsedSQL parsedSQL=this.parseSourceSQL(strSQL);
+		if(parsedSQL==null)
+		{//SQL语句分析错误
+			throw new SQLException("Parse SQL failed: "+strSQL);
+		}
+		**/
+		//执行数据库操作
+		return dataEngine.executeQueryRecordSet(connection,strSQL,cdoRequest,cdoafOutput);		
+	}
+
+	/**
+	 * 查询第一条记录的第一个字段
+	 * 
+	 * @param conn
+	 * @param strSQL
+	 * @param cdoRequest
+	 * @param cdoResponse
+	 * @return
+	 * @throws Exception
+	 */
+	protected Field executeQueryFieldExt(IDataEngine dataEngine,Connection connection,SQLTrans trans,String strSQL,CDO cdoRequest) throws SQLException,IOException
+	{
+		/**分析原先的SQL语句
+		ParsedSQL parsedSQL=this.parseSourceSQL(strSQL);
+		if(parsedSQL==null)
+		{//SQL语句分析错误
+			throw new SQLException("Parse SQL failed: "+strSQL);
+		}
+		**/
+		//执行数据库操作
+		return dataEngine.executeQueryFieldExt(connection,strSQL,cdoRequest);		
+	}
+
+	/**
+	 * 插入,更新数据库记录或删除数据库记录
+	 * 
+	 * @param conn
+	 * @param strSQL
+	 * @param cdoRequest
+	 * @param cdoResponse
+	 * @return
+	 * @throws Exception
+	 */
+	protected int executeUpdate(IDataEngine dataEngine,Connection connection,SQLTrans trans,String strSQL,CDO cdoRequest) throws SQLException,IOException
+	{
+		/**分析原先的SQL语句
+		ParsedSQL parsedSQL=this.parseSourceSQL(strSQL);
+		if(parsedSQL==null)
+		{//SQL语句分析错误
+			throw new SQLException("Parse SQL failed: "+strSQL);
+		}**/
+		//执行数据库操作
+		return dataEngine.executeUpdate(connection,strSQL,cdoRequest);		
+	}
+	
 	/**
 	 * 执行commit语句
 	 * 
@@ -373,8 +659,7 @@ public class BigTableEngine
 				handleSQLBlock(insert,cdoRequest,strbSQL);
 				String strSQL=strbSQL.toString();
 				// 执行SQL
-				//this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
-				dataEngine.executeUpdate(connection,strSQL,cdoRequest);	
+				this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
 			}
 			else if(blockItem.getSelectRecord()!=null)
 			{
@@ -391,8 +676,7 @@ public class BigTableEngine
 				{//表示要 获取SQL查询条件中的总数量					
 					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
 				}
-				//int nRecordCount=this.executeQueryRecord(dataEngine,connection,trans,strSQL,cdoRequest,cdoRecord);
-				int nRecordCount=dataEngine.executeQueryRecord(connection,strSQL,cdoRequest,cdoRecord);
+				int nRecordCount=this.executeQueryRecord(dataEngine,connection,trans,strSQL,cdoRequest,cdoRecord);
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
 					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
@@ -415,8 +699,7 @@ public class BigTableEngine
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL
-				//int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
-				int nRecordCount=dataEngine.executeUpdate(connection,strSQL,cdoRequest);	
+				int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
 				String strRecordCountId=update.getRecordCountId();
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
@@ -433,8 +716,7 @@ public class BigTableEngine
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL
-				//int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
-				int nRecordCount=dataEngine.executeUpdate(connection,strSQL,cdoRequest);
+				int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
 				String strRecordCountId=delete.getRecordCountId();
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
@@ -451,20 +733,78 @@ public class BigTableEngine
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL
-				//Field objFieldValue=this.executeQueryFieldExt(dataEngine,connection,trans,strSQL,cdoRequest);
-				Field objFieldValue=dataEngine.executeQueryFieldExt(connection,strSQL,cdoRequest);
+				Field objFieldValue=this.executeQueryFieldExt(dataEngine,connection,trans,strSQL,cdoRequest);
 				if(objFieldValue==null)
 				{
 					continue;
 				}
-				//int nType=objFieldValue.getFieldType().getType();
+				int nType=objFieldValue.getFieldType().getType();
 				Object objValue=objFieldValue.getObjectValue();
 
 				String strOutputId=selectField.getOutputId();
 				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
-				//=====设置Field数据=====//
-				DataEngineHelp.setFieldValue(cdoRequest, objFieldValue.getFieldType(), strOutputId, objValue);
-				
+				switch(nType)
+				{
+					case FieldType.BYTE_TYPE:
+					{
+						cdoRequest.setByteValue(strOutputId,((Byte)objValue).byteValue());
+						break;
+					}
+					case FieldType.SHORT_TYPE:
+					{
+						cdoRequest.setShortValue(strOutputId,((Short)objValue).shortValue());
+						break;
+					}
+					case FieldType.INTEGER_TYPE:
+					{
+						cdoRequest.setIntegerValue(strOutputId,((Integer)objValue).intValue());
+						break;
+					}
+					case FieldType.LONG_TYPE:
+					{
+						cdoRequest.setLongValue(strOutputId,((Long)objValue).longValue());
+						break;
+					}
+					case FieldType.FLOAT_TYPE:
+					{
+						cdoRequest.setFloatValue(strOutputId,((Float)objValue).floatValue());
+						break;
+					}
+					case FieldType.DOUBLE_TYPE:
+					{
+						cdoRequest.setDoubleValue(strOutputId,((Double)objValue).doubleValue());
+						break;
+					}
+					case FieldType.STRING_TYPE:
+					{
+						cdoRequest.setStringValue(strOutputId,((String)objValue));
+						break;
+					}
+					case FieldType.DATE_TYPE:
+					{
+						cdoRequest.setDateValue(strOutputId,((String)objValue));
+						break;
+					}
+					case FieldType.TIME_TYPE:
+					{
+						cdoRequest.setTimeValue(strOutputId,((String)objValue));
+						break;
+					}
+					case FieldType.DATETIME_TYPE:
+					{
+						cdoRequest.setDateTimeValue(strOutputId,((String)objValue));
+						break;
+					}
+					case FieldType.BYTE_ARRAY_TYPE:
+					{
+						cdoRequest.setByteArrayValue(strOutputId,((byte[])objValue));
+						break;
+					}
+					default:
+					{
+						throw new SQLException("Unsupported type "+nType);
+					}
+				}
 			}
 			else if(blockItem.getSelectRecordSet()!=null)
 			{// SelectRecordSet
@@ -481,8 +821,8 @@ public class BigTableEngine
 				{//表示要 获取SQL查询条件中的总数量					
 					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
 				}				
-				//int nRecordCount=this.executeQueryRecordSet(dataEngine,connection,trans,strSQL,cdoRequest,cdoArrayField);
-				int nRecordCount=dataEngine.executeQueryRecordSet(connection,strSQL,cdoRequest,cdoArrayField);
+				int nRecordCount=this.executeQueryRecordSet(dataEngine,connection,trans,strSQL,cdoRequest,cdoArrayField);
+				
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
 					strRecordCountId=strRecordCountId.substring(1,strRecordCountId.length()-1);
@@ -746,8 +1086,11 @@ public class BigTableEngine
 
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
-	public BigTableEngine(){
-		
+	public BigTableEngine20210327()
+	{
+
+		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
+		//hmParsedSQL=new HashMap<String,ParsedSQL>(100);
 	}
 	
 }
