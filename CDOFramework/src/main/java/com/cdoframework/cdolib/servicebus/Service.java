@@ -16,6 +16,9 @@ import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.cdolib.database.TransDefine;
 
 import com.cdoframework.cdolib.database.xsd.SQLTrans;
+import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.PropagationChain;
+import com.cdoframework.transaction.PropagationChainThreadLocal;
 
 /**
  * @author Aaron
@@ -174,6 +177,11 @@ public class Service implements IService
 		}				
 		if(ret==null){
 			try{
+				//========对未经过TransService直接调用xml里的SQL语句,添加事务传播默认方法========//
+				/**PropagationChain propagations=new PropagationChainThreadLocal();
+				 * propagations.addPropagation(Propagation.REQUIRED);
+				 * 
+				 */
 				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
 			}catch(Exception e){
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);

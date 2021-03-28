@@ -574,8 +574,7 @@ public class DataServiceParse
    	if(trans==null){//不能处理该请求
    		return null;
    	}
-   	//可以处理该请求
-   	//DataService dataService = trans.getDataService();
+   	//==========TODO 加入事务传播========// 
    	//处理事务
    	Return ret=new Return();
 

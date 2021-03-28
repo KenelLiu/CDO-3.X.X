@@ -76,7 +76,7 @@ public interface ITransService extends IServiceObject
 	/**同一服务,是否已经包含该transName**/
 	boolean containsTrans(String strTransName);
 	/**
-	 * 提供普通数据库connection, 非bigTable 分库分表连接
+	 * 提供普通数据库connection
 	 * @param strDataGroupId
 	 * @return
 	 * @throws SQLException

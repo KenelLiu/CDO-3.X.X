@@ -2,7 +2,11 @@ package com.cdoframework.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
+/**
+ * 
+ * @author Kenel
+ *
+ */
 public class TransactionManagerThreadLocal implements TransactionManager {
 	private static final ThreadLocal<TransactionManager> tranManager = new ThreadLocal<TransactionManager>(){
 		
@@ -33,8 +37,8 @@ public class TransactionManagerThreadLocal implements TransactionManager {
 	}
 
 	@Override
-	public boolean isEmpty(String strDataGroupId) {
-		return tranManager.get().isEmpty(strDataGroupId);
+	public boolean isExistsTransaction(String strDataGroupId) {
+		return tranManager.get().isExistsTransaction(strDataGroupId);
 	}
 	
 	public ThreadLocal<TransactionManager> getThreadLocal(){

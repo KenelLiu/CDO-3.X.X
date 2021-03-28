@@ -13,6 +13,14 @@ import com.cdoframework.cdolib.annotation.TransName;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.IDataEngine;
+import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.PropagationChain;
+import com.cdoframework.transaction.PropagationChainThreadLocal;
+/**
+ * 增加事务传播属性
+ * @author Kenel
+ *
+ */
 public abstract class TransService implements ITransService
 {
 	private Logger logger = Logger.getLogger(TransService.class);
@@ -22,6 +30,7 @@ public abstract class TransService implements ITransService
 	protected IService service = null;
 	
 	protected Map<String, Method> transMap = new HashMap<String, Method>();
+	protected Map<String,Propagation> propagationMap=new HashMap<String,Propagation>();
 
 	final public void setServiceBus(IServiceBus serviceBus)
 	{
@@ -58,8 +67,8 @@ public abstract class TransService implements ITransService
 			for(Method method : methods) {
 				// 查找所有带@TransName方法
 				if(method.isAnnotationPresent(TransName.class)) {
-					transName = method.getAnnotation(TransName.class);
-					name = transName.name();
+					transName = method.getAnnotation(TransName.class);					
+					name = transName.name();		
 					if(name == null || name.equals("")) {
 						name = method.getName();
 					}
@@ -68,6 +77,13 @@ public abstract class TransService implements ITransService
 						logger.error("存在同名的transName："+ name);
 						System.exit(-1);
 					}
+					/**
+					Propagation propagation=transName.propagation();
+					if(propagation==null){
+						propagation=Propagation.REQUIRED;
+					}
+					propagationMap.put(name, propagation);
+					**/
 				}
 			}
 		}
@@ -118,6 +134,10 @@ public abstract class TransService implements ITransService
 		Method method = null;
 		if((method = transMap.get(strTransName)) != null) {
 			try {
+				//==========为每个thread在每个库上添加事务传播属性======//
+				/**Propagation propagation=propagationMap.get(strTransName);
+				PropagationChain propagations=new PropagationChainThreadLocal();
+				propagations.addPropagation(propagation);**/
 				return (Return) method.invoke(this, cdoRequest, cdoResponse);
 			} catch (IllegalArgumentException e) {
 				logger.warn(strTransName+": 参数错误"+ cdoRequest+cdoResponse);

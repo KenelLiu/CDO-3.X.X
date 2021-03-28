@@ -813,7 +813,6 @@ public class DataEngineHelp {
  // 去掉{和}，并得到是否为FieldId
  	static boolean handleFieldIdText(String strFieldIdText,StringBuilder strbOutput)
  	{
- 		// modified at 2006-12-21
  		if(strFieldIdText==null||strFieldIdText.length()==0)
  		{
  			return false;
@@ -1189,6 +1188,7 @@ public class DataEngineHelp {
 		return 0;
 	}
 	
+	@SuppressWarnings("unchecked")
 	static void setFieldValue(CDO cdoData,FieldType.type fieldType,String strOutputId,Object objValue) throws SQLException{
 		switch(fieldType.getType())
 		{

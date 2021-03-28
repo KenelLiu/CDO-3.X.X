@@ -16,7 +16,7 @@ public abstract class ThreadGroup implements IActiveObject
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-	private ArrayList	alThread;
+	private ArrayList<GroupedThread>	alThread;
 	protected boolean	bCanExit;
 
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
@@ -151,7 +151,7 @@ public abstract class ThreadGroup implements IActiveObject
 
 		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
 		nThreadCount	=3;
-		alThread		=new ArrayList();
+		alThread		=new ArrayList<GroupedThread>();
 		bCanExit		=false;
 	}
 
@@ -162,7 +162,7 @@ public abstract class ThreadGroup implements IActiveObject
 
 		//请在此加入初始化代码,内部对象和属性对象负责创建或赋初值,引用对象初始化为null，初始化完成后在设置各对象之间的关系
 		this.nThreadCount	=nThreadCount;
-		alThread		=new ArrayList();
+		alThread		=new ArrayList<GroupedThread>();
 		bCanExit		=false;
 	}
 }
