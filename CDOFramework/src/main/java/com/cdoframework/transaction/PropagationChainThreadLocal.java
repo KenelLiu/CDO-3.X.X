@@ -13,11 +13,31 @@ public class PropagationChainThreadLocal implements PropagationChain {
 	public void addPropagation(Propagation propagation) {
 		propagationManager.get().addPropagation(propagation);
 	}
-
+	
+	@Override
+	public void addPropagation(String strDataGroupId, Propagation propagation) {
+		propagationManager.get().addPropagation(strDataGroupId, propagation);
+	}
+	
+	@Override
+	public void popPropagation() {
+		propagationManager.get().popPropagation();
+		
+	}
+	
+	@Override
+	public void popPropagation(String strDataGroupId) {
+		propagationManager.get().popPropagation(strDataGroupId);		
+	}
+	
 	@Override
 	public Propagation getPropagation(String strDataGroupId) {
 		
 		return propagationManager.get().getPropagation(strDataGroupId);
 	}
+
+
+
+
 
 }

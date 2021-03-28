@@ -138,7 +138,8 @@ public abstract class TransService implements ITransService
 				/**Propagation propagation=propagationMap.get(strTransName);
 				PropagationChain propagations=new PropagationChainThreadLocal();
 				propagations.addPropagation(propagation);**/
-				return (Return) method.invoke(this, cdoRequest, cdoResponse);
+				return (Return) method.invoke(this, cdoRequest, cdoResponse);				
+				//propagations.popPropagation();
 			} catch (IllegalArgumentException e) {
 				logger.warn(strTransName+": 参数错误"+ cdoRequest+cdoResponse);
 			} catch (IllegalAccessException e) {

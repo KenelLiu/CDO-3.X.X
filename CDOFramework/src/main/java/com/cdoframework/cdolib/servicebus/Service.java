@@ -72,6 +72,20 @@ public class Service implements IService
 	//私有方法 所有仅在本类或派生类中使用的函数在此定义为private方法-------------------------------------------
 	
 
+	private String getDataGroupId(String strTransName){
+		TransDefine transDefine = this.hmTransDefine.get(strTransName);
+		if(transDefine==null)
+		{
+			return null;
+		}
+		SQLTrans sqlTrans = transDefine.getSqlTrans();
+		if(sqlTrans==null)
+		{
+			return null;
+		}	
+	   return sqlTrans.getDataGroupId();
+	}
+	
 	public Return executeDataServiceTrans(String strTransName,CDO cdoRequest,CDO cdoResponse)
 	{
 		TransDefine transDefine = this.hmTransDefine.get(strTransName);
@@ -178,11 +192,14 @@ public class Service implements IService
 		if(ret==null){
 			try{
 				//========对未经过TransService直接调用xml里的SQL语句,添加事务传播默认方法========//
+				
 				/**PropagationChain propagations=new PropagationChainThreadLocal();
+				 * PropagationChain propagations=new PropagationChainThreadLocal();
 				 * propagations.addPropagation(Propagation.REQUIRED);
 				 * 
 				 */
 				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
+				//propagations.popPropagation(getDataGroupId(strTransName));
 			}catch(Exception e){
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);
 				return Return.valueOf(-1,e.getMessage(),e);

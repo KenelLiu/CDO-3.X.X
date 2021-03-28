@@ -1,7 +1,5 @@
 package com.cdoframework.transaction;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -20,18 +18,43 @@ public class PropagationChainImpl implements PropagationChain {
         try {
         	 Set<String>  DataGroupId=DBPoolManager.getInstances().getHmDBPool().keySet();
         	 for (String strDataGroupId : DataGroupId) {
-             	Stack<Propagation> stack=propagationMap.get(strDataGroupId);
-                if(stack==null){
-                	stack=new Stack<Propagation>();
-                }    
-                stack.push(propagation);
-                propagationMap.put(strDataGroupId, stack); 
+        		 	this.addPropagation(strDataGroupId, propagation);
 			}
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         } 
 	}
-
+	@Override
+	public void addPropagation(String strDataGroupId,Propagation propagation){
+     	Stack<Propagation> stack=propagationMap.get(strDataGroupId);
+        if(stack==null){
+        	stack=new Stack<Propagation>();
+        }    
+        stack.push(propagation);
+        propagationMap.put(strDataGroupId, stack); 
+	}
+	
+	@Override
+	public void popPropagation(){
+        try {
+       	 Set<String>  DataGroupId=DBPoolManager.getInstances().getHmDBPool().keySet();
+       	 for (String strDataGroupId : DataGroupId) {
+       		 this.popPropagation(strDataGroupId);
+		 }
+       } catch (Exception e) {
+           logger.error(e.getMessage(),e);
+       } 
+	}
+	
+	@Override
+	public void popPropagation(String strDataGroupId) {
+        Stack<Propagation> stack=propagationMap.get(strDataGroupId);
+        if(stack==null || stack.isEmpty()){
+        	return;
+        } 
+        stack.pop();
+	}
+	
 	@Override
 	public Propagation getPropagation(String strDataGroupId) {
         Stack<Propagation> stack=propagationMap.get(strDataGroupId);
@@ -41,7 +64,12 @@ public class PropagationChainImpl implements PropagationChain {
         if (stack.isEmpty()) {
         	stack.push(Propagation.REQUIRED);
         }
-        return stack.pop();
+        return stack.peek();
 	}
+	
+
+	
+
+	
 
 }
