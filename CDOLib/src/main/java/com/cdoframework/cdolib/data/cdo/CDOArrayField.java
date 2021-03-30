@@ -160,7 +160,20 @@ public class CDOArrayField extends ArrayFieldImpl{
 		return str_JSON.toString();
 		
 	}
-	
+	@Override
+	public String toString()
+	{
+		StringBuffer str_JSON=new StringBuffer();
+		str_JSON.append("\"").append(this.getName()).append("\"").append(":").append("[");
+		int _length=this.cdosValue.size();
+		for(int i=0;i<_length;i=i+1)
+		{
+			String _sign=(i==_length-1)?"":",";
+			str_JSON.append("").append(this.cdosValue.get(i).toString()).append(_sign);
+		}
+		str_JSON.append("],");
+		return str_JSON.toString();
+	}	
 	
 	public Object getObjectValue()
 	{

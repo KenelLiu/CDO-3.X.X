@@ -122,7 +122,10 @@ public class ParseCDOBuffer extends CDOBuffer {
 				break;	
 			case FieldType.FILE_TYPE:
 				setFileValue(cdo, key, buffer);
-				break;					
+				break;	
+			case FieldType.NULL_TYPE:
+				cdo.setNullValue(key);
+				break;
 			default:
 				throw new java.lang.RuntimeException("unsupport object type! key="+key+",type="+dataType);
 		}

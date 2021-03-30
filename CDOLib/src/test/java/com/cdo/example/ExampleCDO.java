@@ -1,8 +1,12 @@
 package com.cdo.example;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 
+import org.json.JSONObject;
+
+import com.cdo.field.FieldType;
 import com.cdo.field.array.BooleanArrayField;
 import com.cdo.field.array.ByteArrayField;
 import com.cdo.field.array.DateArrayField;
@@ -33,11 +37,7 @@ public class ExampleCDO {
 	public static ExampleCDOType getCDOClassType(){
 		return new ExampleCDOType();
 	}
-	public static void main(String[] args){
-		System.out.println(getCDO().toXMLWithIndent());
-		//SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		//System.out.println(sdf.format(new java.util.Date(1597975166000L)));
-	}
+
 	public static CDO getCDO(){
 			CDO cdo = new CDO();		
 			cdo.setByteValue("byte1", (byte)2);
@@ -63,7 +63,7 @@ public class ExampleCDO {
 			cdo.setDateTimeValue("dateTime1", "2012-05-01 20:00:00");
 			cdo.setDateTimeArrayValue("dateTimeArr", new String[]{"2012-05-01 20:00:00","2013-05-01 21:00:00","2014-05-01 22:00:00"});
 			cdo.setFileValue("file", new File("D:/test/excel.xlsx"));
-			
+			cdo.setNullValue("KK");
 			for(int i=0;i<5;i++){
 
 				System.out.println(((ByteArrayField)cdo.getField("bytes")).getValue());
@@ -143,7 +143,9 @@ public class ExampleCDO {
 			cdoOut.copyFrom(cdo);
 			cdoOut.setCDOValue("cdo", cdo.clone());
 			cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});
-			return cdoOut;
+			CDO x=new CDO();
+			x.copyFrom(cdoOut.toXML());
+			return x;
 	 }
 	
 }

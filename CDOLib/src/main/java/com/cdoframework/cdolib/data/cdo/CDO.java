@@ -29,6 +29,7 @@ import com.cdo.field.FileField;
 import com.cdo.field.FloatField;
 import com.cdo.field.IntegerField;
 import com.cdo.field.LongField;
+import com.cdo.field.NullField;
 import com.cdo.field.ShortField;
 import com.cdo.field.StringField;
 import com.cdo.field.TimeField;
@@ -977,6 +978,17 @@ public class CDO implements java.io.Serializable
     	}
     	Field field=new DateTimeField(fieldId.strFieldId,lValue);
 		this.setObjectValue(fieldId,FieldType.DATETIME_TYPE,lValue,field,this);
+    }
+    
+    public void setNullValue(String strFieldId){
+
+    	FieldId fieldId=this.parseFieldId(strFieldId);
+    	if(fieldId==null)
+    	{
+			throw new RuntimeException("Invalid FieldId "+strFieldId);
+    	}
+    	Field field=new NullField(fieldId.strFieldId);
+		this.setObjectValue(fieldId,FieldType.NULL_TYPE,null,field,this);
     }
     
     public void setCDOValue(String strFieldId,CDO cdoValue)

@@ -12,14 +12,11 @@ import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
-import org.json.JSONException;
-
 import com.cdo.avro.AvroCDO;
 import com.cdo.avro.parse.ParseAvroCDO;
 import com.cdo.google.GoogleCDO;
 import com.cdo.google.parse.ParseProtoCDO;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.util.JsonUtil;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.MessageLite;
 
@@ -155,16 +152,5 @@ public class Serializable {
 			if(in!=null){try{in.close();}catch(Exception e){}}
 		}
 	}	
-	/**
-	 * 将 json字符串 转换成CDO对象	 * 
-	 * @param strJSON  json字符串
-	 * @param cls    定义 了strJSON中    key作为变量,key变量的类型为    key对应的value值实际数据类型。
-	 *      如 : strJSON={"key1":"value1","key2":20} 则 定义的class中   存在  int key2,String key1 变量,
-	 *        则自动 将strJSON 转换key1成CDO 中string 对象,转换key2成CDO 中int 对象数据
-	 * @return
-	 * @throws JSONException
-	 */
-	public static CDO strJson2CDO(String strJSON,Class<?> cls) throws JSONException{
-		return JsonUtil.json2CDO(strJSON, cls);
-	}
+	
 }

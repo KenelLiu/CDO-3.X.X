@@ -10,7 +10,8 @@ public interface FieldType extends Serializable
 {
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-	byte NONE_TYPE				=0;
+	byte NONE_TYPE				=-1;//表示无字段类型
+	byte NULL_TYPE				=0;//表示值为NULL字段
 
 	byte BOOLEAN_TYPE			=1;
 	byte BYTE_TYPE				=2;
@@ -45,6 +46,7 @@ public interface FieldType extends Serializable
 	
 	public enum type{
 		NONE(NONE_TYPE,"none"),
+		NULL(NULL_TYPE,"null"),
 		BOOLEAN(BOOLEAN_TYPE,"boolean"),
 		BYTE(BYTE_TYPE,"byte"),
 		SHORT(SHORT_TYPE,"short"),

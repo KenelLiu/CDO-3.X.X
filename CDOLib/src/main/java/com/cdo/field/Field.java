@@ -11,8 +11,11 @@ import com.cdo.google.GoogleCDO;
  */
 public interface Field extends FieldType{
 
-	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
+	/**
+	 * 字段类型
+	 * @param data
+	 */
 	public void setFieldType(FieldType.type data);
 	
 	public FieldType.type getFieldType();	

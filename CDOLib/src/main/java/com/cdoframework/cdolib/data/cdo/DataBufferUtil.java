@@ -402,7 +402,7 @@ public class DataBufferUtil {
 			case FieldType.DATETIME_TYPE:
 			{
 				return ((DateTimeField)field).getLongValue();
-			}
+			}			
 		}
 		
 		throw new RuntimeException(field.getFieldType().getName()+" cannot be cast to date,field name="+field.getName());
@@ -527,6 +527,9 @@ public class DataBufferUtil {
 				case FieldType.FILE_TYPE:
 					cdo.setFileValue(strFieldId, ((FileField)field).getValue());
 					break;
+				case FieldType.NULL_TYPE:
+					cdo.setNullValue(strFieldId);
+					break;					
 				case FieldType.BOOLEAN_ARRAY_TYPE:
 					cdo.setBooleanArrayValue(strFieldId, ((BooleanArrayField)field).getValue());
 					break;

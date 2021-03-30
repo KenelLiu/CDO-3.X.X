@@ -16,6 +16,7 @@ import com.cdo.field.FileField;
 import com.cdo.field.FloatField;
 import com.cdo.field.IntegerField;
 import com.cdo.field.LongField;
+import com.cdo.field.NullField;
 import com.cdo.field.ShortField;
 import com.cdo.field.StringField;
 import com.cdo.field.TimeField;
@@ -49,6 +50,7 @@ public class ParseXmlCDO {
 			XMLElement node=(XMLElement)enumNodes.next();
 
 			String strTag=node.getName();
+			
 			if(strTag.equals("BF"))//BooleanField
 			{
 				String strName	=node.getStringAttribute("N");
@@ -397,7 +399,7 @@ public class ParseXmlCDO {
 			else if(strTag.equals("CDOAF"))
 			{
 				String strName	=node.getStringAttribute("N");
-				Iterator enumItems	=node.enumerateChildren();
+				Iterator<?> enumItems	=node.enumerateChildren();
 
 				List<CDO> cdosValue=new ArrayList<CDO>(node.countChildren());
 				int nIndex=0;
@@ -415,8 +417,10 @@ public class ParseXmlCDO {
 					nIndex++;
 				}
 				cdo.putItem(strName,new CDOArrayField(strName, cdosValue));
-			}else
-			{
+			}else if(strTag.equals("NullF")){
+				String strName	=node.getStringAttribute("N");
+				cdo.putItem(strName,new NullField(strName));
+			}else{
 				throw new RuntimeException("Parse xml error: unexpected Tag name ["+strTag+"]");
 			}
 		}

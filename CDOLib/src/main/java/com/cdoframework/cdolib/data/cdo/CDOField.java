@@ -64,6 +64,14 @@ public class CDOField extends FieldImpl{
 		return str_JSON.toString();
 	}
 
+	@Override
+	public String toString()
+	{
+		StringBuffer str_JSON=new StringBuffer();
+		str_JSON.append("\"").append(this.getName()).append("\"").append(":").append(this.cdoValue.toString())
+						.append(",");
+		return str_JSON.toString();
+	}
 	public Object getObjectValue()
 	{
 		return cdoValue;
