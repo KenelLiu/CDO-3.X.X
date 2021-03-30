@@ -342,6 +342,9 @@ public class JsonUtil {
 			case FieldType.FLOAT_TYPE: 
 				json.put(field, data.getFloatValue(field));
 				break;		
+			case FieldType.DOUBLE_TYPE:
+				json.put(field, data.getDoubleValue(field));
+				break;		
 			case FieldType.STRING_TYPE: 
 				json.put(field, data.getStringValue(field));
 				break;	

@@ -220,6 +220,7 @@ public class RSAUtils {
 //        String decodeData = RSAUtils.publicDecrypt(urlDecode, RSAUtils.getPublicKey(publicKey));
         String decodeData = RSAUtils.privateDecrypt(urlDecode, RSAUtils.getPrivateKey(privateKey));
         System.out.println("解密后文字: \r\n" + decodeData);
+
 //        String decodedData2= new String(RSA.decryptByPrivateKey(RSA.decryptBASE64(urlDecode), privateKey));
 //        System.out.println("解密后文字: \r\n" + decodedData2);
          //encodedData = RSAUtils.publicEncrypt(str, RSAUtils.getPublicKey(publicKey));
