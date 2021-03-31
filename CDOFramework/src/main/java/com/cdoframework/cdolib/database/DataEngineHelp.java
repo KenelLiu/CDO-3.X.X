@@ -289,17 +289,32 @@ public class DataEngineHelp {
 
 		// =
 		if(strOperator.equalsIgnoreCase("=")){
-			return checkEqual(strValue1, strValue2, ifType, cdoRequest);
+				//如果是boolean 值
+			  if(ifType==IfTypeType.BOOLEAN){
+				  return checkEqualBoolean(strValue1, strValue2, cdoRequest);
+			  }else{
+				  return checkEqual(strValue1, strValue2, ifType, cdoRequest);
+			  }
+			
 		}else if(strOperator.equalsIgnoreCase("!=")){
-			return checkNotEqual(strValue1, strValue2, ifType, cdoRequest);
+			 //如果是boolean 值
+			  if(ifType==IfTypeType.BOOLEAN){
+				  return !checkEqualBoolean(strValue1, strValue2, cdoRequest);
+			  }else{
+				  return !checkEqual(strValue1, strValue2, ifType, cdoRequest);
+			  }
 		}else if(strOperator.equalsIgnoreCase(">")){
 			return checkGreaterThan(strValue1, strValue2, ifType, cdoRequest);
 		}else if(strOperator.equalsIgnoreCase("<")){
-			return checkLessThan(strValue1, strValue2, ifType, cdoRequest);
+			return !checkEqual(strValue1, strValue2, ifType, cdoRequest)
+					&& !checkGreaterThan(strValue1, strValue2, ifType, cdoRequest);
 		}else if(strOperator.equalsIgnoreCase(">=")){
-			return checkGatherAndEqual(strValue1, strValue2, ifType, cdoRequest);
+			return checkGreaterThan(strValue1, strValue2, ifType, cdoRequest) ||
+					checkEqual(strValue1, strValue2, ifType, cdoRequest);
+			
 		}else if(strOperator.equalsIgnoreCase("<=")){
-			return checkLessAndEqual(strValue1, strValue2, ifType, cdoRequest);
+			return !checkGreaterThan(strValue1, strValue2, ifType, cdoRequest) 
+					|| checkEqual(strValue1, strValue2, ifType, cdoRequest);
 			
 		}else if(strOperator.equalsIgnoreCase("MATCH")){
 			switch(ifType)
@@ -334,6 +349,12 @@ public class DataEngineHelp {
 		{
 			throw new RuntimeException("Invalid operator "+strOperator);
 		}
+    }
+	
+    private static boolean checkEqualBoolean(String strValue1,String strValue2,CDO cdoRequest){
+		boolean value1=getBooleanValue(strValue1,cdoRequest);
+		boolean value2=getBooleanValue(strValue2,cdoRequest);
+		return value1==value2;
     }
     /**
      * 判断是否相等	
@@ -406,103 +427,15 @@ public class DataEngineHelp {
 				double value2=getDoubleValue(strValue2,cdoRequest);
 				return value1==value2;
 			}
-			case BOOLEAN:
-			{
-				boolean value1=getBooleanValue(strValue1,cdoRequest);
-				boolean value2=getBooleanValue(strValue2,cdoRequest);
-				return value1==value2;
-			}
 			default:
 			{
 				throw new RuntimeException("Invalid type "+ifType.value());
 			}
 		}
     }
+   
     /**
-     * 判断不相等
-     * @param strValue1
-     * @param strValue2
-     * @param ifType
-     * @param cdoRequest
-     * @return
-     */
-    private static boolean checkNotEqual(String strValue1,String strValue2,IfTypeType ifType,CDO cdoRequest){
-    	switch(ifType)
-		{
-			case INTEGER:
-			{
-				int value1=getIntegerValue(strValue1,cdoRequest);
-				int value2=getIntegerValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case STRING:
-			{
-				String value1=getStringValue(strValue1,cdoRequest);
-				String value2=getStringValue(strValue2,cdoRequest);
-				return !value1.equals(value2);
-			}
-			case LONG:
-			{
-				long value1=getLongValue(strValue1,cdoRequest);
-				long value2=getLongValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case BYTE:
-			{
-				byte value1=getByteValue(strValue1,cdoRequest);
-				byte value2=getByteValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case SHORT:
-			{
-				short value1=getShortValue(strValue1,cdoRequest);
-				short value2=getShortValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case DATE:
-			{
-				String value1=getDateValue(strValue1,cdoRequest);
-				String value2=getDateValue(strValue2,cdoRequest);
-				return !value1.equals(value2);
-			}
-			case TIME:
-			{
-				String value1=getTimeValue(strValue1,cdoRequest);
-				String value2=getTimeValue(strValue2,cdoRequest);
-				return !value1.equals(value2);
-			}
-			case DATETIME:
-			{
-				String value1=getDateTimeValue(strValue1,cdoRequest);
-				String value2=getDateTimeValue(strValue2,cdoRequest);
-				return !value1.equals(value2);
-			}
-			case FLOAT:
-			{
-				float value1=getFloatValue(strValue1,cdoRequest);
-				float value2=getFloatValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case DOUBLE:
-			{
-				double value1=getDoubleValue(strValue1,cdoRequest);
-				double value2=getDoubleValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}
-			case BOOLEAN:
-			{
-				boolean value1=getBooleanValue(strValue1,cdoRequest);
-				boolean value2=getBooleanValue(strValue2,cdoRequest);
-				return value1!=value2;
-			}				
-			default:
-			{
-				throw new RuntimeException("Invalid type "+ifType.value());
-			}
-		}
-    } 
-    /**
-     * 判断是否 大于等于
+     * 判断是否 大于
      * @param strValue1
      * @param strValue2
      * @param ifType
@@ -579,237 +512,7 @@ public class DataEngineHelp {
 		}
     }
     
-    /**
-     * 判断小于
-     * @param strValue1
-     * @param strValue2
-     * @param ifType
-     * @param cdoRequest
-     * @return
-     */
-    private static boolean checkLessThan(String strValue1,String strValue2,IfTypeType ifType,CDO cdoRequest){
-    	switch(ifType)
-		{
-			case INTEGER:
-			{
-				int value1=getIntegerValue(strValue1,cdoRequest);
-				int value2=getIntegerValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			case STRING:
-			{
-				String value1=getStringValue(strValue1,cdoRequest);
-				String value2=getStringValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<0;
-			}
-			case LONG:
-			{
-				long value1=getLongValue(strValue1,cdoRequest);
-				long value2=getLongValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			case BYTE:
-			{
-				byte value1=getByteValue(strValue1,cdoRequest);
-				byte value2=getByteValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			case SHORT:
-			{
-				short value1=getShortValue(strValue1,cdoRequest);
-				short value2=getShortValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			case DATE:
-			{
-				String value1=getDateValue(strValue1,cdoRequest);
-				String value2=getDateValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<0;
-			}
-			case TIME:
-			{
-				String value1=getTimeValue(strValue1,cdoRequest);
-				String value2=getTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<0;
-			}
-			case DATETIME:
-			{
-				String value1=getDateTimeValue(strValue1,cdoRequest);
-				String value2=getDateTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<0;
-			}
-			case FLOAT:
-			{
-				float value1=getFloatValue(strValue1,cdoRequest);
-				float value2=getFloatValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			case DOUBLE:
-			{
-				double value1=getDoubleValue(strValue1,cdoRequest);
-				double value2=getDoubleValue(strValue2,cdoRequest);
-				return value1<value2;
-			}
-			default:
-			{
-				throw new RuntimeException("Invalid type "+ifType.value());
-			}
-		}    	
-    }
-    /**
-     * 判断大于等于
-     * @param strValue1
-     * @param strValue2
-     * @param ifType
-     * @param cdoRequest
-     * @return
-     */
-    private static boolean checkGatherAndEqual(String strValue1,String strValue2,IfTypeType ifType,CDO cdoRequest){
-    	switch(ifType)
-		{
-			case INTEGER:
-			{
-				int value1=getIntegerValue(strValue1,cdoRequest);
-				int value2=getIntegerValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			case STRING:
-			{
-				String value1=getStringValue(strValue1,cdoRequest);
-				String value2=getStringValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)>=0;
-			}
-			case LONG:
-			{
-				long value1=getLongValue(strValue1,cdoRequest);
-				long value2=getLongValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			case BYTE:
-			{
-				byte value1=getByteValue(strValue1,cdoRequest);
-				byte value2=getByteValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			case SHORT:
-			{
-				short value1=getShortValue(strValue1,cdoRequest);
-				short value2=getShortValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			case DATE:
-			{
-				String value1=getDateValue(strValue1,cdoRequest);
-				String value2=getDateValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)>=0;
-			}
-			case TIME:
-			{
-				String value1=getTimeValue(strValue1,cdoRequest);
-				String value2=getTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)>=0;
-			}
-			case DATETIME:
-			{
-				String value1=getDateTimeValue(strValue1,cdoRequest);
-				String value2=getDateTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)>=0;
-			}
-			case FLOAT:
-			{
-				float value1=getFloatValue(strValue1,cdoRequest);
-				float value2=getFloatValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			case DOUBLE:
-			{
-				double value1=getDoubleValue(strValue1,cdoRequest);
-				double value2=getDoubleValue(strValue2,cdoRequest);
-				return value1>=value2;
-			}
-			default:
-			{
-				throw new RuntimeException("Invalid type "+ifType.value());
-			}
-		}    	
-    }
-    /**
-     * 判断小于等于
-     * @param strValue1
-     * @param strValue2
-     * @param ifType
-     * @param cdoRequest
-     * @return
-     */ 
-    private static boolean checkLessAndEqual(String strValue1,String strValue2,IfTypeType ifType,CDO cdoRequest){
-    	switch(ifType)
-		{
-			case INTEGER:
-			{
-				int value1=getIntegerValue(strValue1,cdoRequest);
-				int value2=getIntegerValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			case STRING:
-			{
-				String value1=getStringValue(strValue1,cdoRequest);
-				String value2=getStringValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<=0;
-			}
-			case LONG:
-			{
-				long value1=getLongValue(strValue1,cdoRequest);
-				long value2=getLongValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			case BYTE:
-			{
-				byte value1=getByteValue(strValue1,cdoRequest);
-				byte value2=getByteValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			case SHORT:
-			{
-				short value1=getShortValue(strValue1,cdoRequest);
-				short value2=getShortValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			case DATE:
-			{
-				String value1=getDateValue(strValue1,cdoRequest);
-				String value2=getDateValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<=0;
-			}
-			case TIME:
-			{
-				String value1=getTimeValue(strValue1,cdoRequest);
-				String value2=getTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<=0;
-			}
-			case DATETIME:
-			{
-				String value1=getDateTimeValue(strValue1,cdoRequest);
-				String value2=getDateTimeValue(strValue2,cdoRequest);
-				return value1.compareTo(value2)<=0;
-			}
-			case FLOAT:
-			{
-				float value1=getFloatValue(strValue1,cdoRequest);
-				float value2=getFloatValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			case DOUBLE:
-			{
-				double value1=getDoubleValue(strValue1,cdoRequest);
-				double value2=getDoubleValue(strValue2,cdoRequest);
-				return value1<=value2;
-			}
-			default:
-			{
-				throw new RuntimeException("Invalid type "+ifType.value());
-			}
-		}
-    }
+    
  // 去掉{和}，并得到是否为FieldId
  	static boolean handleFieldIdText(String strFieldIdText,StringBuilder strbOutput)
  	{
