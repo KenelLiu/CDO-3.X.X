@@ -44,13 +44,13 @@ public class NullField extends FieldImpl{
 	
 	@Override
 	public void toAvro(String prefixField,Map<CharSequence,ByteBuffer> fieldMap){
-		buffer=ByteBuffer.allocate(1);//必须分配2个字节,是为了兼容protoCDO
+		buffer=ByteBuffer.allocate(2);//必须分配2个字节
 		buffer.put((byte)FieldType.NULL_TYPE);	
 		super.toAvro(prefixField, fieldMap);
 	}	
 	@Override
 	public void toProto(String prefixField,GoogleCDO.CDOProto.Builder cdoProto){
-		buffer=ByteBuffer.allocate(2);//必须分配2个字节,是为了兼容protoCDO反序列化
+		buffer=ByteBuffer.allocate(2);//必须分配2个字节
 		buffer.put((byte)FieldType.NULL_TYPE);	
 		super.toProto(prefixField, cdoProto);
 	}

@@ -876,7 +876,10 @@ public class CDO implements java.io.Serializable
     public void setStringValue(String strFieldId,String strValue)
     {
     	
-
+    	if(strValue==null){
+    		setNullValue(strFieldId);
+    		return;
+    	}
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -989,6 +992,13 @@ public class CDO implements java.io.Serializable
     	}
     	Field field=new NullField(fieldId.strFieldId);
 		this.setObjectValue(fieldId,FieldType.NULL_TYPE,null,field,this);
+    }
+    
+    public boolean isNull(String strFieldId){    	
+    	Field field=this.getObject(strFieldId);    	
+    	if(field.getFieldType().getType()==FieldType.NULL_TYPE)
+    			return true;    	
+    	return false;
     }
     
     public void setCDOValue(String strFieldId,CDO cdoValue)

@@ -55,7 +55,7 @@ public class ExampleCDO {
 			cdo.setDoubleValue("double1", 5.0);
 			cdo.setDoubleArrayValue("doubleArr", new double[]{6.0,7.0,8.0});
 			cdo.setStringValue("str1", "张三");
-			cdo.setStringArrayValue("strArr", new String[]{ "张3", "张4", "张5"});
+			cdo.setStringArrayValue("strArr", new String[]{ "张3", "张4", "张5",null});
 			cdo.setDateValue("date1", "2016-05-01");
 			cdo.setDateArrayValue("dateArr", new String[]{"2012-05-01","2013-05-01","2014-05-01"});
 			cdo.setTimeValue("time1", "20:00:00");
@@ -147,5 +147,7 @@ public class ExampleCDO {
 			x.copyFrom(cdoOut.toXML());
 			return x;
 	 }
-	
+	public static void main(String[] args){
+		System.out.println(ExampleCDO.getCDO());
+	}
 }

@@ -90,8 +90,9 @@ public class DateArrayField extends ArrayFieldImpl{
 	public void setValueAt(int nIndex,String strValue)
 	{		
 		long v=0;
-		try{			
-			v=java.sql.Date.valueOf(strValue).getTime();
+		try{		
+			SimpleDateFormat sdf=new SimpleDateFormat(PATTERN_DATE);
+			v=sdf.parse(strValue).getTime();			
 		}catch(Exception ex){
 			throw new RuntimeException("arr index="+nIndex+",["+strValue+"] Invalid date or Invalid date format,date format must is "+PATTERN_DATE);
 		}			

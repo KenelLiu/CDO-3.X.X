@@ -91,8 +91,9 @@ public class DateTimeArrayField extends ArrayFieldImpl{
 	public void setValueAt(int nIndex,String strValue)
 	{
 		long v=0;
-		try{			
-			v=java.sql.Timestamp.valueOf(strValue).getTime();
+		try{		
+			SimpleDateFormat sdf=new SimpleDateFormat(PATTERN_DATETIME);
+			v=sdf.parse(strValue).getTime();
 		}catch(Exception ex){
 			throw new RuntimeException("arr index="+nIndex+",["+strValue+"] Invalid dateTime or Invalid dateTime format,dateTime format must is "+PATTERN_DATETIME);
 		}				
