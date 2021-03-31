@@ -43,7 +43,7 @@ public class ParseXmlCDO {
 	
 	protected static void xml2CDO(CDO cdo,XMLElement nodeCDO,boolean isRootNode)
 	{
-		Iterator enumNodes=nodeCDO.enumerateChildren();
+		Iterator<?> enumNodes=nodeCDO.enumerateChildren();
 
 		while(enumNodes.hasNext())
 		{
@@ -334,7 +334,7 @@ public class ParseXmlCDO {
 			else if(strTag.equals("STRAF"))
 			{
 				String strName	=node.getStringAttribute("N");
-				Iterator enumItems	=node.enumerateChildren();
+				Iterator<?> enumItems	=node.enumerateChildren();
 
 				String[] strsValue=new String[node.countChildren()];
 				int nIndex=0;
@@ -342,11 +342,14 @@ public class ParseXmlCDO {
 				{
 					XMLElement subNode=(XMLElement)enumItems.next();
 					String strSubNodeTag=subNode.getName();
-					if(strSubNodeTag.equals("STR")==false)
-					{
-						throw new RuntimeException("Parse xml error: unexpected Tag name "+strSubNodeTag+" under "+strTag);
+					if(strSubNodeTag.equals("NullF")==true){
+						strsValue[nIndex]=null;
+					}else{
+						if(strSubNodeTag.equals("STR")==false){
+							throw new RuntimeException("Parse xml error: unexpected Tag name "+strSubNodeTag+" under "+strTag);
+						}
+						strsValue[nIndex]=subNode.getContent();
 					}
-					strsValue[nIndex]=subNode.getContent();
 					nIndex++;
 				}
 				cdo.putItem(strName,new StringArrayField(strName, strsValue));
@@ -402,7 +405,7 @@ public class ParseXmlCDO {
 				Iterator<?> enumItems	=node.enumerateChildren();
 
 				List<CDO> cdosValue=new ArrayList<CDO>(node.countChildren());
-				int nIndex=0;
+				//int nIndex=0;
 				while(enumItems.hasNext())
 				{
 					XMLElement subNode=(XMLElement)enumItems.next();
@@ -414,7 +417,7 @@ public class ParseXmlCDO {
 					CDO tmpCDO=new CDO();
 					xml2CDO(tmpCDO,subNode,false);
 					cdosValue.add(tmpCDO);
-					nIndex++;
+					//nIndex++;
 				}
 				cdo.putItem(strName,new CDOArrayField(strName, cdosValue));
 			}else if(strTag.equals("NullF")){

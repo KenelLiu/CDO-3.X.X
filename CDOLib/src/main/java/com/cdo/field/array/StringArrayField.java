@@ -179,7 +179,11 @@ public class StringArrayField extends ArrayFieldImpl{
 		strbXML.append("<STRAF N=\"").append(this.getName()).append("\">");
 		for(int i=0;i<this.strsValue.length;i=i+1)
 		{
-			strbXML.append("<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>");
+			if(strsValue[i]==null){
+				strbXML.append("<NullF N=\"").append(this.getName()).append("\"/>");
+			}else{
+				strbXML.append("<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>");
+			}
 		}
 		strbXML.append("</STRAF>");
 	}
@@ -192,7 +196,11 @@ public class StringArrayField extends ArrayFieldImpl{
 		strbXML.append(strIndent).append("<STRAF N=\"").append(this.getName()).append("\">\r\n");
 		for(int i=0;i<this.strsValue.length;i=i+1)
 		{
-			strbXML.append(strIndent).append("\t<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>\r\n");
+			if(strsValue[i]==null){
+				strbXML.append(strIndent).append("\t<NullF>").append("</NullF>\r\n");
+			}else{
+				strbXML.append(strIndent).append("\t<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>\r\n");
+			}
 		}
 		strbXML.append(strIndent).append("</STRAF>\r\n");
 	}	

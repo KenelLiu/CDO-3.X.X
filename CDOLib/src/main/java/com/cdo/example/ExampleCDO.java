@@ -1,12 +1,7 @@
 package com.cdo.example;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
 
-import org.json.JSONObject;
-
-import com.cdo.field.FieldType;
 import com.cdo.field.array.BooleanArrayField;
 import com.cdo.field.array.ByteArrayField;
 import com.cdo.field.array.DateArrayField;
@@ -21,22 +16,7 @@ import com.cdoframework.cdolib.data.cdo.CDO;
 
 public class ExampleCDO {
 
-	
-	public static class  ExampleCDOType{
-		byte byte1,bytes;
-		boolean boolean1,booleanArr;
-		short short1,shortArr;
-		int int1,intArr;
-		long long1,longArr;
-		float float1,floatArr;
-		double double1,doubleArr;
-		String str1,strArr;
-		File file;
-	}
-	
-	public static ExampleCDOType getCDOClassType(){
-		return new ExampleCDOType();
-	}
+
 
 	public static CDO getCDO(){
 			CDO cdo = new CDO();		
@@ -138,16 +118,7 @@ public class ExampleCDO {
 				System.out.println(((DoubleArrayField)cdo.getField("doubleArr")).getValue()[0]);
 				System.out.println(((DoubleArrayField)cdo.getField("doubleArr")).getValue()[0]);				
 			}	
-			
-			CDO cdoOut=new CDO();
-			cdoOut.copyFrom(cdo);
-			cdoOut.setCDOValue("cdo", cdo.clone());
-			cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});
-			CDO x=new CDO();
-			x.copyFrom(cdoOut.toXML());
-			return x;
+
+			return cdo;
 	 }
-	public static void main(String[] args){
-		System.out.println(ExampleCDO.getCDO());
-	}
 }

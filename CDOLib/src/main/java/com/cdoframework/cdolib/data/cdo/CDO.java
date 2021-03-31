@@ -873,6 +873,10 @@ public class CDO implements java.io.Serializable
 
     public void setStringValue(String strFieldId,String strValue)
     {
+    	if(strValue==null){
+    		setNullValue(strFieldId);
+    		return;
+    	}
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
