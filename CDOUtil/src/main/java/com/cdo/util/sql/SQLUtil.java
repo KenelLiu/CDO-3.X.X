@@ -354,7 +354,7 @@ public class SQLUtil {
 			try
 			{
 				ps=conn.prepareStatement(anaSQL.strSQL);
-				
+			
 				int nParaCount=anaSQL.alParaName.size();
 				for(int i=0;i<nParaCount;i++)
 				{
@@ -364,6 +364,11 @@ public class SQLUtil {
 					int nType=object.getFieldType().getType();
 					switch(nType)
 					{
+						case FieldType.NULL_TYPE:
+						{							
+							ps.setNull(i+1, java.sql.Types.VARCHAR);							
+							break;
+						}
 						case FieldType.BYTE_TYPE:
 						case FieldType.SHORT_TYPE:
 						case FieldType.INTEGER_TYPE:

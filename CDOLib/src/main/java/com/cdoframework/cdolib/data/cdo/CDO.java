@@ -862,8 +862,6 @@ public class CDO implements java.io.Serializable
 
     public void setDoubleValue(String strFieldId,double dValue)
     {
-    	
-
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -875,11 +873,6 @@ public class CDO implements java.io.Serializable
 
     public void setStringValue(String strFieldId,String strValue)
     {
-    	
-    	if(strValue==null){
-    		setNullValue(strFieldId);
-    		return;
-    	}
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -888,6 +881,24 @@ public class CDO implements java.io.Serializable
     	Field field=new StringField(fieldId.strFieldId,strValue);
 		this.setObjectValue(fieldId,FieldType.STRING_TYPE,strValue,field,this);
     }
+    
+    public void setNullValue(String strFieldId){
+
+    	FieldId fieldId=this.parseFieldId(strFieldId);
+    	if(fieldId==null)
+    	{
+			throw new RuntimeException("Invalid FieldId "+strFieldId);
+    	}
+    	Field field=new NullField(fieldId.strFieldId);
+		this.setObjectValue(fieldId,FieldType.NULL_TYPE,null,field,this);
+    }
+    
+    public boolean isNull(String strFieldId){    	
+    	Field field=this.getObject(strFieldId);    	
+    	if(field.getFieldType().getType()==FieldType.NULL_TYPE)
+    			return true;    	
+    	return false;
+    }    
     /**
      * 
      * @param strFieldId
@@ -907,9 +918,7 @@ public class CDO implements java.io.Serializable
     }
     
     public void setDateValue(String strFieldId,String strValue)
-    {
-    	
-
+    {    	
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -973,7 +982,6 @@ public class CDO implements java.io.Serializable
     public void setDateTimeValue(String strFieldId,long lValue)
     {
     	
-
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -983,23 +991,7 @@ public class CDO implements java.io.Serializable
 		this.setObjectValue(fieldId,FieldType.DATETIME_TYPE,lValue,field,this);
     }
     
-    public void setNullValue(String strFieldId){
 
-    	FieldId fieldId=this.parseFieldId(strFieldId);
-    	if(fieldId==null)
-    	{
-			throw new RuntimeException("Invalid FieldId "+strFieldId);
-    	}
-    	Field field=new NullField(fieldId.strFieldId);
-		this.setObjectValue(fieldId,FieldType.NULL_TYPE,null,field,this);
-    }
-    
-    public boolean isNull(String strFieldId){    	
-    	Field field=this.getObject(strFieldId);    	
-    	if(field.getFieldType().getType()==FieldType.NULL_TYPE)
-    			return true;    	
-    	return false;
-    }
     
     public void setCDOValue(String strFieldId,CDO cdoValue)
     {

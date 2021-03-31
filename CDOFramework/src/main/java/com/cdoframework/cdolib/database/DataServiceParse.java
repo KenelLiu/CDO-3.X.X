@@ -73,7 +73,7 @@ public class DataServiceParse
 			{
 				continue;
 			}
-			//int nType=object.getFieldType().getType();
+		
 			Object objValue=object.getObjectValue();
 			//=======设置返回数据=======//
 			DataEngineHelp.setFieldValue(cdoResponse, object.getFieldType(), strFieldId, objValue);			
@@ -362,14 +362,13 @@ public class DataServiceParse
 		{
 			BlockTypeItem blockItem=block.getBlockTypeItem(i);
 			if(blockItem.getInsert()!=null)
-			{// Insert
-				// 获得将要执行的SQL
+			{ 
+				//Insert  获得将要执行的SQL
 				Insert insert=(Insert)blockItem.getInsert();
 				StringBuilder strbSQL=new StringBuilder();
 				handleSQLBlock(insert,cdoRequest,strbSQL);
 				String strSQL=strbSQL.toString();
-				// 执行SQL
-				//this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
+				// 执行SQL				
 				dataEngine.executeUpdate(connection,strSQL,cdoRequest);	
 			}
 			else if(blockItem.getSelectRecord()!=null)
@@ -387,7 +386,7 @@ public class DataServiceParse
 				{//表示要 获取SQL查询条件中的总数量					
 					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
 				}
-				//int nRecordCount=this.executeQueryRecord(dataEngine,connection,trans,strSQL,cdoRequest,cdoRecord);
+				
 				int nRecordCount=dataEngine.executeQueryRecord(connection,strSQL,cdoRequest,cdoRecord);
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
@@ -410,8 +409,7 @@ public class DataServiceParse
 				handleSQLBlock(update,cdoRequest,strbSQL);
 				String strSQL=strbSQL.toString();
 
-				// 执行SQL
-				//int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
+				// 执行SQL				
 				int nRecordCount=dataEngine.executeUpdate(connection,strSQL,cdoRequest);	
 				String strRecordCountId=update.getRecordCountId();
 				if(strRecordCountId.length()>0)
@@ -428,8 +426,7 @@ public class DataServiceParse
 				handleSQLBlock(delete,cdoRequest,strbSQL);
 				String strSQL=strbSQL.toString();
 
-				// 执行SQL
-				//int nRecordCount=this.executeUpdate(dataEngine,connection,trans,strSQL,cdoRequest);
+				// 执行SQL				
 				int nRecordCount=dataEngine.executeUpdate(connection,strSQL,cdoRequest);
 				String strRecordCountId=delete.getRecordCountId();
 				if(strRecordCountId.length()>0)
@@ -446,14 +443,12 @@ public class DataServiceParse
 				handleSQLBlock(selectField,cdoRequest,strbSQL);
 				String strSQL=strbSQL.toString();
 
-				// 执行SQL
-				//Field objFieldValue=this.executeQueryFieldExt(dataEngine,connection,trans,strSQL,cdoRequest);
+				// 执行SQL				
 				Field objFieldValue=dataEngine.executeQueryFieldExt(connection,strSQL,cdoRequest);
 				if(objFieldValue==null)
 				{
 					continue;
 				}
-				//int nType=objFieldValue.getFieldType().getType();
 				Object objValue=objFieldValue.getObjectValue();
 
 				String strOutputId=selectField.getOutputId();
@@ -463,8 +458,8 @@ public class DataServiceParse
 				
 			}
 			else if(blockItem.getSelectRecordSet()!=null)
-			{// SelectRecordSet
-				// 获得将要执行的SQL
+			{
+				// SelectRecordSet 获得将要执行的SQL
 				SelectRecordSet selectRecordSet=(SelectRecordSet)blockItem.getSelectRecordSet();
 				StringBuilder strbSQL=new StringBuilder();
 				handleSQLBlock(selectRecordSet,cdoRequest,strbSQL);
@@ -569,15 +564,11 @@ public class DataServiceParse
 	}
 
 	protected Return executeTrans(HashMap<String,IDataEngine> hmDataGroup,SQLTrans trans,CDO cdoRequest,CDO cdoResponse){
-	 //检查是否能处理该请求
-   	String strTransName=cdoRequest.getStringValue("strTransName");
-   	if(trans==null){//不能处理该请求
-   		return null;
-   	}
-   	//==========TODO 加入事务传播========// 
-   	//处理事务
-   	Return ret=new Return();
 
+	//==========TODO 加入事务传播========//
+		
+   	//处理事务   	
+	Return ret=new Return();
    	String strDataGroupId=trans.getDataGroupId();
    	IDataEngine dataEngine=hmDataGroup.get(strDataGroupId);
 	Connection connection=null;
@@ -663,6 +654,7 @@ public class DataServiceParse
 				connection.commit();
 			}
 		}catch(SQLException e){
+		   	String strTransName=cdoRequest.getStringValue("strTransName");
 			try{this.executeRollback(connection);}catch(Exception ex){};
 			callOnException("executeTrans Exception: "+strTransName,e);
 			ret=null;
@@ -685,11 +677,12 @@ public class DataServiceParse
 			}
 			return ret;
 		}catch(Exception e){
+		   	String strTransName=cdoRequest.getStringValue("strTransName");
 			try{this.executeRollback(connection);}catch(Exception ex){};
 			callOnException("executeTrans Exception: "+strTransName,e);
 			OnException onException=trans.getOnException();
 			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
-
+			
 			return ret;
 		}finally{
 			//关闭连接

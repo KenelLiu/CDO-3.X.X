@@ -130,6 +130,13 @@
 	</xs:element>
 	<xs:complexType name="SQLBlockType">
 		<xs:choice maxOccurs="unbounded">
+			<xs:element name="OutputTable">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\.|\[|\])*\}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
 			<xs:element name="OutputSQL">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
