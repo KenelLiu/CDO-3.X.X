@@ -8,24 +8,18 @@ import com.cdo.google.GoogleCDO;
 import com.cdo.pattern.Pattern;
 import com.google.protobuf.ByteString;
 /**
- * 重新构造
  * @author KenelLiu
- *
  */
-public abstract class FieldImpl implements Field,Pattern
-{
-
-
-	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
-
-	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
+public abstract class FieldImpl implements Field,Pattern{
 
 	private static final long serialVersionUID = 1324693182949266208L;
-	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
+	//=========字段类型==============//
 	private FieldType.type type;
-	private String strName;
-	protected ByteBuffer buffer=null;//需要谨慎操作，仅在内部字段里使用
+	//=========字段名称==============//
+	private String fieldName;
+	
+	//=====管理字段字节内容分配,需要谨慎操作，仅在内部字段里使用=======//
+	protected ByteBuffer buffer=null;
 	
 	public void setFieldType(FieldType.type type)
 	{
@@ -36,13 +30,13 @@ public abstract class FieldImpl implements Field,Pattern
 		return type;
 	}
 
-	public void setName(String strName)
+	public void setName(String fieldName)
 	{
-		this.strName=strName;
+		this.fieldName=fieldName;
 	}
 	public String getName()
 	{
-		return strName;
+		return fieldName;
 	}
 
 
@@ -52,7 +46,7 @@ public abstract class FieldImpl implements Field,Pattern
 
 	public FieldImpl(String strFieldName){
 		this.type=FieldType.type.NONE;
-		strName=strFieldName;
+		this.fieldName=strFieldName;
 	}
 	@Override
 	public String toHtmlJSON(){
@@ -87,7 +81,7 @@ public abstract class FieldImpl implements Field,Pattern
 	}
 	
 	@Override
-	public void release() {		
+	public void release() {			
 		 this.buffer=null;
 	}
 	

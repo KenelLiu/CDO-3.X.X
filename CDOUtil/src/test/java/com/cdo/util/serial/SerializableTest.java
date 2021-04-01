@@ -28,7 +28,7 @@ public class SerializableTest {
 		cdoOut.copyFrom(cdo);
 		cdoOut.setCDOValue("cdo", cdo.clone());
 		cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});
-		cdoOut.setStringValue("abc", null);
+		cdoOut.setStringValue("abc", "2020-10-01 00:00:00");
 		byte[] array=Serializable.protoCDO2Byte(cdoOut);
 		CDO x=Serializable.byte2ProtoCDO(array);
 		

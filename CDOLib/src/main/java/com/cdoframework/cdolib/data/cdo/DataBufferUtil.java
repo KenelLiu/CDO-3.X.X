@@ -119,7 +119,7 @@ public class DataBufferUtil {
 	
 	static byte getByte(Field field)
 	{
-		Object objValue=field;
+		Object objValue=field.getObjectValue();
 		switch(field.getFieldType().getType())
 		{		
 			case FieldType.BYTE_TYPE:
@@ -347,9 +347,6 @@ public class DataBufferUtil {
 	static String getString(Field field)
 	{
 		Object objValue=field.getObjectValue();
-		if(objValue == null) {
-			return null;
-		}
 		switch(field.getFieldType().getType())
 		{
 			case FieldType.BYTE_TYPE:
@@ -371,20 +368,16 @@ public class DataBufferUtil {
 	}
 	
 	static String getDate(Field field)
-	{
-		Object objValue=field.getObjectValue();
-		if(objValue == null) {
-			return null;
-		}
+	{		
 		switch(field.getFieldType().getType())
 		{
 			case FieldType.DATE_TYPE:
 			{
-				return objValue.toString();
+				return ((DateField)field).getValue();
 			}
 			case FieldType.DATETIME_TYPE:
 			{
-				return objValue.toString().substring(0,10);
+				return ((DateTimeField)field).getValue().substring(0,10);
 			}
 		}
 		
@@ -410,19 +403,16 @@ public class DataBufferUtil {
 	
 	static String getTime(Field field)
 	{
-		Object objValue=field.getObjectValue();
-		if(objValue == null) {
-			return null;
-		}
+		
 		switch(field.getFieldType().getType())
 		{
 			case FieldType.TIME_TYPE:
 			{
-				return objValue.toString();
+				return ((TimeField)field).getValue();
 			}
 			case FieldType.DATETIME_TYPE:
 			{
-				return objValue.toString().substring(11);
+				return ((DateTimeField)field).getValue().substring(11);
 			}
 		}
 		
@@ -448,15 +438,11 @@ public class DataBufferUtil {
 	static String getDateTime(Field field)
 	{
 		
-		Object objValue=field.getObjectValue();
-		if(objValue == null) {
-			return null;
-		}
 		switch(field.getFieldType().getType())
 		{
 			case FieldType.DATETIME_TYPE:
 			{
-				return objValue.toString();
+				return ((DateTimeField)field).getValue();
 			}
 		}		
 		throw new RuntimeException(field.getFieldType().getName()+" cannot be cast to dateTime,field name="+field.getName());

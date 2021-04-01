@@ -26,10 +26,14 @@ public class CDOFieldTest {
 		CDO cdoOut=new CDO();
 		cdoOut.copyFrom(cdo);
 		cdoOut.setCDOValue("cdo", cdo.clone());
+		
 		cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});
+		
 		CDO x=new CDO();
 		x.copyFrom(cdoOut.toXML());
-		System.out.println(x.toXMLWithIndent());
+
+		x.setShortValue("ssa", (short)300);
+		System.out.println("ssa="+x.getByteValue("ssa"));
 	}
 
 }

@@ -50,19 +50,18 @@ import com.cdoframework.cdolib.util.Utility;
 
 /**
  *CDO 维护一个通用数据类型
- *key dot符号[即 .]，表示cdo的层级关系 
+ *key dot符号[即 .]，表示cdo的层级关系
+ *除  NullField能保存null值外,
+ *其他常规字段[StringField,DateField...等],内容不能为NULL值
+ *若设置了null值,会初始化成默认
  */
-public class CDO implements java.io.Serializable
-{
+public class CDO{
 
-	/**
-	 * Comment for <code>serialVersionUID</code>
-	 */
-	private static final long serialVersionUID=1L;
 	
 	private static final Logger logger = Logger.getLogger(CDO.class);
 
-	int fileCount;//CDO里是否设置了文件，若设置了文件 则在网络传输需要特别处理 ,仅对最外层cdo有文件类型的进行处理
+	//========CDO里是否设置了文件，若设置了文件 则在网络传输需要特别处理 ,仅对最外层cdo有文件类型的进行处理=====//
+	int fileCount;
 	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
 	final class FieldId
 	{
@@ -77,27 +76,24 @@ public class CDO implements java.io.Serializable
 		String strIndexFieldId;
 	};
 
-	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
+	//======内部对象,存储字段内容==========//
 	private HashMap<String,Field> hmItem;
 	
-	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
-
-	//引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
+	//======设置需要传输文件个数=======//
 	 void setFileCount(int fileCount) {
 		this.fileCount = fileCount;
 	}
 	 
-	//内部方法---------------------------------------------------------------------------------------------------
-	protected void putItem(String strKey,Field objExt){
-		hmItem.put(strKey,objExt);
-	}
-	
-	//0-简单类型，1-多级，2-数组元素
-	//如果FieldId错误，则返回null
+	//=================内部方法==================//
+	protected void putItem(String strKey,Field field){
+		hmItem.put(strKey,field);
+	}	
+	//======0-简单类型，1-多级，2-数组元素========//
+	//======如果FieldId错误，则返回null=========//
 	 FieldId parseFieldId(String strFieldId)
 	{
 		if(hmItem==null){
-			throw new RuntimeException(" CDO is already release ,can'n  set field ["+strFieldId+"]");
+			throw new RuntimeException(" CDO is already release ,can't set field ["+strFieldId+"]");
 		}
 			
 		char[] chsFieldId=strFieldId.toCharArray();
@@ -159,9 +155,9 @@ public class CDO implements java.io.Serializable
 		return fieldId;
 	}
 
-	//---------------------- 序列化方法    cdo2xml  cdo2Avro cdo2proto,cdo2Json------------------------//
+	//=============序列化方法    cdo2xml  cdo2Avro cdo2proto,cdo2Json=============//
 	/**
-	 * 将CDO转换成apache avro对象
+	 * 将CDO转换成avro对象
 	 * @return
 	 */
 	public  AvroCDO toAvro(){	
@@ -172,10 +168,10 @@ public class CDO implements java.io.Serializable
 		String prefixField="";	
 		toAvro(prefixField,fieldMap);		
 		AvroCDO arvo=new AvroCDO();			
-		arvo.setFields(fieldMap);				
+		arvo.setFields(fieldMap);		
 		return arvo;
 	}
-
+	
 	/**
 	 * 将保存在CDO字段调用该方法,转换成key,fieldMap
 	 * @param prefixField
@@ -241,10 +237,9 @@ public class CDO implements java.io.Serializable
 		}
 		throw new StateException(message+"["+prefixField+"] has been released by another program.");
 	}
-
 	
 	/**
-	 * 将CDO 对象转换成 xml  
+	 * 将CDO对象转换成 xml  
 	 * @return
 	 */
 	public String toXML()
@@ -420,8 +415,7 @@ public class CDO implements java.io.Serializable
     			{
     				return null;
     			}
-    			int nIndex=this.getIndexValue(fieldIdMain.strIndexFieldId,cdoRoot);
-//    			return ((CDO)objExt.getValueAt(nIndex)).getObject(fieldId.strFieldId);    			
+    			int nIndex=this.getIndexValue(fieldIdMain.strIndexFieldId,cdoRoot);    			
     			return (((CDOArrayField)objExt).getValueAt(nIndex)).getObject(fieldId.strFieldId);
     		}
     		Field cdoMainField=getObject(fieldIdMain,cdoRoot);
@@ -431,10 +425,8 @@ public class CDO implements java.io.Serializable
     		}
     		if(cdoMainField.getFieldType().getType()>=FieldType.BOOLEAN_ARRAY_TYPE && fieldId.strFieldId.equalsIgnoreCase("length")==true)
     		{//是数组类型
-//    			return new ObjectExt(DataType.INTEGER_TYPE,cdoMainField.getLength());
     			return new IntegerField(((ArrayField)cdoMainField).getLength());
     		}
-//    		return ((CDO)cdoMainField.getValue()).hmItem.get(fieldId.strFieldId);
     		return (((CDOField)cdoMainField).getValue()).hmItem.get(fieldId.strFieldId);
     	}
 
@@ -442,7 +434,7 @@ public class CDO implements java.io.Serializable
 		int nIndex=this.getIndexValue(fieldId.strIndexFieldId,cdoRoot);
 		FieldId fieldIdMain=this.parseFieldId(fieldId.strMainFieldId);
 		Field objExt=this.getObject(fieldIdMain,cdoRoot);	
-//		return objExt.getValueAtExt(nIndex);
+
 		return getValueAtExt(objExt,nIndex);
 	}
 
@@ -782,9 +774,7 @@ public class CDO implements java.io.Serializable
     //----------设置 指定类型Field的name和value------------------------//
    
     public void setBooleanValue(String strFieldId,boolean bValue)
-    {
-    	
-
+    {    	
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -848,9 +838,7 @@ public class CDO implements java.io.Serializable
     }
 
     public void setFloatValue(String strFieldId,float fValue)
-    {
-    	
-
+    {    
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -873,10 +861,6 @@ public class CDO implements java.io.Serializable
 
     public void setStringValue(String strFieldId,String strValue)
     {
-    	if(strValue==null){
-    		setNullValue(strFieldId);
-    		return;
-    	}
     	FieldId fieldId=this.parseFieldId(strFieldId);
     	if(fieldId==null)
     	{
@@ -885,7 +869,10 @@ public class CDO implements java.io.Serializable
     	Field field=new StringField(fieldId.strFieldId,strValue);
 		this.setObjectValue(fieldId,FieldType.STRING_TYPE,strValue,field,this);
     }
-    
+    /**
+     * 存储一个特殊的字段[NullField]用来保存Null值, 与其他字段地位相同【如:StringField】
+     * @param strFieldId
+     */
     public void setNullValue(String strFieldId){
 
     	FieldId fieldId=this.parseFieldId(strFieldId);
@@ -896,7 +883,11 @@ public class CDO implements java.io.Serializable
     	Field field=new NullField(fieldId.strFieldId);
 		this.setObjectValue(fieldId,FieldType.NULL_TYPE,null,field,this);
     }
-    
+    /**
+     * 该字段是否存储了Null值
+     * @param strFieldId
+     * @return
+     */
     public boolean isNull(String strFieldId){    	
     	Field field=this.getObject(strFieldId);    	
     	if(field.getFieldType().getType()==FieldType.NULL_TYPE)

@@ -46,7 +46,7 @@ public interface FieldType extends Serializable
 	
 	public enum type{
 		NONE(NONE_TYPE,"none"),
-		NULL(NULL_TYPE,"null"),
+		NULL(NULL_TYPE,"NullField"),
 		BOOLEAN(BOOLEAN_TYPE,"boolean"),
 		BYTE(BYTE_TYPE,"byte"),
 		SHORT(SHORT_TYPE,"short"),

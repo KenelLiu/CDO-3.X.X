@@ -34,15 +34,14 @@ public class StringArrayField extends ArrayFieldImpl{
 		if(strsValue==null)
 		{
 			strsValue=new String[0];
-		}
-		/**
+		}		
 		for(int i=0;i<strsValue.length;i++)
 		{
 			if(strsValue[i]==null)
 			{
 				strsValue[i]="";
 			}
-		}**/
+		}
 		this.strsValue=strsValue;			
 	}
 	public String[] getValue()
@@ -57,11 +56,11 @@ public class StringArrayField extends ArrayFieldImpl{
 
 	public void setValueAt(int nIndex,String strValue)
 	{
-		/**
+	
 		if(strValue==null)
 		{
 			strValue="";
-		}**/
+		}
 		strsValue[nIndex]=strValue;
 	}
 	
@@ -89,14 +88,9 @@ public class StringArrayField extends ArrayFieldImpl{
 		databuffer=strsValue.length*4;//表示数据内容长度所占用字节
 		for(int i=0;i<strsValue.length;i++)
 		{	
-			if(strsValue[i]!=null){
-				content[i]=strsValue[i].getBytes(Charset.forName("UTF-8")); //字符串内容数据   Charset.forName faster in Java 7 & 8,slow in java6
-				dataLen[i]=content[i].length;  //每个数据字节的长度
-				databuffer=databuffer+content[i].length;//数组里的数据内容字节长度之和
-			}else{
-				content[i]=new byte[0];
-				dataLen[i]=-1;//null字符串长度,使用特殊标识						
-			}
+			content[i]=strsValue[i].getBytes(Charset.forName("UTF-8")); //字符串内容数据   Charset.forName faster in Java 7 & 8,slow in java6
+			dataLen[i]=content[i].length;  //每个数据字节的长度
+			databuffer=databuffer+content[i].length;//数组里的数据内容字节长度之和			
 		}		
 		if(buffer==null){
 			allocateBuffer();
@@ -138,12 +132,6 @@ public class StringArrayField extends ArrayFieldImpl{
 			 //计算字符串内容所在buffer下标
 			 int contentLen=buffer.getInt(index);
 			 int pos=(3+4*(i+1))+totalContentLen;
-			 //字符串长度-1,则表示为null,内容字节content长度=0;			 
-			 if(contentLen==-1){
-				 this.strsValue[i]=null;
-				 index=pos;
-				 continue;
-			 }
 			 //=====有内容字符串===//
 			 totalContentLen=totalContentLen+contentLen;			 
 			 buffer.position(pos);
@@ -179,11 +167,7 @@ public class StringArrayField extends ArrayFieldImpl{
 		strbXML.append("<STRAF N=\"").append(this.getName()).append("\">");
 		for(int i=0;i<this.strsValue.length;i=i+1)
 		{
-			if(strsValue[i]==null){
-				strbXML.append("<NullF N=\"").append(this.getName()).append("\"/>");
-			}else{
-				strbXML.append("<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>");
-			}
+			strbXML.append("<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>");
 		}
 		strbXML.append("</STRAF>");
 	}
@@ -196,11 +180,7 @@ public class StringArrayField extends ArrayFieldImpl{
 		strbXML.append(strIndent).append("<STRAF N=\"").append(this.getName()).append("\">\r\n");
 		for(int i=0;i<this.strsValue.length;i=i+1)
 		{
-			if(strsValue[i]==null){
-				strbXML.append(strIndent).append("\t<NullF>").append("</NullF>\r\n");
-			}else{
-				strbXML.append(strIndent).append("\t<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>\r\n");
-			}
+			strbXML.append(strIndent).append("\t<STR>").append(Function.FormatTextForXML(this.strsValue[i])).append("</STR>\r\n");
 		}
 		strbXML.append(strIndent).append("</STRAF>\r\n");
 	}	
