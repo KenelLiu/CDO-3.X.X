@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
 <!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="SetVar">
 		<xs:complexType>
@@ -128,6 +131,13 @@
 	</xs:element>
 	<xs:complexType name="SQLBlockType">
 		<xs:choice maxOccurs="unbounded">
+			<xs:element name="OutputTable">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\.|\[|\])*\}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
 			<xs:element name="OutputSQL">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -146,6 +156,21 @@
 			<xs:element ref="SQLFor"/>
 		</xs:choice>
 	</xs:complexType>
+	<xs:element name="SelectTable">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="SQLBlockType">
+					<xs:attribute name="OutputId" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:pattern value="\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\.|\[|\])*\}"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="SelectRecordSet">
 		<xs:complexType>
 			<xs:complexContent>
@@ -249,6 +274,7 @@
 	<xs:element name="Rollback"/>
 	<xs:complexType name="BlockType">
 		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="SelectTable"/>
 			<xs:element ref="Insert"/>
 			<xs:element ref="Update"/>
 			<xs:element ref="Delete"/>
@@ -420,6 +446,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="SelectTable"/>
 					<xs:element ref="Insert"/>
 					<xs:element ref="Update"/>
 					<xs:element ref="Delete"/>
