@@ -1,4 +1,4 @@
-#Wed Apr 17 10:55:19 CST 2019
+#Thu Apr 01 11:05:49 CST 2021
 com.cdoframework.cdolib.database.xsd.Insert=com.cdoframework.cdolib.database.xsd.descriptors.InsertDescriptor
 com.cdoframework.cdolib.database.xsd.SQLBlockType=com.cdoframework.cdolib.database.xsd.descriptors.SQLBlockTypeDescriptor
 com.cdoframework.cdolib.database.xsd.DataServiceChoiceItem=com.cdoframework.cdolib.database.xsd.descriptors.DataServiceChoiceItemDescriptor
@@ -10,6 +10,7 @@ com.cdoframework.cdolib.database.xsd.Update=com.cdoframework.cdolib.database.xsd
 com.cdoframework.cdolib.database.xsd.SQLElse=com.cdoframework.cdolib.database.xsd.descriptors.SQLElseDescriptor
 com.cdoframework.cdolib.database.xsd.SQLTransChoiceItem=com.cdoframework.cdolib.database.xsd.descriptors.SQLTransChoiceItemDescriptor
 com.cdoframework.cdolib.database.xsd.SQLThen=com.cdoframework.cdolib.database.xsd.descriptors.SQLThenDescriptor
+com.cdoframework.cdolib.database.xsd.SelectTable=com.cdoframework.cdolib.database.xsd.descriptors.SelectTableDescriptor
 com.cdoframework.cdolib.database.xsd.Else=com.cdoframework.cdolib.database.xsd.descriptors.ElseDescriptor
 com.cdoframework.cdolib.database.xsd.ReturnItem=com.cdoframework.cdolib.database.xsd.descriptors.ReturnItemDescriptor
 com.cdoframework.cdolib.database.xsd.SQLFor=com.cdoframework.cdolib.database.xsd.descriptors.SQLForDescriptor

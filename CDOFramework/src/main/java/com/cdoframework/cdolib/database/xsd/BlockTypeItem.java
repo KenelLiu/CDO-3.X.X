@@ -21,6 +21,11 @@ public class BlockTypeItem implements java.io.Serializable {
     private java.lang.Object _choiceValue;
 
     /**
+     * Field selectTable.
+     */
+    private com.cdoframework.cdolib.database.xsd.SelectTable selectTable;
+
+    /**
      * Field insert.
      */
     private com.cdoframework.cdolib.database.xsd.Insert insert;
@@ -200,6 +205,15 @@ public class BlockTypeItem implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'selectTable'.
+     * 
+     * @return the value of field 'SelectTable'.
+     */
+    public com.cdoframework.cdolib.database.xsd.SelectTable getSelectTable() {
+        return this.selectTable;
+    }
+
+    /**
      * Returns the value of field 'setVar'.
      * 
      * @return the value of field 'SetVar'.
@@ -329,6 +343,16 @@ public class BlockTypeItem implements java.io.Serializable {
     public void setSelectRecordSet(final com.cdoframework.cdolib.database.xsd.SelectRecordSet selectRecordSet) {
         this.selectRecordSet = selectRecordSet;
         this._choiceValue = selectRecordSet;
+    }
+
+    /**
+     * Sets the value of field 'selectTable'.
+     * 
+     * @param selectTable the value of field 'selectTable'.
+     */
+    public void setSelectTable(final com.cdoframework.cdolib.database.xsd.SelectTable selectTable) {
+        this.selectTable = selectTable;
+        this._choiceValue = selectTable;
     }
 
     /**

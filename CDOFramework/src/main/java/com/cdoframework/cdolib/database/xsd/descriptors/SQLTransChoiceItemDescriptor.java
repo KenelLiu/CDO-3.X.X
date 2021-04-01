@@ -58,6 +58,46 @@ public class SQLTransChoiceItemDescriptor extends org.exolab.castor.xml.util.XML
 
         //-- initialize element descriptors
 
+        //-- selectTable
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.SelectTable.class, "selectTable", "SelectTable", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            @Override
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                SQLTransChoiceItem target = (SQLTransChoiceItem) object;
+                return target.getSelectTable();
+            }
+            @Override
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    SQLTransChoiceItem target = (SQLTransChoiceItem) object;
+                    target.setSelectTable( (com.cdoframework.cdolib.database.xsd.SelectTable) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            @Override
+            @SuppressWarnings("unused")
+            public java.lang.Object newInstance(java.lang.Object parent) {
+                return new com.cdoframework.cdolib.database.xsd.SelectTable();
+            }
+        };
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.SelectTable");
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        addSequenceElement(desc);
+
+        //-- validation code for: selectTable
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
         //-- insert
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Insert.class, "insert", "Insert", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {

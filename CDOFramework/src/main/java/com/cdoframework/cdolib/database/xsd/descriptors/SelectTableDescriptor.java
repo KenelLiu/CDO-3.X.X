@@ -11,14 +11,14 @@ package com.cdoframework.cdolib.database.xsd.descriptors;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import com.cdoframework.cdolib.database.xsd.SetVar;
+import com.cdoframework.cdolib.database.xsd.SelectTable;
 
 /**
  * 
  * 
  * @version $Revision$ $Date$
  */
-public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class SelectTableDescriptor extends com.cdoframework.cdolib.database.xsd.descriptors.SQLBlockTypeDescriptor {
 
     /**
      * Field _elementDefinition.
@@ -45,72 +45,34 @@ public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
      */
     private org.exolab.castor.xml.XMLFieldDescriptor _identity;
 
-    public SetVarDescriptor() {
+    public SelectTableDescriptor() {
         super();
-        _xmlName = "SetVar";
+        setExtendsWithoutFlatten(new com.cdoframework.cdolib.database.xsd.descriptors.SQLBlockTypeDescriptor());
+        _xmlName = "SelectTable";
         _elementDefinition = true;
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
 
-        //-- type
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.types.SetVarTypeType.class, "type", "Type", org.exolab.castor.xml.NodeType.Attribute);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SetVar target = (SetVar) object;
-                return target.getType();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SetVar target = (SetVar) object;
-                    target.setType( (com.cdoframework.cdolib.database.xsd.types.SetVarTypeType) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
-            }
-        };
-        handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(com.cdoframework.cdolib.database.xsd.types.SetVarTypeType.class, handler);
-        desc.setImmutable(true);
-        desc.setSchemaType("SetVarTypeType");
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-
-        //-- validation code for: type
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        { //-- local scope
-        }
-        desc.setValidator(fieldValidator);
-        //-- varId
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "varId", "VarId", org.exolab.castor.xml.NodeType.Attribute);
+        //-- outputId
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "outputId", "OutputId", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {
             @Override
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SetVar target = (SetVar) object;
-                return target.getVarId();
+                SelectTable target = (SelectTable) object;
+                return target.getOutputId();
             }
             @Override
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SetVar target = (SetVar) object;
-                    target.setVarId( (java.lang.String) value);
+                    SelectTable target = (SelectTable) object;
+                    target.setOutputId( (java.lang.String) value);
                 } catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
@@ -127,7 +89,7 @@ public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
 
-        //-- validation code for: varId
+        //-- validation code for: outputId
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
@@ -135,51 +97,6 @@ public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
             typeValidator = new org.exolab.castor.xml.validators.StringValidator();
             fieldValidator.setValidator(typeValidator);
             typeValidator.addPattern("\\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\\.|\\[|\\])*\\}");
-            typeValidator.setWhiteSpace("preserve");
-            typeValidator.setMinLength(1);
-        }
-        desc.setValidator(fieldValidator);
-        //-- value
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "value", "Value", org.exolab.castor.xml.NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SetVar target = (SetVar) object;
-                return target.getValue();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SetVar target = (SetVar) object;
-                    target.setValue( (java.lang.String) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
-            }
-        };
-        desc.setSchemaType("string");
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-
-        //-- validation code for: value
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-            org.exolab.castor.xml.validators.StringValidator typeValidator;
-            typeValidator = new org.exolab.castor.xml.validators.StringValidator();
-            fieldValidator.setValidator(typeValidator);
             typeValidator.setWhiteSpace("preserve");
         }
         desc.setValidator(fieldValidator);
@@ -205,6 +122,9 @@ public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
      */
     @Override()
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
+        if (_identity == null) {
+            return super.getIdentity();
+        }
         return _identity;
     }
 
@@ -215,7 +135,7 @@ public class SetVarDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
      */
     @Override()
     public java.lang.Class getJavaClass() {
-        return com.cdoframework.cdolib.database.xsd.SetVar.class;
+        return com.cdoframework.cdolib.database.xsd.SelectTable.class;
     }
 
     /**

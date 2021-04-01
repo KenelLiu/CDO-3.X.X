@@ -21,7 +21,9 @@ import com.cdoframework.transaction.PropagationChain;
 import com.cdoframework.transaction.PropagationChainThreadLocal;
 
 /**
- * @author Aaron
+ * 
+ * @author KenelLiu
+ *
  */
 public class Service implements IService
 {

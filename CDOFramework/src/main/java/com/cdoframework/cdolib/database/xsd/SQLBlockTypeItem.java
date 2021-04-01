@@ -21,6 +21,11 @@ public class SQLBlockTypeItem implements java.io.Serializable {
     private java.lang.Object _choiceValue;
 
     /**
+     * Field outputTable.
+     */
+    private java.lang.String outputTable;
+
+    /**
      * Field outputSQL.
      */
     private java.lang.String outputSQL;
@@ -74,6 +79,15 @@ public class SQLBlockTypeItem implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'outputTable'.
+     * 
+     * @return the value of field 'OutputTable'.
+     */
+    public java.lang.String getOutputTable() {
+        return this.outputTable;
+    }
+
+    /**
      * Returns the value of field 'SQLFor'.
      * 
      * @return the value of field 'SQLFor'.
@@ -109,6 +123,16 @@ public class SQLBlockTypeItem implements java.io.Serializable {
     public void setOutputSQL(final java.lang.String outputSQL) {
         this.outputSQL = outputSQL;
         this._choiceValue = outputSQL;
+    }
+
+    /**
+     * Sets the value of field 'outputTable'.
+     * 
+     * @param outputTable the value of field 'outputTable'.
+     */
+    public void setOutputTable(final java.lang.String outputTable) {
+        this.outputTable = outputTable;
+        this._choiceValue = outputTable;
     }
 
     /**

@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
@@ -32,6 +34,7 @@ import com.cdoframework.cdolib.database.xsd.SQLTransChoiceItem;
 import com.cdoframework.cdolib.database.xsd.SelectField;
 import com.cdoframework.cdolib.database.xsd.SelectRecord;
 import com.cdoframework.cdolib.database.xsd.SelectRecordSet;
+import com.cdoframework.cdolib.database.xsd.SelectTable;
 import com.cdoframework.cdolib.database.xsd.SetVar;
 import com.cdoframework.cdolib.database.xsd.Then;
 import com.cdoframework.cdolib.database.xsd.Update;
@@ -120,7 +123,7 @@ public class DataServiceParse
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	private int handleSQLIf(SQLIf sqlIf,CDO cdoRequest,StringBuilder strbSQL)
+	private int handleSQLIf(SQLIf sqlIf,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap)
 	{
 		// 检查执行条件
 		boolean bCondition=checkCondition(sqlIf.getValue1(),sqlIf.getOperator().toString(),sqlIf.getValue2(),sqlIf
@@ -128,7 +131,7 @@ public class DataServiceParse
 		if(bCondition==true)
 		{// Handle Then
 			SQLThen sqlThen=sqlIf.getSQLThen();
-			return handleSQLBlock(sqlThen,cdoRequest,strbSQL);
+			return handleSQLBlock(sqlThen,cdoRequest,strbSQL,selTblMap);
 		}
 		else
 		{// handle Else
@@ -137,7 +140,7 @@ public class DataServiceParse
 			{// 自然完成
 				return 0;
 			}
-			return handleSQLBlock(sqlElse,cdoRequest,strbSQL);
+			return handleSQLBlock(sqlElse,cdoRequest,strbSQL,selTblMap);
 		}
 	}
 	/**
@@ -149,7 +152,7 @@ public class DataServiceParse
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	protected int handleSQLFor(SQLFor sqlFor,CDO cdoRequest,StringBuilder strbSQL)
+	protected int handleSQLFor(SQLFor sqlFor,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap)
 	{
 		// 获取循环数据
 		int nFromIndex=0;
@@ -172,7 +175,7 @@ public class DataServiceParse
 			cdoRequest.setIntegerValue(strIndexId,i);
 
 			// 执行Block
-			int nResult=handleSQLBlock(sqlFor,cdoRequest,strbSQL);
+			int nResult=handleSQLBlock(sqlFor,cdoRequest,strbSQL,selTblMap);
 			if(nResult==0)
 			{// 自然执行完毕
 				continue;
@@ -196,7 +199,7 @@ public class DataServiceParse
 	 * @param sqlBlock
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 */
-	protected int handleSQLBlock(SQLBlockType sqlBlock,CDO cdoRequest,StringBuilder strbSQL)
+	protected int handleSQLBlock(SQLBlockType sqlBlock,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap)
 	{
 		// 依次处理各个Item
 		int nItemCount=sqlBlock.getSQLBlockTypeItemCount();
@@ -214,9 +217,19 @@ public class DataServiceParse
 				strOutputFieldId=strOutputFieldId.substring(1,strOutputFieldId.length()-1);
 				strbSQL.append(cdoRequest.getStringValue(strOutputFieldId));
 			}
+			else if(item.getOutputTable()!=null){
+				// OutputTable，输出文本代表的字段值
+				String outTblId=item.getOutputTable();
+				outTblId=outTblId.substring(1,outTblId.length()-1);
+				if(selTblMap==null || selTblMap.get(outTblId)==null){					
+					throw new RuntimeException("在使用OutputTable前,未定义SelectTable.当前未找到["+outTblId+"]对应的SelectTable");
+				}else{
+					strbSQL.append(selTblMap.get(outTblId));
+				}
+			}
 			else if(item.getSQLIf()!=null)
 			{// SQLIf
-				int nResult=handleSQLIf(item.getSQLIf(),cdoRequest,strbSQL);
+				int nResult=handleSQLIf(item.getSQLIf(),cdoRequest,strbSQL,selTblMap);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -228,7 +241,7 @@ public class DataServiceParse
 			}
 			else if(item.getSQLFor()!=null)
 			{// SQLFor
-				int nResult=handleSQLFor(item.getSQLFor(),cdoRequest,strbSQL);
+				int nResult=handleSQLFor(item.getSQLFor(),cdoRequest,strbSQL,selTblMap);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -256,14 +269,14 @@ public class DataServiceParse
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	private int handleIf(IDataEngine dataEngine ,Connection connection,If ifItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleIf(IDataEngine dataEngine ,Connection connection,If ifItem,CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException
 	{
 		// 检查执行条件
 		boolean bCondition=checkCondition(ifItem.getValue1(),ifItem.getOperator().toString(),ifItem.getValue2(),ifItem.getType(),ifItem.getType().toString(),cdoRequest);
 		if(bCondition==true)
 		{// Handle Then
 			Then thenItem=ifItem.getThen();
-			return handleBlock(dataEngine,connection,thenItem,cdoRequest,cdoResponse,ret);
+			return handleBlock(dataEngine,connection,thenItem,cdoRequest,cdoResponse,ret,selTblMap);
 		}
 		else
 		{// handle Else
@@ -272,7 +285,7 @@ public class DataServiceParse
 			{// 没有else模块，当作自然执行完毕处理???
 				return 0;
 			}
-			return handleBlock(dataEngine,connection,elseItem,cdoRequest,cdoResponse,ret);
+			return handleBlock(dataEngine,connection,elseItem,cdoRequest,cdoResponse,ret,selTblMap);
 		}
 	}
 	/**
@@ -284,7 +297,7 @@ public class DataServiceParse
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 * @throws Exception
 	 */
-	private int handleFor(IDataEngine dataEngine ,Connection connection,For forItem,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleFor(IDataEngine dataEngine ,Connection connection,For forItem,CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException
 	{
 		// 获取循环数据
 		int nFromIndex=0;
@@ -307,7 +320,7 @@ public class DataServiceParse
 			cdoRequest.setIntegerValue(strIndexId,i);
 
 			// 执行Block
-			int nResult=handleBlock(dataEngine,connection,forItem,cdoRequest,cdoResponse,ret);
+			int nResult=handleBlock(dataEngine,connection,forItem,cdoRequest,cdoResponse,ret,selTblMap);
 			if(nResult==0)
 			{// 自然执行完毕
 				continue;
@@ -355,18 +368,31 @@ public class DataServiceParse
 	 * 
 	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
 	 */
-	private int handleBlock(IDataEngine dataEngine,Connection connection,BlockType block,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException,IOException
+	private int handleBlock(IDataEngine dataEngine,Connection connection,BlockType block,
+							CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException
 	{
 		int nItemCount=block.getBlockTypeItemCount();
 		for(int i=0;i<nItemCount;i++)
 		{
 			BlockTypeItem blockItem=block.getBlockTypeItem(i);
-			if(blockItem.getInsert()!=null)
+			if(blockItem.getSelectTable()!=null){
+				// 获得将要执行的SQL
+				SelectTable selectTable=(SelectTable)blockItem.getSelectTable();
+				StringBuilder strbSQL=new StringBuilder();
+				handleSQLBlock(selectTable,cdoRequest,strbSQL,selTblMap);
+				String strSQL=strbSQL.toString();
+				if(selTblMap==null)
+					selTblMap=new HashMap<String,String>(5);
+				
+				String strOutputId=selectTable.getOutputId();
+				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
+				selTblMap.put(strOutputId, strSQL);
+			}else if(blockItem.getInsert()!=null)
 			{ 
 				//Insert  获得将要执行的SQL
 				Insert insert=(Insert)blockItem.getInsert();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(insert,cdoRequest,strbSQL);
+				handleSQLBlock(insert,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 				// 执行SQL				
 				dataEngine.executeUpdate(connection,strSQL,cdoRequest);	
@@ -376,7 +402,7 @@ public class DataServiceParse
 				// 获得将要执行的SQL
 				SelectRecord selectRecord=(SelectRecord)blockItem.getSelectRecord();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectRecord,cdoRequest,strbSQL);
+				handleSQLBlock(selectRecord,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL
@@ -406,7 +432,7 @@ public class DataServiceParse
 				// 获得将要执行的SQL
 				Update update=(Update)blockItem.getUpdate();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(update,cdoRequest,strbSQL);
+				handleSQLBlock(update,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL				
@@ -423,7 +449,7 @@ public class DataServiceParse
 				// 获得将要执行的SQL
 				Delete delete=(Delete)blockItem.getDelete();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(delete,cdoRequest,strbSQL);
+				handleSQLBlock(delete,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL				
@@ -440,7 +466,7 @@ public class DataServiceParse
 				// 获得将要执行的SQL
 				SelectField selectField=(SelectField)blockItem.getSelectField();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectField,cdoRequest,strbSQL);
+				handleSQLBlock(selectField,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL				
@@ -462,7 +488,7 @@ public class DataServiceParse
 				// SelectRecordSet 获得将要执行的SQL
 				SelectRecordSet selectRecordSet=(SelectRecordSet)blockItem.getSelectRecordSet();
 				StringBuilder strbSQL=new StringBuilder();
-				handleSQLBlock(selectRecordSet,cdoRequest,strbSQL);
+				handleSQLBlock(selectRecordSet,cdoRequest,strbSQL,selTblMap);
 				String strSQL=strbSQL.toString();
 
 				// 执行SQL
@@ -506,7 +532,7 @@ public class DataServiceParse
 			}
 			else if(blockItem.getIf()!=null)
 			{
-				int nResult=this.handleIf(dataEngine,connection,(If)blockItem.getIf(),cdoRequest,cdoResponse,ret);
+				int nResult=this.handleIf(dataEngine,connection,(If)blockItem.getIf(),cdoRequest,cdoResponse,ret,selTblMap);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -518,7 +544,7 @@ public class DataServiceParse
 			}
 			else if(blockItem.getFor()!=null)
 			{
-				int nResult=this.handleFor(dataEngine,connection,(For)blockItem.getFor(),cdoRequest,cdoResponse,ret);
+				int nResult=this.handleFor(dataEngine,connection,(For)blockItem.getFor(),cdoRequest,cdoResponse,ret,selTblMap);
 				if(nResult==0)
 				{// 自然执行完毕
 					continue;
@@ -572,6 +598,8 @@ public class DataServiceParse
    	String strDataGroupId=trans.getDataGroupId();
    	IDataEngine dataEngine=hmDataGroup.get(strDataGroupId);
 	Connection connection=null;
+	//=========增加SelectTable处理,方便复用SQL,创建唯一个======//
+	Map<String,String> selTblMap=null;
 	try{
 			if(dataEngine==null){//DataGroupId错误
 				throw new SQLException("Invalid datagroup id: "+strDataGroupId);
@@ -585,14 +613,21 @@ public class DataServiceParse
 				connection.setAutoCommit(false);
 			}
 
-			// 生成Block对象
+			//=========生成Block对象==========//
 			BlockType block=new BlockType();
 			int nTransItemCount=trans.getSQLTransChoice().getSQLTransChoiceItemCount();
 			for(int i=0;i<nTransItemCount;i++)
 			{
 				SQLTransChoiceItem transItem=trans.getSQLTransChoice().getSQLTransChoiceItem(i);
 				BlockTypeItem blockItem=null;
-				if(transItem.getInsert()!=null)
+				if(transItem.getSelectTable()!=null){
+					
+					blockItem=new BlockTypeItem();
+					blockItem.setSelectTable(transItem.getSelectTable());
+					if(selTblMap==null)
+						selTblMap=new HashMap<String,String>(5);
+				}
+				else if(transItem.getInsert()!=null)
 				{
 					blockItem=new BlockTypeItem();
 					blockItem.setInsert(transItem.getInsert());
@@ -643,7 +678,7 @@ public class DataServiceParse
 			}
 
 			// 处理事务
-			int nResult=handleBlock(dataEngine,connection,block,cdoRequest,cdoResponse,ret);
+			int nResult=handleBlock(dataEngine,connection,block,cdoRequest,cdoResponse,ret,selTblMap);
 			if(nResult!=2){
 				// Break或自然执行完毕退出
 				com.cdoframework.cdolib.database.xsd.Return returnObject=trans.getReturn();
@@ -687,6 +722,10 @@ public class DataServiceParse
 		}finally{
 			//关闭连接
 			SQLUtil.closeConnection(connection);
+			if(selTblMap!=null){
+				selTblMap.clear();
+				selTblMap=null;
+			}
 		}		
 		return ret;
 	}

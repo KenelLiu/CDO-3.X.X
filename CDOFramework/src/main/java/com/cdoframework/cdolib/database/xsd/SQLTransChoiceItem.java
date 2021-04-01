@@ -16,6 +16,11 @@ package com.cdoframework.cdolib.database.xsd;
 public class SQLTransChoiceItem implements java.io.Serializable {
 
     /**
+     * Field selectTable.
+     */
+    private com.cdoframework.cdolib.database.xsd.SelectTable selectTable;
+
+    /**
      * Field insert.
      */
     private com.cdoframework.cdolib.database.xsd.Insert insert;
@@ -156,6 +161,15 @@ public class SQLTransChoiceItem implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'selectTable'.
+     * 
+     * @return the value of field 'SelectTable'.
+     */
+    public com.cdoframework.cdolib.database.xsd.SelectTable getSelectTable() {
+        return this.selectTable;
+    }
+
+    /**
      * Returns the value of field 'setVar'.
      * 
      * @return the value of field 'SetVar'.
@@ -254,6 +268,15 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     public void setSelectRecordSet(final com.cdoframework.cdolib.database.xsd.SelectRecordSet selectRecordSet) {
         this.selectRecordSet = selectRecordSet;
+    }
+
+    /**
+     * Sets the value of field 'selectTable'.
+     * 
+     * @param selectTable the value of field 'selectTable'.
+     */
+    public void setSelectTable(final com.cdoframework.cdolib.database.xsd.SelectTable selectTable) {
+        this.selectTable = selectTable;
     }
 
     /**

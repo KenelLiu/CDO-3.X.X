@@ -135,6 +135,7 @@ public class DataService implements java.io.Serializable {
         org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     }
+
     /**
   	 * ***************************************manual  code *************************************************
   	 * 序列化DataService对象
@@ -238,5 +239,5 @@ public class DataService implements java.io.Serializable {
   	public Map<String,TransDefine> getTransMap()
   	{
   		return hmTransDefine;
-  	}
+  	}    
 }
