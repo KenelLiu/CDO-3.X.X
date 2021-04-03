@@ -99,50 +99,7 @@ public class SelectRecordSetDescriptor extends com.cdoframework.cdolib.database.
             typeValidator.addPattern("\\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\\.|\\[|\\])*\\}");
             typeValidator.setWhiteSpace("preserve");
         }
-        desc.setValidator(fieldValidator);
-        //-- keyFieldName
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "keyFieldName", "KeyFieldName", org.exolab.castor.xml.NodeType.Attribute);
-        desc.setImmutable(true);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SelectRecordSet target = (SelectRecordSet) object;
-                return target.getKeyFieldName();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SelectRecordSet target = (SelectRecordSet) object;
-                    target.setKeyFieldName( (java.lang.String) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
-            }
-        };
-        desc.setSchemaType("string");
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-
-        //-- validation code for: keyFieldName
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        { //-- local scope
-            org.exolab.castor.xml.validators.StringValidator typeValidator;
-            typeValidator = new org.exolab.castor.xml.validators.StringValidator();
-            fieldValidator.setValidator(typeValidator);
-            typeValidator.addPattern("(([a-z]|[A-Z])([a-z]|[A-Z]|[0-9])*)?");
-            typeValidator.setWhiteSpace("preserve");
-        }
-        desc.setValidator(fieldValidator);
+        desc.setValidator(fieldValidator);         
         //-- recordCountId
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "recordCountId", "RecordCountId", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);

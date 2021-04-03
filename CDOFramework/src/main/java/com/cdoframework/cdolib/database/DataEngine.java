@@ -509,10 +509,8 @@ public class DataEngine implements IDataEngine{
 			// 读取记录信息
 			int nRecordCount=readRecord(rs,strsFieldName,nsFieldType,nsPrecision,nsScale,cdoResponse);
 			//统计查询
-			int nCount=executeCount(conn, strSourceSQL, cdoRequest);
-			if(nCount==0)
-				nCount=nRecordCount;
-			return nCount;
+			//int nCount=executeCount(conn, strSourceSQL, cdoRequest);
+			return nRecordCount;
 			
 		}catch(SQLException e){
 			callOnException("executeQueryRecord Exception: "+strSourceSQL,e);
@@ -572,11 +570,11 @@ public class DataEngine implements IDataEngine{
 
 			cdoArrayField.setValue(alRecord);		
 			//统计总数量查询
-			int nCount=executeCount(conn, strSQL, cdoRequest);
-			if(nCount==0)
-				nCount=alRecord.size();
+//			int nCount=executeCount(conn, strSQL, cdoRequest);
+//			if(nCount==0)
+//				nCount=alRecord.size();
 			
-			return nCount;
+			return alRecord.size();
 		}catch(SQLException e){
 			callOnException("executeQueryRecordSet Exception: "+strSQL,e);
 			throw e;
@@ -651,151 +649,9 @@ public class DataEngine implements IDataEngine{
 	}
 	
 	private int executeCount(Connection conn,String strSQL,CDO cdoRequest){
-		if(!cdoRequest.exists("$$nRecordCountId$$") || !cdoRequest.getBooleanValue("$$nRecordCountId$$"))
-			return 0;
-		if(!getDriver().trim().equals("com.mysql.jdbc.Driver"))
-			return 0;
-
-		String strTempSQL=strSQL.toUpperCase();
-		//是否是分组
-		int index=-1;
-		boolean isGroup=false;
-		if(strTempSQL.contains("GROUP")){
-			index=strTempSQL.lastIndexOf("GROUP");
-			index=index+5;
-			if(strTempSQL.charAt(index)==' ' || strTempSQL.charAt(index)!='\t'
-					|| strTempSQL.charAt(index)=='\n'){	
-				index++;
-				while(true){
-					try{
-						if(strTempSQL.charAt(index)==' ' || strTempSQL.charAt(index)=='\t'
-								|| strTempSQL.charAt(index)=='\n'){
-							System.out.println(strTempSQL.charAt(index));
-							index++;
-							continue;
-						}						
-						if(strTempSQL.charAt(index)=='B' && strTempSQL.charAt(index+1)=='Y'
-								&& (strTempSQL.charAt(index+2)==' ' || strTempSQL.charAt(index+2)!='\t'
-										|| strTempSQL.charAt(index+2)!='\n') ){
-							isGroup=true;
-							break;
-						}else{
-							break;
-						}
-					}catch(Exception ex){
-						isGroup=false;
-					}
-				}				
-			}
-		}
-		
-		//如果不是Group by  
-		if(!isGroup){
-			//去掉 原始SQL From前面 字段			
-			while(true){
-				strTempSQL=strSQL.toUpperCase();
-				index=strTempSQL.lastIndexOf("FROM");			
-				if(index==-1 || strTempSQL.length()<(index+4))
-					break;
-				if(strSQL.charAt(index-1)=='{' && strSQL.charAt(index+4)=='}'){
-					strSQL=" "+strSQL.substring(index+4);
-					continue;
-				}
-				//如果前一个是空格 ,回车 且 From后面是空格，回车
-				if((strTempSQL.charAt(index-1)==' ' ||strTempSQL.charAt(index-1)=='\t' || strTempSQL.charAt(index-1)=='\n')
-						&& (strTempSQL.charAt(index+4)==' ' ||strTempSQL.charAt(index+4)=='\t' || strTempSQL.charAt(index+4)=='\n')){
-					strSQL=strSQL.substring(index);
-					break;
-				}else{
-					for(int i=(index+4);i<strSQL.length();i++){
-						if(strSQL.charAt(i)==' '||strSQL.charAt(i)=='\t'||strSQL.charAt(i)=='\n'){
-							strSQL=strSQL.substring(i);
-							break;
-						}
-					}
-				}
-			}
-		}
-		/** strSQL得到 从from 后 截取的字符串 
-		 * 去掉 limit限制
-		 */
-		//统计查询语句总数量
-		StringBuilder sb=new StringBuilder(30);
-		sb.append("SELECT count(*) as nCount ");
-		if(isGroup)
-			sb.append(" FROM (");
-		delOrderLimit(sb, strSQL, "LIMIT");		
-		/**去掉Order  By**/
-		strSQL=sb.toString();
-		sb=new StringBuilder(30);
-		delOrderLimit(sb, strSQL, "ORDER");
-		if(isGroup)
-			sb.append(" )T");		
-		// 准备JDBC语句 执行sql查询记录
-		PreparedStatement ps=null;			
-		// 输出查询结果
-		ResultSet rs=null;
-		int nCount=0;
-		try
-		{
-			ps=prepareStatement(conn,sb.toString(),cdoRequest);
-			rs=ps.executeQuery();	
-			while(rs.next()){
-				nCount=rs.getInt("nCount");
-			}
-		}catch(Exception e){		
-			nCount=0;
-			callOnException("executeQueryRecord Count Exception: "+strSQL,e);			
-		}finally{
-			SQLUtil.closeResultSet(rs);
-			SQLUtil.closePreparedStatement(ps);
-		}
-		return nCount;
-		
+		//TODO SQL语法分析,统计数量
+		return 0;
 	}
-	/**去掉strSQL 中的 Limit,ORDER BY ，统计总数用到
-	 * delKeys="LIMIT","ORDER"
-	**/
-	private void delOrderLimit(StringBuilder sb,String strSQL,String delKeys){
-		String strTempSQL=null;
-		int index=-1;
-		int delKeyLength=delKeys.length();
-		boolean isbreak=false;
-		while(true){
-			strTempSQL=strSQL.toUpperCase();
-			index=strTempSQL.lastIndexOf(delKeys);			
-			if(index==-1 || strTempSQL.length()<(index+delKeyLength)){
-				if(delKeys.equals("ORDER"))
-					sb.append(strSQL);
-				break;
-			}				
-			if(strSQL.charAt(index-1)=='{' && strSQL.charAt(index+delKeyLength)=='}'){
-				sb.append(strSQL.substring(0,index+delKeyLength));
-				strSQL=" "+strSQL.substring(index+delKeyLength);
-				continue;
-			}
-			if((strTempSQL.charAt(index-1)==' ' ||strTempSQL.charAt(index-1)=='\t' || strTempSQL.charAt(index-1)=='\n')
-				&& (strTempSQL.charAt(index+delKeyLength)==' '||strTempSQL.charAt(index+delKeyLength)=='\t'||strTempSQL.charAt(index+delKeyLength)=='\n')){
-				sb.append(strSQL.substring(0,index));
-				break;
-			}else{
-				isbreak=false;
-				for(int i=(index+delKeyLength);i<strSQL.length();i++){
-					if(strSQL.charAt(i)==' ' || strSQL.charAt(i)=='\t' || strSQL.charAt(index+delKeyLength)=='\n'){
-						sb.append(strSQL.substring(0,i));
-						strSQL=strSQL.substring(i);
-						isbreak=true;
-						break;
-					}
-				}
-				if(!isbreak)
-					break;
-			}	
-		}	
-	}
-	
-	
-
 
 	// 构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
@@ -812,8 +668,6 @@ public class DataEngine implements IDataEngine{
 		strUserName="";
 		strPassword="";
 		strSystemCharset=System.getProperty("sun.jnu.encoding");
-
-		//hmAnalyzedSQL	=new HashMap<String,AnalyzedSQL>(100);
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -407,12 +406,7 @@ public class DataServiceParse
 
 				// 执行SQL
 				CDO cdoRecord=new CDO();
-				String strRecordCountId=selectRecord.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{//表示要 获取SQL查询条件中的总数量					
-					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
-				}
-				
+				String strRecordCountId=selectRecord.getRecordCountId();				
 				int nRecordCount=dataEngine.executeQueryRecord(connection,strSQL,cdoRequest,cdoRecord);
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
@@ -494,11 +488,6 @@ public class DataServiceParse
 				// 执行SQL
 				CDOArrayField cdoArrayField=new CDOArrayField("");
 				String strRecordCountId=selectRecordSet.getRecordCountId();
-				if(strRecordCountId.length()>0)
-				{//表示要 获取SQL查询条件中的总数量					
-					cdoRequest.setBooleanValue("$$nRecordCountId$$", true);
-				}				
-				//int nRecordCount=this.executeQueryRecordSet(dataEngine,connection,trans,strSQL,cdoRequest,cdoArrayField);
 				int nRecordCount=dataEngine.executeQueryRecordSet(connection,strSQL,cdoRequest,cdoArrayField);
 				if(strRecordCountId.length()>0)
 				{// 输出受影响的记录数
@@ -508,22 +497,8 @@ public class DataServiceParse
 				
 				String strOutputId=selectRecordSet.getOutputId();
 				strOutputId=strOutputId.substring(1,strOutputId.length()-1);
-				String strKeyFieldName=selectRecordSet.getKeyFieldName();
-				if(strKeyFieldName.length()==0)
-				{// RecordSet输出到数组
-					cdoRequest.setCDOListValue(strOutputId, cdoArrayField.getValue());
-				}
-				else
-				{// RecordSet输出到HashMap					
-					List<CDO> cdosRecordSet=cdoArrayField.getValue();
-					CDO cdoRecordSet=new CDO();
-					for(int j=0;j<cdosRecordSet.size();j++)
-					{
-						cdoRecordSet.setCDOValue(cdosRecordSet.get(j).getObjectValue(strKeyFieldName).toString(),
-										cdosRecordSet.get(j));
-					}
-					cdoRequest.setCDOValue(strOutputId,cdoRecordSet);
-				}
+				// RecordSet输出到数组
+				cdoRequest.setCDOListValue(strOutputId, cdoArrayField.getValue());
 			}
 			else if(blockItem.getSetVar()!=null)
 			{

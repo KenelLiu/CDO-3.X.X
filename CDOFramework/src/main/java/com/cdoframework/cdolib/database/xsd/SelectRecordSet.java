@@ -22,10 +22,6 @@ implements java.io.Serializable
      */
     private java.lang.String outputId;
 
-    /**
-     * Field keyFieldName.
-     */
-    private java.lang.String keyFieldName = "";
 
     /**
      * Field recordCountId.
@@ -34,17 +30,7 @@ implements java.io.Serializable
 
     public SelectRecordSet() {
         super();
-        setKeyFieldName("");
         setRecordCountId("");
-    }
-
-    /**
-     * Returns the value of field 'keyFieldName'.
-     * 
-     * @return the value of field 'KeyFieldName'.
-     */
-    public java.lang.String getKeyFieldName() {
-        return this.keyFieldName;
     }
 
     /**
@@ -107,14 +93,7 @@ implements java.io.Serializable
         org.exolab.castor.xml.Marshaller.marshal(this, handler);
     }
 
-    /**
-     * Sets the value of field 'keyFieldName'.
-     * 
-     * @param keyFieldName the value of field 'keyFieldName'.
-     */
-    public void setKeyFieldName(final java.lang.String keyFieldName) {
-        this.keyFieldName = keyFieldName;
-    }
+
 
     /**
      * Sets the value of field 'outputId'.
