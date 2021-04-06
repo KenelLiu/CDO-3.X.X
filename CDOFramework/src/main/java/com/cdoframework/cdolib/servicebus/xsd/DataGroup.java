@@ -213,10 +213,7 @@ public class DataGroup implements java.io.Serializable {
   	 */
   	public IDataEngine init() throws Exception
   	{
-  		
-  		
-//  		CycleList<IDataEngine> clDataEngine=new CycleList<IDataEngine>();
-  		
+  
   		Database dbs=this.getDatabase();
   		IDataEngine dataEngine=(IDataEngine)Class.forName(this.getClassPath()).newInstance();			  		
   		dataEngine.setDriver(this.getDriver());
@@ -256,8 +253,8 @@ public class DataGroup implements java.io.Serializable {
 		Return ret = dataEngine.open();
 		if(ret.getCode()!=Return.OK.getCode()){
 				throw new Exception("Could not create JDBC connection "+dataEngine.getURI());
-			}			
-//		clDataEngine.add(dataEngine);  		
+		}
+		
   		return dataEngine;
   	}
 }

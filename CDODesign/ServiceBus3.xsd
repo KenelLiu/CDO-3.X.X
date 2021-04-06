@@ -40,6 +40,7 @@
 <!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
 <!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
 <!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
 <!-- edited with XMLSpy v2005 sp1 U (http://www.xmlspy.com) by any (Ru-Board) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="DataGroup">
@@ -142,7 +143,6 @@
 						<xs:attribute name="Value" type="xs:string" use="required"/>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="DataGroup" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="ServiceConfig" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:attribute name="Id" use="required">
