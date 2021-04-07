@@ -157,13 +157,13 @@ public abstract class TransService implements ITransService
 	}
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException{
-		IDataEngine dataEngine=this.serviceBus.getHMDataGroup().get(strDataGroupId);
+		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
 		return dataEngine.getConnection();
 	}
 	@Override
 	public String getDBCharset(String strDataGroupId){
 	
-		IDataEngine dataEngine=this.serviceBus.getHMDataGroup().get(strDataGroupId);
+		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
 		return dataEngine.getDBPool().getCharset();
 	}
 }

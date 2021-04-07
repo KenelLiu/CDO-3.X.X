@@ -38,8 +38,7 @@ public class ServicePlugin implements IServicePlugin
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 
 	private HashMap<String,String> hmParameterMap;//配置参数
-	//private HashMap<String,IDataEngine> hmLocalDataGroup;//关系数据库引擎容器 不再使用插件配置数据源======//
-	private HashMap<String,IDataEngine> hmAllDataGroup;//关系数据库引擎容器
+
 	private HashMap<String,Service> hmService;
 
 	
@@ -47,11 +46,8 @@ public class ServicePlugin implements IServicePlugin
 	{
 		this.hmParameterMap=hmParameterMap;
 	}
-
-	public void setPublicDataGroup(HashMap<String,IDataEngine> hmPublicDataGroup)
-	{
-		hmAllDataGroup.putAll(hmPublicDataGroup);
-	}
+	
+	
 
 	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 
@@ -118,8 +114,7 @@ public class ServicePlugin implements IServicePlugin
 		for(ServiceConfig sc:serviceConfigs)
 		{
 			Service service = new Service();
-			service.setDataServiceParse(serviceBus.getDataServiceParse());
-			service.setPublicDataGroup(this.hmAllDataGroup);
+			service.setDataServiceParse(serviceBus.getDataServiceParse());			
 			if(logger.isInfoEnabled()){logger.info("init service: "+ sc.getId());}
 			Return ret = service.init(sc.getId(),sc.getZkId(),this,serviceBus);
 			if(ret.getCode()!=Return.OK.getCode()){
@@ -378,8 +373,6 @@ public class ServicePlugin implements IServicePlugin
 	public ServicePlugin()
 	{
 		hmService 			= new HashMap<String,Service>(5);
-		hmParameterMap			= new HashMap<String,String>(10);
-		//hmLocalDataGroup		= new HashMap<String,IDataEngine>(1);
-		hmAllDataGroup			= new HashMap<String,IDataEngine>(6);	
+		hmParameterMap			= new HashMap<String,String>(10);			
 	}
 }

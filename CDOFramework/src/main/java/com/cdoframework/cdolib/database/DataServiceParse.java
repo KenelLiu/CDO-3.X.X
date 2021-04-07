@@ -564,14 +564,14 @@ public class DataServiceParse
 		}
 	}
 
-	protected Return executeTrans(HashMap<String,IDataEngine> hmDataGroup,SQLTrans trans,CDO cdoRequest,CDO cdoResponse){
+	protected Return executeTrans(HashMap<String,IDataEngine> hmDataEngine,SQLTrans trans,CDO cdoRequest,CDO cdoResponse){
 
 	//==========TODO 加入事务传播========//
 		
    	//处理事务   	
 	Return ret=new Return();
    	String strDataGroupId=trans.getDataGroupId();
-   	IDataEngine dataEngine=hmDataGroup.get(strDataGroupId);
+   	IDataEngine dataEngine=hmDataEngine.get(strDataGroupId);
 	Connection connection=null;
 	//=========增加SelectTable处理,方便复用SQL,创建唯一个======//
 	Map<String,String> selTblMap=null;
@@ -713,9 +713,9 @@ public class DataServiceParse
 
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
-	public Return handleTrans(HashMap<String,IDataEngine> hmDataGroup,SQLTrans sqlTrans, CDO cdoRequest,CDO cdoResponse)
+	public Return handleTrans(HashMap<String,IDataEngine> hmDataEngine,SQLTrans sqlTrans, CDO cdoRequest,CDO cdoResponse)
 	{
-		return this.executeTrans(hmDataGroup,sqlTrans,cdoRequest,cdoResponse);
+		return this.executeTrans(hmDataEngine,sqlTrans,cdoRequest,cdoResponse);
 	}
 
 	//构造函数,所有构造函数在此定义------------------------------------------------------------------------------

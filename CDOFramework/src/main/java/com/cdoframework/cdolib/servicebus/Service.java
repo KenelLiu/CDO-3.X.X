@@ -36,7 +36,7 @@ public class Service implements IService
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
 	private ArrayList<IActiveService> alActiveService;//动态服务对象集合
 	private Map<String,TransDefine> hmTransDefine;
-	private HashMap<String,IDataEngine> hmAllDataGroup;//关系数据库引擎容器
+	//private HashMap<String,IDataEngine> hmAllDataGroup;//关系数据库引擎容器
 
 	//属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
 
@@ -44,8 +44,8 @@ public class Service implements IService
 	private String strServiceName;
 	private String ZkProducerId;
 	private DataServiceParse dataServiceParse;
-//	private IServicePlugin servicePlugin;
-//	private IServiceBus serviceBus; 
+	private IServicePlugin servicePlugin;
+	private IServiceBus serviceBus; 
 	// 存放所有的普通的transService 和 动态 activeService 对象
 	private Map<String, List<ITransService>> hmServiceMap;
 
@@ -100,8 +100,8 @@ public class Service implements IService
 		{
 			return null;
 		}		
-		try{    
-			return this.dataServiceParse.handleTrans(hmAllDataGroup,sqlTrans,cdoRequest,cdoResponse);
+		try{    			
+			return this.dataServiceParse.handleTrans(this.serviceBus.getHMDataEngine(),sqlTrans,cdoRequest,cdoResponse);
 		}
 		catch(Exception e)
 		{
@@ -110,11 +110,7 @@ public class Service implements IService
 		}
 	}
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
-	public void setPublicDataGroup(HashMap<String,IDataEngine> hmPublicDataGroup)
-	{
-		hmAllDataGroup=new HashMap<String,IDataEngine>();
-		hmAllDataGroup.putAll(hmPublicDataGroup);
-	}
+	
 	public void addTransService(ITransService transService)
 	{
 		addService(transService);
@@ -152,8 +148,8 @@ public class Service implements IService
 	{
 		this.strServiceName = strServiceName;
 		this.ZkProducerId = ZkProducerId;
-//		this.servicePlugin = servicePlugin;
-//		this.serviceBus = serviceBus;
+		this.servicePlugin = servicePlugin;
+		this.serviceBus = serviceBus;
 		return Return.OK;
 	}
 	//接口实现,所有实现接口函数的实现在此定义--------------------------------------------------------------------
@@ -277,10 +273,10 @@ public class Service implements IService
 	public Service()
 	{
 		alActiveService	= new ArrayList<IActiveService>(1);
-		hmTransDefine	= new HashMap<String,TransDefine>(30); 
-		hmAllDataGroup	= new HashMap<String,IDataEngine>(4);	
+		hmTransDefine	= new HashMap<String,TransDefine>(30); 			
 		hmServiceMap = new HashMap<String, List<ITransService>>();
 	}
+	
 	public ArrayList<IActiveService> getAlActiveService() {
 		return alActiveService;
 	}

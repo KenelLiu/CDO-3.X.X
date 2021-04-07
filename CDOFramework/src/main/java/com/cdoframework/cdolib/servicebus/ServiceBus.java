@@ -42,7 +42,7 @@ public class ServiceBus implements IServiceBus
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	private Logger logger = Logger.getLogger(ServiceBus.class);
 	//内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-	private HashMap<String,IDataEngine> hmDataGroup;
+	private HashMap<String,IDataEngine> hmDataEngine;
 	private ServicePlugin[] plugins;
 	private ClusterController clusterController;
 	private DataServiceParse dataServiceParse=new DataServiceParse();
@@ -113,21 +113,21 @@ public class ServiceBus implements IServiceBus
 			this.hmParameterMap.put(para.getName(),para.getValue());
 		}
 		//加载和初始化全局DataGroup
-		this.hmDataGroup=new HashMap<String,IDataEngine>(6);
+		this.hmDataEngine=new HashMap<String,IDataEngine>(6);
 		DataGroup[] dgs=serviceBus.getDataGroup();
 		DBPoolManager dbPoolManager=DBPoolManager.getInstances();
 		try
 		{			
 			for(int i=0;i<dgs.length;i++){				
-				this.hmDataGroup.put(dgs[i].getId(),dgs[i].init());	
+				this.hmDataEngine.put(dgs[i].getId(),dgs[i].init());	
 				DBPool dbPool=dbPoolManager.addDBPool(dgs[i].getId(),dgs[i].getDBPool());
 				if(dbPool!=null){
-					throw new RuntimeException("存在同名的DataGroupId:"+dgs[i].getId());
+					throw new RuntimeException("duplicated DataGroupId:"+dgs[i].getId());
 				}
 			}
 		}catch(Exception e){
-			this.hmDataGroup.clear();
-			this.hmDataGroup=null;
+			this.hmDataEngine.clear();
+			this.hmDataEngine=null;
 			dbPoolManager.getHmDBPool().clear();			
 			logger.error("When parse DataGroup , caught exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
@@ -138,7 +138,7 @@ public class ServiceBus implements IServiceBus
 		if(ccDefine!=null){
 			if(logger.isInfoEnabled()){logger.info("Staring initialize  cluster controller ....................");}
 			clusterController	=new ClusterController();
-			IDataEngine clDataEngine=hmDataGroup.get(ccDefine.getDataGroupId());
+			IDataEngine clDataEngine=hmDataEngine.get(ccDefine.getDataGroupId());
 			if(clDataEngine==null)
 			{
 				return Return.valueOf(-1,"Invalid DataGroupId: "+ccDefine.getDataGroupId());
@@ -178,8 +178,7 @@ public class ServiceBus implements IServiceBus
 				this.plugins[i]=new ServicePlugin();
 
 				//初始化插件
-				this.plugins[i].setServiceBus(this);				
-				this.plugins[i].setPublicDataGroup(hmDataGroup);				
+				this.plugins[i].setServiceBus(this);											
 				this.plugins[i].init(i+"",this,servicePluginDefine);
 			}
 		}catch(Exception e){
@@ -508,8 +507,8 @@ public class ServiceBus implements IServiceBus
 		
 	}
 	
-	public HashMap<String,IDataEngine> getHMDataGroup(){		
-		return hmDataGroup;		
+	public HashMap<String,IDataEngine> getHMDataEngine(){		
+		return hmDataEngine;		
 	}
 	@Override
 	public IClient getRPCClient(String zkId) {
