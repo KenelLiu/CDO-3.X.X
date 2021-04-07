@@ -47,58 +47,7 @@ import com.cdoframework.cdolib.database.xsd.SQLTrans;
 
 public interface IDataEngine
 {
-	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
-	public void setDriver(String strDriver);
-	public String getDriver();
-
-	public void setURI(String strURI);
-	public String getURI();
-
-	public String getCharset();
-	public void setCharset(String strCharset);
-
-	public Properties getProperties();
-	public void setProperties(Properties properties);
-
-	public String getUserName();
-	public void setUserName(String strUserName);
-
-	public String getPassword();
-	public void setPassword(String strPassword);
 	
-	public void setInitialSize(int nInitalSize);
-	public int getInitialSize();
-
-	public void setMinIdle(int nMinIdle);	
-	public int getMinIdle();
-	
-	public void setMaxIdle(int nMaxIdle);
-	public int getMaxIdle();	    
-	
-	public long getnMaxConnLifetimeMillis();
-	public void setnMaxConnLifetimeMillis(long nMaxConnLifetimeMillis);
-	
-	public int getnMaxTotal();
-	public void setnMaxTotal(int nMaxTotal);
-
-	public void setRemoveAbandonedTimeout(int nRemoveAbandonedTimeout);		//removeAbandonedTimeout
-	public void setTestWhileIdle(boolean bTestWhileIdle);
-	public void setTestOnBorrow(boolean bTestOnBorrow);
-	public void setValidationQuery(String strSql);
-	public void setPoolPreparedStatements(boolean bPoolPreparedStatements);
-	public void setRemoveAbandonedOnMaintenance(boolean bRemoveAbandonedOnMaintenance);
-	public void setLogAbandoned(boolean bLogAbandoned);
-	
-	public boolean isOpened();
-	/**
-	 * 初始连接池
-	 */
-	public Return open();
-
-	/**
-	 * 关闭连接池
-	 */
-	public void close();
 
 	/**
 	 * 获取一个数据库连接
@@ -106,11 +55,10 @@ public interface IDataEngine
 	 * @return
 	 */
 	public Connection getConnection() throws SQLException;
-
-	public void commit(Connection conn) throws SQLException;
-
-	public void rollback(Connection conn);
-
+	
+	public void setDBPool(DBPool dbPool);
+	
+	public DBPool getDBPool();
 
 	/**
 	 * 

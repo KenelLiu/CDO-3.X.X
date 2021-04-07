@@ -14,14 +14,17 @@ public class DBPoolManager {
 	public static DBPoolManager getInstances(){
 		return instances;
 	}
-
 	public Map<String, DBPool> getHmDBPool() {
 		return hmDBPool;
 	}
 
-	public void setHmDBPool(Map<String, DBPool> hmDBPool) {
-		this.hmDBPool = hmDBPool;
+	public DBPool getDBPool(String strDataGroupId){
+		return hmDBPool.get(strDataGroupId);
 	}
+	public DBPool addDBPool(String strDataGroupId,DBPool dbPool) {
+		return hmDBPool.put(strDataGroupId, dbPool);
+	}
+
 	
 	
 }

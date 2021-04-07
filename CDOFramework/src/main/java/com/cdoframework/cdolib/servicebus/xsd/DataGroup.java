@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
+import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.IDataEngine;
 
 /**
@@ -211,17 +212,22 @@ public class DataGroup implements java.io.Serializable {
   	 * ***************************************manual  code *************************************************
   	 * 序列化DataGroup对象
   	 */
+    private DBPool dbPool;
+    
+    public DBPool getDBPool(){
+    	return this.dbPool;
+    }
   	public IDataEngine init() throws Exception
   	{
   
   		Database dbs=this.getDatabase();
-  		IDataEngine dataEngine=(IDataEngine)Class.forName(this.getClassPath()).newInstance();			  		
-  		dataEngine.setDriver(this.getDriver());
-		dataEngine.setURI(dbs.getURI());
-		dataEngine.setCharset(this.getCharset());
+  		dbPool=new DBPool();
+  		dbPool.setDriver(this.getDriver());
+  		dbPool.setURI(dbs.getURI());
+  		dbPool.setCharset(this.getCharset());
 			
-		dataEngine.setUserName(dbs.getUser().getUserName());
-		dataEngine.setPassword(dbs.getUser().getPassword());
+  		dbPool.setUserName(dbs.getUser().getUserName());
+  		dbPool.setPassword(dbs.getUser().getPassword());
 
 		Properties properties=null;
 		int nPropertyCount=dbs.getPropertyCount();
@@ -231,30 +237,33 @@ public class DataGroup implements java.io.Serializable {
 					Property proper=dbs.getProperty(j);
 					properties.setProperty(proper.getName(),proper.getValue());
 				}
-				dataEngine.setProperties(properties);
+				dbPool.setProperties(properties);
 			}			
 		ConnectionPool connPool=dbs.getConnectionPool();
 		if(connPool!=null){
-				dataEngine.setInitialSize(connPool.getInitialSize());
-				dataEngine.setnMaxTotal(connPool.getMaxTotal());
-				dataEngine.setMinIdle(connPool.getMinIdle());
-				dataEngine.setMaxIdle(connPool.getMaxTotal());
-				dataEngine.setnMaxConnLifetimeMillis(connPool.getMaxConnLifetimeMillis());
+			dbPool.setInitialSize(connPool.getInitialSize());
+			dbPool.setnMaxTotal(connPool.getMaxTotal());
+			dbPool.setMinIdle(connPool.getMinIdle());
+			dbPool.setMaxIdle(connPool.getMaxTotal());
+			dbPool.setnMaxConnLifetimeMillis(connPool.getMaxConnLifetimeMillis());
 				
-				dataEngine.setRemoveAbandonedTimeout(connPool.getRemoveAbandonedTimeout());
-				dataEngine.setTestWhileIdle(connPool.getTestWhileIdle());
-				dataEngine.setTestOnBorrow(connPool.getTestOnBorrow());
-				dataEngine.setValidationQuery(connPool.getValidationQuery());
-				dataEngine.setPoolPreparedStatements(connPool.getPoolPreparedStatements());
+			dbPool.setRemoveAbandonedTimeout(connPool.getRemoveAbandonedTimeout());
+			dbPool.setTestWhileIdle(connPool.getTestWhileIdle());
+			dbPool.setTestOnBorrow(connPool.getTestOnBorrow());
+			dbPool.setValidationQuery(connPool.getValidationQuery());
+			dbPool.setPoolPreparedStatements(connPool.getPoolPreparedStatements());
 				
-				dataEngine.setRemoveAbandonedOnMaintenance(connPool.getRemoveAbandonedOnMaintenance());
-				dataEngine.setLogAbandoned(connPool.getLogAbandoned());		
+			dbPool.setRemoveAbandonedOnMaintenance(connPool.getRemoveAbandonedOnMaintenance());
+			dbPool.setLogAbandoned(connPool.getLogAbandoned());		
 		}
-		Return ret = dataEngine.open();
+		Return ret = dbPool.open();
 		if(ret.getCode()!=Return.OK.getCode()){
-				throw new Exception("Could not create JDBC connection "+dataEngine.getURI());
+				throw new Exception("Could not create JDBC connection "+dbPool.getURI());
 		}
-		
+		IDataEngine dataEngine=(IDataEngine)Class.forName(this.getClassPath()).newInstance();
+		dataEngine.setDBPool(dbPool);
   		return dataEngine;
   	}
+  	
+  	
 }

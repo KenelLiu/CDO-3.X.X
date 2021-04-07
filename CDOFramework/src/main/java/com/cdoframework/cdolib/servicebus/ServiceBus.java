@@ -21,6 +21,8 @@ import com.cdo.business.rpc.zk.ZookeeperServer;
 import com.cdo.util.exception.ZookeeperException;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
+import com.cdoframework.cdolib.database.DBPool;
+import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.DataServiceParse;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.cdolib.framework.ClusterController;
@@ -113,14 +115,20 @@ public class ServiceBus implements IServiceBus
 		//加载和初始化全局DataGroup
 		this.hmDataGroup=new HashMap<String,IDataEngine>(6);
 		DataGroup[] dgs=serviceBus.getDataGroup();
+		DBPoolManager dbPoolManager=DBPoolManager.getInstances();
 		try
-		{
+		{			
 			for(int i=0;i<dgs.length;i++){				
-				this.hmDataGroup.put(dgs[i].getId(),dgs[i].init());				
+				this.hmDataGroup.put(dgs[i].getId(),dgs[i].init());	
+				DBPool dbPool=dbPoolManager.addDBPool(dgs[i].getId(),dgs[i].getDBPool());
+				if(dbPool!=null){
+					throw new RuntimeException("存在同名的DataGroupId:"+dgs[i].getId());
+				}
 			}
 		}catch(Exception e){
 			this.hmDataGroup.clear();
 			this.hmDataGroup=null;
+			dbPoolManager.getHmDBPool().clear();			
 			logger.error("When parse DataGroup , caught exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
 		}						

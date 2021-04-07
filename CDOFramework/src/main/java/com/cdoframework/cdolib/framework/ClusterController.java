@@ -65,15 +65,15 @@ public class ClusterController extends ThreadGroup
 			}
 
 			String strSQL="";
-			if(dataEngine.getURI().indexOf("sqlserver")>=0)
+			if(dataEngine.getDBPool().getURI().indexOf("sqlserver")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET strServerIP={strServerIP},dtActiveTime=GETDATE() WHERE strServiceId={strServiceId} AND DATEDIFF(second,dtActiveTime,GETDATE())>"+nMaxDeadSecond;
 			}
-			else if(dataEngine.getURI().indexOf("oracle")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("oracle")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET strServerIP={strServerIP},dtActiveTime=SYSDATE WHERE strServiceId={strServiceId} AND dtActiveTime<SYSDATE-"+nMaxDeadSecond+"/86400";
 			}
-			else if(dataEngine.getURI().indexOf("mysql")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("mysql")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET strServerIP={strServerIP},dtActiveTime=now() WHERE strServiceId={strServiceId} AND dtActiveTime<date_sub(now(),interval "+nMaxDeadSecond+" second)";
 			}
@@ -126,15 +126,15 @@ public class ClusterController extends ThreadGroup
 			}
 
 			String strSQL="";
-			if(dataEngine.getURI().indexOf("sqlserver")>=0)
+			if(dataEngine.getDBPool().getURI().indexOf("sqlserver")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET dtActiveTime=GETDATE() WHERE strServiceId={strServiceId} AND strServerIP={strServerIP} AND DATEDIFF(second,dtActiveTime,GETDATE())<"+nMaxDeadSecond;
 			}
-			else if(dataEngine.getURI().indexOf("oracle")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("oracle")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET dtActiveTime=SYSDATE WHERE strServiceId={strServiceId} AND strServerIP={strServerIP} AND SYSDATE-dtActiveTime<"+nMaxDeadSecond+"/86400";
 			}
-			else if(dataEngine.getURI().indexOf("mysql")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("mysql")>=0)
 			{
 				strSQL="UPDATE tbClusteredService SET dtActiveTime=now() WHERE strServiceId={strServiceId} AND strServerIP={strServerIP} AND dtActiveTime>date_sub(now(),interval "+nMaxDeadSecond+" second)";
 			}
@@ -188,15 +188,15 @@ public class ClusterController extends ThreadGroup
 
 			String strSelectSQL="SELECT 1 FROM tbClusteredService WHERE strServiceId={strServiceId} ";
 			String strInsertSQL="";
-			if(dataEngine.getURI().indexOf("sqlserver")>=0)
+			if(dataEngine.getDBPool().getURI().indexOf("sqlserver")>=0)
 			{
 				strInsertSQL="INSERT INTO tbClusteredService (strServiceId,strServerIP,dtActiveTime) VALUES({strServiceId},{strServerIP},GETDATE())";
 			}
-			else if(dataEngine.getURI().indexOf("oracle")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("oracle")>=0)
 			{
 				strInsertSQL="INSERT INTO tbClusteredService (strServiceId,strServerIP,dtActiveTime) VALUES({strServiceId},{strServerIP},SYSDATE)";
 			}
-			else if(dataEngine.getURI().indexOf("mysql")>=0)
+			else if(dataEngine.getDBPool().getURI().indexOf("mysql")>=0)
 			{
 				strInsertSQL="INSERT INTO tbClusteredService (strServiceId,strServerIP,dtActiveTime) VALUES({strServiceId},{strServerIP},now())";
 			}

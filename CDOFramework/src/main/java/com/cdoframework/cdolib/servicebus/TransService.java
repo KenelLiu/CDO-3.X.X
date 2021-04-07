@@ -164,6 +164,6 @@ public abstract class TransService implements ITransService
 	public String getDBCharset(String strDataGroupId){
 	
 		IDataEngine dataEngine=this.serviceBus.getHMDataGroup().get(strDataGroupId);
-		return dataEngine.getCharset();
+		return dataEngine.getDBPool().getCharset();
 	}
 }
