@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.annotation.TransName;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
+import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.Propagation;
 import com.cdoframework.transaction.PropagationChain;
@@ -137,7 +138,7 @@ public abstract class TransService implements ITransService
 				//==========为每个thread在每个库上添加事务传播属性======//
 				/**Propagation propagation=propagationMap.get(strTransName);
 				PropagationChain propagations=new PropagationChainThreadLocal();
-				propagations.addPropagation(propagation);**/
+				propagations.addPropagation(propagation);**/				
 				return (Return) method.invoke(this, cdoRequest, cdoResponse);				
 				//propagations.popPropagation();
 			} catch (IllegalArgumentException e) {
