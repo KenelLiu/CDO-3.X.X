@@ -2,6 +2,7 @@ package com.cdoframework.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -26,24 +27,29 @@ public class TransactionManagerImpl implements TransactionManager {
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
         Stack<Connection> stack=connMap.get(strDataGroupId);
         if (stack==null || stack.isEmpty()) {
-        	stack=this.addConn(strDataGroupId);
+        	stack=this.addConn(strDataGroupId,false);
         }
         return stack.peek();
 	}
 
 	@Override
 	public void beginTransaction(String strDataGroupId) throws SQLException {
-		this.addConn(strDataGroupId);
+		this.addConn(strDataGroupId,false);
 	}
-
+	
+	@Override
+	public void beginNonTransaction(String strDataGroupId) throws SQLException{
+		this.addConn(strDataGroupId,true);
+	}
 	@Override
 	public void commit(String strDataGroupId) throws SQLException {
 		Stack<Connection> stack=connMap.get(strDataGroupId);
-		 Connection conn=null;
+		Connection conn=null;
         try {        
             if (stack!=null && stack.peek() != null){  
             	conn=stack.pop();
-            	conn.commit();
+            	if(conn.getAutoCommit()==false)
+            	   conn.commit();
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
@@ -57,12 +63,24 @@ public class TransactionManagerImpl implements TransactionManager {
 
 	@Override
 	public void rollback(String strDataGroupId) throws SQLException {
+		  this.rollback(strDataGroupId, null);
+	}
+
+	@Override
+	public void rollback(String strDataGroupId, Savepoint savePoint) throws SQLException {
 		  Stack<Connection> stack=connMap.get(strDataGroupId);
 		  Connection conn=null;
 	      try {
 	            if (stack!=null && stack.peek() != null) {
 	            	conn=stack.pop();
-	            	conn.rollback();	            	
+	            	if(conn.getAutoCommit()==false){
+	            		if(savePoint!=null){
+	            			conn.rollback(savePoint);
+	            		}else{
+	            			conn.rollback();
+	            		}
+	            	}
+	            			            	
 	            }
 	        } catch (SQLException e) {
 	            logger.error(e.getMessage(),e);
@@ -71,10 +89,9 @@ public class TransactionManagerImpl implements TransactionManager {
 	        	try{if(conn!=null)conn.close();}catch(Exception ex){}
 	        	connMap.put(strDataGroupId,stack);
 	        }
-
+		
 	}
-
-    private Stack<Connection>  addConn(String strDataGroupId) throws SQLException {
+    private Stack<Connection>  addConn(String strDataGroupId,boolean isAutoCommit) throws SQLException {
         try {
         	DBPool dbPool=hmDBPool.get(strDataGroupId);
         	if(!dbPool.isOpened()){
@@ -84,7 +101,7 @@ public class TransactionManagerImpl implements TransactionManager {
         		}
         	}
             Connection conn=dbPool.getConnection(); 
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(isAutoCommit);
             Stack<Connection> stack=connMap.get(strDataGroupId);
             if(stack==null){
             	stack=new Stack<Connection>();
@@ -98,11 +115,19 @@ public class TransactionManagerImpl implements TransactionManager {
         } 
     }
     
-    public boolean isExistsTransaction(String strDataGroupId){
+    public boolean isExistsTransaction(String strDataGroupId) throws SQLException{
         Stack<Connection> stack=connMap.get(strDataGroupId);
         if(stack==null || stack.isEmpty()){
         	return false;
         } 
-        return true;
+        return !stack.peek().getAutoCommit();
+    }
+
+   public boolean isEmpty(String strDataGroupId){
+       Stack<Connection> stack=connMap.get(strDataGroupId);
+       if(stack==null || stack.isEmpty()){
+       		return true;
+       } 
+       return false;
     }
 }
