@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openjdk.jol.info.ClassLayout;
 
 import com.cdoframework.cdolib.data.cdo.CDO;
 
@@ -22,18 +23,16 @@ public class CDOFieldTest {
 	public void test() {
 		CDO cdo=ExampleCDO.getCDO();
 		cdo.setNullValue("NullKey");
-		cdo.setStringArrayValue("NullKeyArr", new String[]{ "数组元素1", null, "数组元素3",null});
+		cdo.setStringArrayValue("StrArr", new String[]{ "数组元素1", null, "数组元素3",null});
 		CDO cdoOut=new CDO();
 		cdoOut.copyFrom(cdo);
 		cdoOut.setCDOValue("cdo", cdo.clone());
 		
-		cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});
-		
+		cdoOut.setCDOArrayValue("cdoArr", new CDO[]{cdo.clone(),cdo.clone()});		
 		CDO x=new CDO();
 		x.copyFrom(cdoOut.toXML());
+		System.out.println(x.toXMLWithIndent());
 
-		x.setShortValue("ssa", (short)300);
-		System.out.println("ssa="+x.getByteValue("ssa"));
 	}
 
 }

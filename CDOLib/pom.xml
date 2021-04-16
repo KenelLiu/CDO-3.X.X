@@ -159,7 +159,12 @@
 		    <version>2.14.1</version>
 		</dependency>
 		-->
-	
+	<dependency>
+	    <groupId>org.openjdk.jol</groupId>
+	    <artifactId>jol-core</artifactId>
+	    <version>0.14</version>
+	    <scope>provided</scope>
+	</dependency>
 			        		
 	</dependencies>	
 	<!--  

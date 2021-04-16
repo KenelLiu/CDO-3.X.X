@@ -78,7 +78,7 @@ public class CDO{
 	//======内部对象,存储字段内容==========//
 	private HashMap<String,Field> hmItem;
 	
-	//======设置需要传输文件个数=======//
+	//======设置需要传输文件个数 =======//
 	 void setFileCount(int fileCount) {
 		this.fileCount = fileCount;
 	}
