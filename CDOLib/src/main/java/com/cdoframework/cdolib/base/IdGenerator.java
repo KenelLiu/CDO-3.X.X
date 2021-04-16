@@ -1,10 +1,6 @@
-/**
- * 
- */
 package com.cdoframework.cdolib.base;
 
 import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * @author dengyong
  * 

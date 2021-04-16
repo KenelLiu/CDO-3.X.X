@@ -4,16 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
 import com.cdoframework.cdolib.annotation.TransName;
-import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.base.ThreadExt;
 import com.cdoframework.cdolib.data.cdo.CDO;
@@ -24,11 +20,7 @@ public abstract class ActiveService extends ThreadExt implements IActiveService
 	private Logger logger = Logger.getLogger(ActiveService.class);
 	
 	protected Map<String, Method> activeMap = new HashMap<String, Method>();
-	
-	protected Return validate(CDO cdoRequest)
-	{
-		return Return.OK;
-	}
+
 	
 	protected IServiceBus serviceBus=null;
 	protected IServicePlugin servicePlugin=null;
@@ -107,10 +99,6 @@ public abstract class ActiveService extends ThreadExt implements IActiveService
 	{
 	}
 	
-	public Return handleTrans(CDO cdoRequest,CDO cdoResponse)
-	{
-		return null;
-	}
 
 	private boolean bIsCustered=false;
 	

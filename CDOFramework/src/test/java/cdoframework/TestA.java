@@ -20,9 +20,5 @@ public class TestA extends TransService{
 		return null;
 	}
 
-	@Override
-	public Return handleTrans(CDO cdoRequest, CDO cdoResponse) {
-		// TODO Auto-generated method stub
-		return null;
-	} 
+
 }

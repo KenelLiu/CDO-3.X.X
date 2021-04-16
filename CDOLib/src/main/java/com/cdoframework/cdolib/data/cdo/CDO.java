@@ -52,8 +52,7 @@ import com.cdoframework.cdolib.util.Utility;
  *CDO 维护一个通用数据类型
  *key dot符号[即 .]，表示cdo的层级关系
  *除  NullField能保存null值外,
- *其他常规字段[StringField,DateField...等],内容不能为NULL值
- *若设置了null值,会初始化成默认
+ *其他常规字段[StringField,DateField...等],内容不能为NULL值,若设置null值,则会初始化成默认值
  */
 public class CDO{
 
@@ -870,7 +869,8 @@ public class CDO{
 		this.setObjectValue(fieldId,FieldType.STRING_TYPE,strValue,field,this);
     }
     /**
-     * 存储一个特殊的字段[NullField]用来保存Null值, 与其他字段地位相同【如:StringField】
+     * 存储一个特殊的字段[NullField]用来保存Null值, 与其他字段【如:StringField,IntegerField】等地位相同
+     * 多用于插入或更新数据库字段为为null值时使用
      * @param strFieldId
      */
     public void setNullValue(String strFieldId){

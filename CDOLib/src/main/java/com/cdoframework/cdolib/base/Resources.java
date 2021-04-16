@@ -101,15 +101,8 @@ public class Resources extends Object {
    */
   public static Properties getResourceAsProperties(String resource)
       throws IOException {
-    Properties props = new Properties();
-    InputStream in = null;
-    String propfile = resource;
-    in = getResourceAsStream(propfile);
-    props.load(in);
-    in.close();
-    return props;
+	  return getResourceAsProperties(getClassLoader(), resource);
   }
-
   /**
    * Returns a resource on the classpath as a Properties object
    *
@@ -120,13 +113,17 @@ public class Resources extends Object {
    */
   public static Properties getResourceAsProperties(ClassLoader loader, String resource)
       throws IOException {
-    Properties props = new Properties();
-    InputStream in = null;
-    String propfile = resource;
-    in = getResourceAsStream(loader, propfile);
-    props.load(in);
-    in.close();
-    return props;
+	    Properties props = new Properties();
+	    InputStream in = null;
+	    try{	
+		    in = getResourceAsStream(loader,resource);
+		    props.load(in);
+		    return props;
+	    }catch(Exception ex){
+	    	throw new IOException(ex.getMessage(),ex);
+	    }finally{
+	    	try{if(in!=null) in.close();}catch(Exception ex){};    	
+	    } 
   }
 
   /**
@@ -209,11 +206,15 @@ public class Resources extends Object {
   public static Properties getUrlAsProperties(String urlString) throws IOException {
     Properties props = new Properties();
     InputStream in = null;
-    String propfile = urlString;
-    in = getUrlAsStream(propfile);
-    props.load(in);
-    in.close();
-    return props;
+    try{	
+	    in = getUrlAsStream(urlString);
+	    props.load(in);
+	    return props;
+    }catch(Exception ex){
+    	throw new IOException(ex.getMessage(),ex);
+    }finally{
+    	try{if(in!=null) in.close();}catch(Exception ex){};    	
+    }     
   }
 
   /**
@@ -223,8 +224,8 @@ public class Resources extends Object {
    * @return The loaded class
    * @throws ClassNotFoundException If the class cannot be found (duh!)
    */
-  public static Class classForName(String className) throws ClassNotFoundException {
-    Class clazz = null;
+  public static Class<?> classForName(String className) throws ClassNotFoundException {
+    Class<?> clazz = null;
     try {
       clazz = getClassLoader().loadClass(className);
     } catch (Exception e) {

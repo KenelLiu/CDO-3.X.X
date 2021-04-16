@@ -58,7 +58,7 @@ public abstract class TransService implements ITransService
 	}
 	
 	@Override
-	public void inject(ITransService child) {
+	public final void inject(ITransService child) {
 		if(child != null)
 		{
 			Class<?> cls = child.getClass();
@@ -89,15 +89,7 @@ public abstract class TransService implements ITransService
 			}
 		}
 	}
-	
-	@Override
-	public Return handleTrans(CDO cdoRequest, CDO cdoResponse) {
-		Return validateReturn = validate(cdoRequest);
-		if (!Return.OK.equals(validateReturn)) {
-			return validateReturn;
-		}
-		return null;
-	}
+
 		
 	/**
 	 * 设置服务名
@@ -108,9 +100,6 @@ public abstract class TransService implements ITransService
 		this.strServiceName = strServiceName;
 	}
 	
-	protected Return validate(CDO cdoRequest){
-		return Return.OK;
-	}
 	/**
 	 * 取服务名
 	 * @return

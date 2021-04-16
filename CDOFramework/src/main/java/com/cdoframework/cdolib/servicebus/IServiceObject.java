@@ -19,6 +19,9 @@ public interface IServiceObject
 	 * @param servicePlugin 服务插件对象
 	 */
 	void setServicePlugin(IServicePlugin servicePlugin);
-	
+	/**
+	 * 传入service
+	 * @param service
+	 */
 	void setService(IService service);
 }
