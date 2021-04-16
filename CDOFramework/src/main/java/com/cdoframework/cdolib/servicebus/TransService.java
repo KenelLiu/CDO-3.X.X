@@ -131,12 +131,15 @@ public abstract class TransService implements ITransService
 				return (Return) method.invoke(this, cdoRequest, cdoResponse);				
 				//propagations.popPropagation();
 			} catch (IllegalArgumentException e) {
-				logger.warn(strTransName+": 参数错误"+ cdoRequest+cdoResponse);
+				logger.error(strTransName+":参数错误,"+e.getMessage(),e);
+				return Return.valueOf(-1, e.getMessage());
 			} catch (IllegalAccessException e) {
-				logger.warn(strTransName+": 函数访问错误IllegalAccessException");
+				logger.error(strTransName+":函数访问错误IllegalAccessException,"+e.getMessage(),e);
+				return Return.valueOf(-1, e.getMessage());
 			} catch (InvocationTargetException e) {
-				logger.warn(strTransName+": 函数调用错误InvocationTargetException");
-			}
+				logger.error(strTransName+": 函数调用错误InvocationTargetException,"+e.getMessage(),e);
+				return Return.valueOf(-1, e.getMessage());
+			}			
 		} 
 		return null;
 	}
