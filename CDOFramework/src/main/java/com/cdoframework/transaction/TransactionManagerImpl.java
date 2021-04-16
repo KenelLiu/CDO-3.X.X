@@ -55,8 +55,7 @@ public class TransactionManagerImpl implements TransactionManager {
             logger.error(e.getMessage(),e);
             throw new SQLException(e.getMessage(),e);
         }finally{
-        	try{if(conn!=null)conn.close();}catch(Exception ex){}
-        	connMap.put(strDataGroupId,stack);
+        	try{if(conn!=null)conn.close();}catch(Exception ex){}        	
         }
 
 	}
@@ -86,8 +85,7 @@ public class TransactionManagerImpl implements TransactionManager {
 	            logger.error(e.getMessage(),e);
 	            throw new SQLException(e.getMessage(),e);
 	        }finally{
-	        	try{if(conn!=null)conn.close();}catch(Exception ex){}
-	        	connMap.put(strDataGroupId,stack);
+	        	try{if(conn!=null)conn.close();}catch(Exception ex){}	        	
 	        }
 		
 	}

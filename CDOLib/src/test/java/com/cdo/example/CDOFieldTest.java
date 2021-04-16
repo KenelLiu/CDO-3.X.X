@@ -2,6 +2,10 @@ package com.cdo.example;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +36,17 @@ public class CDOFieldTest {
 		CDO x=new CDO();
 		x.copyFrom(cdoOut.toXML());
 		System.out.println(x.toXMLWithIndent());
+		
+		Map<String,Stack<String>> map=new HashMap<String,Stack<String>>();
+		Stack<String> stack=new Stack<String>();
+		stack.add("a");
+		stack.add("b");
+		map.put("k", stack);
+		System.out.println(map);
+		stack.pop();
+		System.out.println(map);
+		stack.add("d");
+		System.out.println(map);
 
 	}
 
