@@ -12,11 +12,8 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.annotation.TransName;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.Propagation;
-import com.cdoframework.transaction.PropagationChain;
-import com.cdoframework.transaction.PropagationChainThreadLocal;
 /**
  * 增加事务传播属性
  * @author Kenel
@@ -58,7 +55,7 @@ public abstract class TransService implements ITransService
 	}
 	
 	@Override
-	public final void inject(ITransService child) {
+	public void inject(ITransService child) {
 		if(child != null)
 		{
 			Class<?> cls = child.getClass();
@@ -78,18 +75,11 @@ public abstract class TransService implements ITransService
 						logger.error("存在同名的transName："+ name);
 						System.exit(-1);
 					}
-					/**
-					Propagation propagation=transName.propagation();
-					if(propagation==null){
-						propagation=Propagation.REQUIRED;
-					}
-					propagationMap.put(name, propagation);
-					**/
 				}
 			}
 		}
 	}
-
+	
 		
 	/**
 	 * 设置服务名
@@ -100,6 +90,9 @@ public abstract class TransService implements ITransService
 		this.strServiceName = strServiceName;
 	}
 	
+	protected Return validate(CDO cdoRequest){
+		return Return.OK;
+	}
 	/**
 	 * 取服务名
 	 * @return
@@ -124,22 +117,16 @@ public abstract class TransService implements ITransService
 		Method method = null;
 		if((method = transMap.get(strTransName)) != null) {
 			try {
-				//==========为每个thread在每个库上添加事务传播属性======//
-				/**Propagation propagation=propagationMap.get(strTransName);
-				PropagationChain propagations=new PropagationChainThreadLocal();
-				propagations.addPropagation(propagation);**/				
+				//==========为每个thread在每个库上添加事务传播属性======//			
 				return (Return) method.invoke(this, cdoRequest, cdoResponse);				
 				//propagations.popPropagation();
 			} catch (IllegalArgumentException e) {
-				logger.error(strTransName+":参数错误,"+e.getMessage(),e);
-				return Return.valueOf(-1, e.getMessage());
+				logger.warn(strTransName+": 参数错误"+ cdoRequest+cdoResponse);
 			} catch (IllegalAccessException e) {
-				logger.error(strTransName+":函数访问错误IllegalAccessException,"+e.getMessage(),e);
-				return Return.valueOf(-1, e.getMessage());
+				logger.warn(strTransName+": 函数访问错误IllegalAccessException");
 			} catch (InvocationTargetException e) {
-				logger.error(strTransName+": 函数调用错误InvocationTargetException,"+e.getMessage(),e);
-				return Return.valueOf(-1, e.getMessage());
-			}			
+				logger.warn(strTransName+": 函数调用错误InvocationTargetException");
+			}
 		} 
 		return null;
 	}

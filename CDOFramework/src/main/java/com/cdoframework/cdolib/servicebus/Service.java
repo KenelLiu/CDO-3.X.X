@@ -8,17 +8,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.DataServiceParse;
-import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.cdolib.database.TransDefine;
 
 import com.cdoframework.cdolib.database.xsd.SQLTrans;
 import com.cdoframework.transaction.Propagation;
-import com.cdoframework.transaction.PropagationChain;
-import com.cdoframework.transaction.PropagationChainThreadLocal;
 
 /**
  * 

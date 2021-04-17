@@ -1,56 +1,42 @@
 package com.cdoframework.transaction;
-/**
- * @author Kenel
- */
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+
 public interface Transaction {
-	/**
-	 * Support a current transaction, create a new one if none exists.
-	 * description:
-	 *   if there is an active transaction, then it creates a new one if nothing existed.
-	 *   Otherwise, the business logic appends to the currently active transaction.
-	 */
-	byte PROPAGATION_REQUIRED=1;
-	/**
-	 * Support a current transaction, execute non-transactionally if none exists.
-	 * description: 
-	 * 	 first checks if an active transaction exists. 
-	 * 	 If a transaction exists, then the existing transaction will be used.
-	 *   If there isn't a transaction, it is executed non-transactional.
-	 */
-	byte PROPAGATION_SUPPORTS =2;
-	/**
-	 * Support a current transaction, throw an exception if none exists.
-	 * description: 
-	 *   if there is an active transaction, then it will be used. 
-	 *   If there isn't an active transaction,then throws an exception
-	 */
-	byte PROPAGATION_MANDATORY=3;
-	/**
-	 * Execute non-transactionally, throw an exception if a transaction exists.
-	 * description：
-	 * 	  transactional logic with NEVER propagation,throws an exception if there's an active transaction
-	 */
-	byte PROPAGATION_NEVER=4;
-	/**
-	 * Execute non-transactionally, suspend the current transaction if one exists.
-	 * description：
-	 * 	 at first suspends the current transaction if it exists, 
-	 *   then the business logic is executed without a transaction
-	 */
-	byte PROPAGATION_NOT_SUPPORTED=5;
-	/**
-	 * Create a new transaction, and suspend the current transaction if one exists.
-	 * description：
-	 * 	 suspends the current transaction if it exists and then creates a new one
-	 */
-	byte PROPAGATION_REQUIRES_NEW=6;
-	/**
-	 * Execute within a nested transaction if a current transaction exists, behave like REQUIRED otherwise.
-	 * description：
-	 * 	 checks if a transaction exists, then if yes, it marks a savepoint. 
-	 * 	 This means if our business logic execution throws an exception, 
-	 * 	 then transaction rollbacks to this savepoint. 
-	 * 	 If there's no active transaction, it works like REQUIRED.
-	 */
-	byte PROPAGATION_NESTED=7;
+	 /**
+	  * 当xml里配置成Transactional.PROPAGATION_REQUIRED	时
+	  * 获取当前连接使用.  
+	  * @param strDataGroupId
+	  * @return
+	  * @throws SQLException 
+	  */
+	 Connection getConnection(String strDataGroupId) throws SQLException;
+	 /**
+	  * 开启一个新事务,创建物理连接.被后续xml里配置成PROPAGATION_REQUIRED 共享使用	
+	  * 1 若连接不存在,首次创建连接,引用次数为1
+	  * 2 若连接已经存在,则引用次数加1
+	  * 在进入 transName方法前调用
+	  * @param strDataGroupId
+	  * @throws SQLException 
+	  */
+	 void doBegin(String strDataGroupId) throws SQLException;	 
+	 /**
+	  * 在退出 transName方法后调用
+	  * 1.当连接引用次数大于0时,则计数减一
+	  * 2.当连接引用次数等于0时,则进行事务实际提交
+	  * @param strDataGroupId
+	  * @throws SQLException 
+	  */
+	 void commit(String strDataGroupId) throws SQLException;
+	 /**
+	  * 回滚一个事务:无论连接引用次数否被引用,都回滚
+	  * 通过TransactionException 判断
+	  * @param strDataGroupId
+	  * @throws SQLException 
+	  */
+	 void rollback(String strDataGroupId) throws SQLException;
+	 
+	 
 }

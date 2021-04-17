@@ -6,7 +6,7 @@ import java.sql.Savepoint;
 /**
  * 
  * @author Kenel
- *
+ * 考虑 threadLocal 里value 内存泄露问题
  */
 public class TransactionManagerThreadLocal implements TransactionManager {
 	private static final ThreadLocal<TransactionManager> tranManager = new ThreadLocal<TransactionManager>(){
