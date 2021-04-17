@@ -31,8 +31,8 @@ public interface Transaction {
 	  */
 	 void commit(String strDataGroupId) throws SQLException;
 	 /**
-	  * 回滚一个事务:无论连接引用次数否被引用,都回滚
-	  * 通过TransactionException 判断
+	  * 事务回滚
+	  * 通过反射调用方法的异常和TransactionException判断事务回滚
 	  * @param strDataGroupId
 	  * @throws SQLException 
 	  */

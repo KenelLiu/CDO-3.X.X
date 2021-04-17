@@ -24,14 +24,21 @@ public class TransactionImpl implements Transaction {
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
 		ConnectionHolder holder=connMap.get(strDataGroupId);
-        if (holder==null) {
-        	holder=this.addConn(strDataGroupId,false);
-        }
+		if(holder==null)
+			holder=this.addConn(strDataGroupId, false);
         return holder.getCurConnction();
 	}
-
+	/**
+	  * 1 若连接不存在,首次创建连接,引用次数为1
+	  * 2 若连接已经存在,则引用次数加1
+	 */
 	@Override
 	public void doBegin(String strDataGroupId) throws SQLException {
+		ConnectionHolder holder=connMap.get(strDataGroupId);
+		if(holder!=null){
+			holder.addReference();
+			return;
+		}
 		this.addConn(strDataGroupId,false);
 	}
 
@@ -40,13 +47,17 @@ public class TransactionImpl implements Transaction {
 		Connection conn=null;
         try {    
         	ConnectionHolder holder=connMap.get(strDataGroupId);
-        	holder.decreaseReference();
+        	if(holder==null){
+        		connMap.remove(strDataGroupId);
+        		throw new SQLException("["+strDataGroupId+"] ConnectionHolder is null,can't commit");
+        	}
+        	holder.decReference();
         	if(holder.getReferenceCount()==0){
         		try{
         			conn=holder.getCurConnction();
         			conn.commit();
         		 }finally{
-        			//=====能提交,说明全部结束====//
+        			//=====事务能提交,则所有任务已结束====//
         			 connMap.remove(strDataGroupId);
         		 }
         	}  
@@ -64,18 +75,18 @@ public class TransactionImpl implements Transaction {
 		  Connection conn=null;
 	      try {
 	    	  ConnectionHolder holder=connMap.get(strDataGroupId);
-      		 try{
-    			conn=holder.getCurConnction();
-    			conn.rollback();
-    		 }finally{
-    			//=====事务回滚,说明全部结束====//
-    			 connMap.remove(strDataGroupId);
-    		  }
-	        } catch (SQLException e) {
+   			  if(holder==null){
+   				throw new SQLException("["+strDataGroupId+"] ConnectionHolder is null,can't rollback"); 
+  			  }
+   			  conn=holder.getCurConnction();
+  			  conn.rollback();
+	        } catch (Exception e) {
 	        	logger.error(e.getMessage(),e);
 	            throw new SQLException(e.getMessage(),e);
 	        }finally{
 	        	try{if(conn!=null)conn.close();}catch(Exception ex){}
+	        	//=====事务回滚,所有任务结束====//
+	        	connMap.remove(strDataGroupId);
 	        }		
 	}
 	
@@ -98,6 +109,10 @@ public class TransactionImpl implements Transaction {
         	logger.error(e.getMessage(),e);
             throw new SQLException(e.getMessage(),e);
         } 
+    }
+    
+    public boolean isEmpty(){
+    	 return connMap.isEmpty();
     }
   
 }

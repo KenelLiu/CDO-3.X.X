@@ -30,20 +30,24 @@ public class TransactionThreadLocal implements Transaction {
 
 	@Override
 	public void commit(String strDataGroupId) throws SQLException {
+		TransactionImpl trans=tranManager.get();
 		try{
-			tranManager.get().commit(strDataGroupId);
+			trans.commit(strDataGroupId);
 		}finally{
-			tranManager.remove();
+			if(trans.isEmpty())
+				tranManager.remove();
 		}
 	
 	}
 
 	@Override
 	public void rollback(String strDataGroupId) throws SQLException {
+		TransactionImpl trans=tranManager.get();
 		try{
-			tranManager.get().rollback(strDataGroupId);
+			trans.rollback(strDataGroupId);
 		}finally{
-			tranManager.remove();
+			if(trans.isEmpty())
+				tranManager.remove();
 		}
 	}
 

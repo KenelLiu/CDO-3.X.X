@@ -9,7 +9,6 @@ import java.util.Stack;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openjdk.jol.info.ClassLayout;
 
 import com.cdoframework.cdolib.data.cdo.CDO;
 
@@ -47,7 +46,9 @@ public class CDOFieldTest {
 		System.out.println(map);
 		stack.add("d");
 		System.out.println(map);
+		
 
 	}
+
 
 }

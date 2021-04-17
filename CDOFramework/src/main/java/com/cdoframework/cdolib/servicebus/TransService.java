@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,8 +13,11 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.annotation.TransName;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
+import com.cdoframework.cdolib.database.DBPool;
+import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.TransactionThreadLocal;
 /**
  * 增加事务传播属性
  * @author Kenel
@@ -28,7 +32,7 @@ public abstract class TransService implements ITransService
 	protected IService service = null;
 	
 	protected Map<String, Method> transMap = new HashMap<String, Method>();
-	protected Map<String,Propagation> propagationMap=new HashMap<String,Propagation>();
+
 
 	final public void setServiceBus(IServiceBus serviceBus)
 	{
@@ -89,10 +93,7 @@ public abstract class TransService implements ITransService
 	{
 		this.strServiceName = strServiceName;
 	}
-	
-	protected Return validate(CDO cdoRequest){
-		return Return.OK;
-	}
+
 	/**
 	 * 取服务名
 	 * @return
@@ -116,20 +117,54 @@ public abstract class TransService implements ITransService
 		String strTransName = cdoRequest.getStringValue(ITransService.TRANSNAME_KEY);
 		Method method = null;
 		if((method = transMap.get(strTransName)) != null) {
+			TransactionThreadLocal transaction=new TransactionThreadLocal();
 			try {
-				//==========为每个thread在每个库上添加事务传播属性======//			
-				return (Return) method.invoke(this, cdoRequest, cdoResponse);				
-				//propagations.popPropagation();
+				doBegin(transaction);
+				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);				
+				commit(transaction);
+				return ret;
 			} catch (IllegalArgumentException e) {
-				logger.warn(strTransName+": 参数错误"+ cdoRequest+cdoResponse);
+				logger.error(strTransName+": 参数错误 "+ cdoRequest+",message="+e.getMessage(),e);
+				try{rollback(transaction);} catch (SQLException e1){}
+				return Return.valueOf(-1, strTransName+": 参数错误,message="+e.getMessage());
 			} catch (IllegalAccessException e) {
-				logger.warn(strTransName+": 函数访问错误IllegalAccessException");
+				logger.error(strTransName+": 函数访问错误IllegalAccessException,message="+e.getMessage(),e);
+				try{rollback(transaction);} catch (SQLException e1){}
+				return Return.valueOf(-1, strTransName+": 函数访问错误IllegalAccessException,message="+e.getMessage());
 			} catch (InvocationTargetException e) {
-				logger.warn(strTransName+": 函数调用错误InvocationTargetException");
+				logger.error(strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage(),e);
+				try{rollback(transaction);} catch (SQLException e1){}
+				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
+			} catch (SQLException e) {
+				logger.error(strTransName+":开启事务或提交发生错误,message="+e.getMessage(),e);
+				try{rollback(transaction);} catch (SQLException e1){}
+				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
 			}
 		} 
 		return null;
 	}
+	
+	void doBegin(TransactionThreadLocal transaction) throws SQLException{
+		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
+		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+			 transaction.doBegin(it.next());
+		 }
+	}
+	
+	void commit(TransactionThreadLocal transaction) throws SQLException{
+		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
+		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+			 transaction.commit(it.next());
+		 }
+	}
+	
+	 void rollback(TransactionThreadLocal transaction) throws SQLException{
+		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
+		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+			 transaction.rollback(it.next());
+		 }
+	 }
+	
 	
 	@Override
 	public boolean containsTrans(String strTransName) {

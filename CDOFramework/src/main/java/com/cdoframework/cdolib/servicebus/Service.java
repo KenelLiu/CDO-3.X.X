@@ -1,5 +1,6 @@
 package com.cdoframework.cdolib.servicebus;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,7 +15,7 @@ import com.cdoframework.cdolib.database.DataServiceParse;
 import com.cdoframework.cdolib.database.TransDefine;
 
 import com.cdoframework.cdolib.database.xsd.SQLTrans;
-import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.TransactionThreadLocal;
 
 /**
  * 
@@ -184,17 +185,15 @@ public class Service implements IService
 			}
 		}				
 		if(ret==null){
+			TransactionThreadLocal transaction=new TransactionThreadLocal();
+			String strDataGroupId=getDataGroupId(strTransName);
 			try{
-				//========对未经过TransService直接调用xml里的SQL语句,添加事务传播默认方法========//
-				
-				/**PropagationChain propagations=new PropagationChainThreadLocal();
-				 * PropagationChain propagations=new PropagationChainThreadLocal();
-				 * propagations.addPropagation(Propagation.REQUIRED);
-				 * 
-				 */
+				//========对未经过TransService直接调用xml里的SQL语句========//				
+				transaction.doBegin(strDataGroupId);
 				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
-				//propagations.popPropagation(getDataGroupId(strTransName));
+				transaction.commit(strDataGroupId);
 			}catch(Exception e){
+				try{transaction.rollback(strDataGroupId);} catch (SQLException e1){}
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);
 				return Return.valueOf(-1,e.getMessage(),e);
 			}

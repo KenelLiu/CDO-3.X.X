@@ -35,8 +35,5 @@ public class DBPoolManager {
 	
 	public DBPool addDBPool(String strDataGroupId,DBPool dbPool) {
 		return hmDBPool.put(strDataGroupId, dbPool);
-	}
-
-	
-	
+	}	
 }

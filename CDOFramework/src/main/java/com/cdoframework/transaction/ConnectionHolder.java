@@ -19,7 +19,10 @@ public class ConnectionHolder {
 	public int getReferenceCount() {
 		return referenceCount;
 	}
-	public void decreaseReference(){
-		this.referenceCount=this.referenceCount-1;
+	public void decReference(){
+		this.referenceCount--;
+	}
+	public void addReference(){
+		this.referenceCount++;
 	}
 }
