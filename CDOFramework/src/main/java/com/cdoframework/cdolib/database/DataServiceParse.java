@@ -524,18 +524,6 @@ public class DataServiceParse
 		return 0;
 	}
 	
-	private void callOnException(String strText,Exception e)
-	{
-		try
-		{
-			onException(strText,e);
-		}
-		catch(Exception ex)
-		{
-		}
-	}
-
-
 	private class DataTransaction{
 		Connection connection;
 		boolean isNewConn;
@@ -559,7 +547,7 @@ public class DataServiceParse
 		}else if(propagation==Propagation.REQUIRES_NEW){
 			Connection conn=dataEngine.getConnection();
 			conn.setAutoCommit(false);
-			return new DataTransaction(dataEngine.getConnection(),true,false);
+			return new DataTransaction(conn,true,false);
 		}else if(propagation==Propagation.NOT_SUPPORTED){
 			Connection conn=dataEngine.getConnection();
 			conn.setAutoCommit(true);
@@ -672,38 +660,7 @@ public class DataServiceParse
 			if(dataTransaction.isNewConn && dataTransaction.isTransaction){
 				connection.commit();
 			}			
-		}catch(SQLException e){		   
-		   	if(dataTransaction!=null){
-		   		if(dataTransaction.isNewConn && dataTransaction.isTransaction){
-		   			try{connection.rollback();}catch(Exception ex){};
-		   		}
-		   		if(dataTransaction.isTransaction && dataTransaction.isSavePoint){
-		   			if(savepoint!=null)
-		   				try{connection.rollback(savepoint);}catch(Exception ex){}
-		   		}
-		   	}
-			String strTransName=cdoRequest.getStringValue("strTransName");
-			callOnException("executeTrans Exception: "+strTransName,e);
-			ret=null;
-			OnException onException=trans.getOnException();
-			int nErrorCount=onException.getOnErrorCount();
-			for(int i=0;i<nErrorCount;i++){
-				OnError onError=onException.getOnError(i);
-				if(onError.getCode()==e.getErrorCode()){
-					ret=Return.valueOf(onError.getReturn().getCode(),onError.getReturn().getText(),onError.getReturn().getInfo(),e);
-					break;
-				}
-			}
-			if(ret==null){
-				// 没有定义OnError
-				String strText = onException.getReturn().getText();
-				if("OK".equalsIgnoreCase(strText)){
-					strText="系统服务器故障";
-				}
-				ret=Return.valueOf(onException.getReturn().getCode(),strText,onException.getReturn().getInfo(),e);
-			}
-			throw new TransactionException(ret,e.getMessage(),e);
-		}catch(Exception e){
+		}catch(Throwable e){
 		   	if(dataTransaction!=null){
 		   		if(dataTransaction.isNewConn && dataTransaction.isTransaction){
 		   			try{connection.rollback();}catch(Exception ex){};
@@ -714,7 +671,7 @@ public class DataServiceParse
 		   		}
 		   	}
 		   	String strTransName=cdoRequest.getStringValue("strTransName");
-			callOnException("executeTrans Exception: "+strTransName,e);
+		   	logger.error("executeTrans Exception: "+strTransName,e);
 			OnException onException=trans.getOnException();
 			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());	
 			throw new TransactionException(ret,e.getMessage(),e);
@@ -730,12 +687,6 @@ public class DataServiceParse
 			}
 		}		
 		return ret;
-	}
-
-
-	public void onException(String strText,Exception e)
-	{
-		logger.error(strText, e); 
 	}
 
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------

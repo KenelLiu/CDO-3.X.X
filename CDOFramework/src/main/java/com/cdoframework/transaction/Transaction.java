@@ -2,7 +2,6 @@ package com.cdoframework.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 
 public interface Transaction {
 	 /**
@@ -32,7 +31,7 @@ public interface Transaction {
 	 void commit(String strDataGroupId) throws SQLException;
 	 /**
 	  * 事务回滚
-	  * 通过反射调用方法的异常和TransactionException判断事务回滚
+	  * 通过反射调用方法的异常判断事务回滚
 	  * @param strDataGroupId
 	  * @throws SQLException 
 	  */

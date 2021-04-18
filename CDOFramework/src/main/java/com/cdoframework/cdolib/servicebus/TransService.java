@@ -1,6 +1,5 @@
 package com.cdoframework.cdolib.servicebus;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +16,6 @@ import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.TransactionThreadLocal;
-import com.cdoframework.transaction.exception.TransactionException;
 /**
  * 增加事务传播属性
  * 为了方便处理和事务使用频次,所有定义了transName名称的方法,事务的传播都为Propagation.REQUIRED
@@ -126,25 +124,30 @@ public abstract class TransService implements ITransService
 		String strTransName = cdoRequest.getStringValue(ITransService.TRANSNAME_KEY);
 		Method method = null;
 		if((method = transMap.get(strTransName)) != null) {
-			TransactionThreadLocal transaction=new TransactionThreadLocal();
+			TransName transName = method.getAnnotation(TransName.class);					
+			boolean autoStartTransaction=!transName.denyAutoStartTransaction();
+			TransactionThreadLocal transaction=null;
 			try {
-				doBegin(transaction);
-				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);				
-				commit(transaction);
-				return ret;
+				if(autoStartTransaction){
+					transaction=new TransactionThreadLocal();
+					doBegin(transaction);
+				}		
+				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);	
+				if(autoStartTransaction){
+					commit(transaction);
+				}
+				return ret;			
 			}catch (SQLException e) {
 				logger.error(strTransName+":调用开启/提交事务时发生错误,message="+e.getMessage(),e);
-				try{rollback(transaction);} catch (SQLException e1){}
+				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
 				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
 			}catch(Throwable e){
 				logger.error(strTransName+":调用时发生异常,message="+e.getMessage(),e);
-				try{rollback(transaction);} catch (SQLException e1){}
-				if(e  instanceof TransactionException) {
-					return ((TransactionException)e).getRet();
-				}
+				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
 				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
 			}
 		} 
+
 		return null;
 	}
 	

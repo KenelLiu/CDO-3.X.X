@@ -1,5 +1,6 @@
 package com.cdoframework.cdolib.servicebus;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,14 +98,7 @@ public class Service implements IService
 		{
 			return null;
 		}		
-		try{    			
-			return this.dataServiceParse.handleTrans(this.serviceBus.getHMDataEngine(),sqlTrans,cdoRequest,cdoResponse);
-		}
-		catch(Exception e)
-		{
-			logger.error("handle DataService ["+strTransName+"] occured error:"+e.getMessage(),e);
-			return Return.valueOf(-1,e.getMessage(),e);
-		}
+		return this.dataServiceParse.handleTrans(this.serviceBus.getHMDataEngine(),sqlTrans,cdoRequest,cdoResponse);
 	}
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
@@ -153,6 +147,7 @@ public class Service implements IService
 
 
 	/**
+	 * @throws InvocationTargetException 
 	 * @see {@link com.cdoframework.cdolib.servicebus.IService#handleDataTrans(com.cdoframework.cdolib.data.cdo.CDO, com.cdoframework.cdolib.data.cdo.CDO)}}
 	 */
 	public Return handleDataTrans(CDO cdoRequest,CDO cdoResponse)
@@ -192,7 +187,7 @@ public class Service implements IService
 				transaction.doBegin(strDataGroupId);
 				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
 				transaction.commit(strDataGroupId);
-			}catch(Exception e){
+			}catch(Throwable e){
 				try{transaction.rollback(strDataGroupId);} catch (SQLException e1){}
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);
 				return Return.valueOf(-1,e.getMessage(),e);

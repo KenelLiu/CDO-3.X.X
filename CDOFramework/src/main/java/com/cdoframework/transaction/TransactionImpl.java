@@ -2,11 +2,8 @@ package com.cdoframework.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 
 import com.cdoframework.cdolib.base.Return;
@@ -23,10 +20,13 @@ public class TransactionImpl implements Transaction {
 	private Logger logger=Logger.getLogger(TransactionManagerImpl.class);
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
-		ConnectionHolder holder=connMap.get(strDataGroupId);
-		if(holder==null)
-			holder=this.addConn(strDataGroupId, false);
-        return holder.getCurConnction();
+		try{
+			ConnectionHolder holder=connMap.get(strDataGroupId);
+			return holder.getCurConnction();
+		}catch(Exception e){
+        	logger.error(e.getMessage(),e);
+            throw new SQLException(e.getMessage(),e);
+		}
 	}
 	/**
 	  * 1 若连接不存在,首次创建连接,引用次数为1

@@ -9,5 +9,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TransName {
-	String name() default ""; // TransName的名字，默认是空串
+	//=======TransName的名字，默认是空串=========//
+	String name() default ""; 
+	//====禁止进入该方法前,自动启动事务,创建数据库连接=======//
+	boolean denyAutoStartTransaction() default false;
 }
