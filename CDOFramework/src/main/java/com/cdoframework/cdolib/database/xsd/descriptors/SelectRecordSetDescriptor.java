@@ -99,7 +99,7 @@ public class SelectRecordSetDescriptor extends com.cdoframework.cdolib.database.
             typeValidator.addPattern("\\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\\.|\\[|\\])*\\}");
             typeValidator.setWhiteSpace("preserve");
         }
-        desc.setValidator(fieldValidator);         
+        desc.setValidator(fieldValidator);
         //-- recordCountId
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "recordCountId", "RecordCountId", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);

@@ -103,47 +103,6 @@ public class SQLTransDescriptor extends org.exolab.castor.xml.util.XMLClassDescr
             typeValidator.setMinLength(1);
         }
         desc.setValidator(fieldValidator);
-        //-- transFlag
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType.class, "transFlag", "TransFlag", org.exolab.castor.xml.NodeType.Attribute);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SQLTrans target = (SQLTrans) object;
-                return target.getTransFlag();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SQLTrans target = (SQLTrans) object;
-                    target.setTransFlag( (com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
-            }
-        };
-        handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType.class, handler);
-        desc.setImmutable(true);
-        desc.setSchemaType("SQLTransTransFlagType");
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-
-        //-- validation code for: transFlag
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-        }
-        desc.setValidator(fieldValidator);
         //-- dataGroupId
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "dataGroupId", "DataGroupId", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
@@ -187,6 +146,50 @@ public class SQLTransDescriptor extends org.exolab.castor.xml.util.XMLClassDescr
             fieldValidator.setValidator(typeValidator);
             typeValidator.addPattern("(([a-z]|[A-Z])([a-z]|[A-Z]|[0-9])*)*");
             typeValidator.setWhiteSpace("preserve");
+        }
+        desc.setValidator(fieldValidator);
+        //-- propagation
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.class, "propagation", "Propagation", org.exolab.castor.xml.NodeType.Attribute);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            @Override
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                SQLTrans target = (SQLTrans) object;
+                return target.getPropagation();
+            }
+            @Override
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    SQLTrans target = (SQLTrans) object;
+                    // default value supplied; as such, do not inject null values
+                    if (value == null) {
+                        return;
+                    }
+
+                    target.setPropagation( (com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            @Override
+            @SuppressWarnings("unused")
+            public java.lang.Object newInstance(java.lang.Object parent) {
+                return null;
+            }
+        };
+        handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.class, handler);
+        desc.setImmutable(true);
+        desc.setSchemaType("SQLTransPropagationType");
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+
+        //-- validation code for: propagation
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
         }
         desc.setValidator(fieldValidator);
         //-- zkId

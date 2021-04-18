@@ -21,14 +21,14 @@ public class SQLTrans implements java.io.Serializable {
     private java.lang.String transName;
 
     /**
-     * Field transFlag.
-     */
-    private com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType transFlag;
-
-    /**
      * Field dataGroupId.
      */
     private java.lang.String dataGroupId;
+
+    /**
+     * Field propagation.
+     */
+    private com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType propagation = com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("REQUIRED");
 
     /**
      * Field zkId.
@@ -52,6 +52,7 @@ public class SQLTrans implements java.io.Serializable {
 
     public SQLTrans() {
         super();
+        setPropagation(com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("REQUIRED"));
     }
 
     /**
@@ -73,6 +74,15 @@ public class SQLTrans implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'propagation'.
+     * 
+     * @return the value of field 'Propagation'.
+     */
+    public com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType getPropagation() {
+        return this.propagation;
+    }
+
+    /**
      * Returns the value of field 'return'.
      * 
      * @return the value of field 'Return'.
@@ -88,15 +98,6 @@ public class SQLTrans implements java.io.Serializable {
      */
     public com.cdoframework.cdolib.database.xsd.SQLTransChoice getSQLTransChoice() {
         return this.SQLTransChoice;
-    }
-
-    /**
-     * Returns the value of field 'transFlag'.
-     * 
-     * @return the value of field 'TransFlag'.
-     */
-    public com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType getTransFlag() {
-        return this.transFlag;
     }
 
     /**
@@ -178,6 +179,15 @@ public class SQLTrans implements java.io.Serializable {
     }
 
     /**
+     * Sets the value of field 'propagation'.
+     * 
+     * @param propagation the value of field 'propagation'.
+     */
+    public void setPropagation(final com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType propagation) {
+        this.propagation = propagation;
+    }
+
+    /**
      * Sets the value of field 'return'.
      * 
      * @param _return
@@ -194,15 +204,6 @@ public class SQLTrans implements java.io.Serializable {
      */
     public void setSQLTransChoice(final com.cdoframework.cdolib.database.xsd.SQLTransChoice SQLTransChoice) {
         this.SQLTransChoice = SQLTransChoice;
-    }
-
-    /**
-     * Sets the value of field 'transFlag'.
-     * 
-     * @param transFlag the value of field 'transFlag'.
-     */
-    public void setTransFlag(final com.cdoframework.cdolib.database.xsd.types.SQLTransTransFlagType transFlag) {
-        this.transFlag = transFlag;
     }
 
     /**
@@ -248,7 +249,6 @@ public class SQLTrans implements java.io.Serializable {
         org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     }
-
     /**
   	 * ***************************************manual  code *************************************************
   	 * 设置DataService对象
@@ -264,5 +264,5 @@ public class SQLTrans implements java.io.Serializable {
  	public void setDataService(DataService dataService)
  	{
  		this.dataService=dataService;
- 	}      
+ 	}    
 }

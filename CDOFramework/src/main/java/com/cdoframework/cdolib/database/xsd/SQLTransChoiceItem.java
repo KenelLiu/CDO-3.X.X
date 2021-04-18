@@ -65,27 +65,8 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     private com.cdoframework.cdolib.database.xsd.SetVar setVar;
 
-    /**
-     * Field commit.
-     */
-    private java.lang.Object commit;
-
-    /**
-     * Field rollback.
-     */
-    private java.lang.Object rollback;
-
     public SQLTransChoiceItem() {
         super();
-    }
-
-    /**
-     * Returns the value of field 'commit'.
-     * 
-     * @return the value of field 'Commit'.
-     */
-    public java.lang.Object getCommit() {
-        return this.commit;
     }
 
     /**
@@ -122,15 +103,6 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     public com.cdoframework.cdolib.database.xsd.Insert getInsert() {
         return this.insert;
-    }
-
-    /**
-     * Returns the value of field 'rollback'.
-     * 
-     * @return the value of field 'Rollback'.
-     */
-    public java.lang.Object getRollback() {
-        return this.rollback;
     }
 
     /**
@@ -188,15 +160,6 @@ public class SQLTransChoiceItem implements java.io.Serializable {
     }
 
     /**
-     * Sets the value of field 'commit'.
-     * 
-     * @param commit the value of field 'commit'.
-     */
-    public void setCommit(final java.lang.Object commit) {
-        this.commit = commit;
-    }
-
-    /**
      * Sets the value of field 'delete'.
      * 
      * @param delete the value of field 'delete'.
@@ -232,15 +195,6 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     public void setInsert(final com.cdoframework.cdolib.database.xsd.Insert insert) {
         this.insert = insert;
-    }
-
-    /**
-     * Sets the value of field 'rollback'.
-     * 
-     * @param rollback the value of field 'rollback'.
-     */
-    public void setRollback(final java.lang.Object rollback) {
-        this.rollback = rollback;
     }
 
     /**

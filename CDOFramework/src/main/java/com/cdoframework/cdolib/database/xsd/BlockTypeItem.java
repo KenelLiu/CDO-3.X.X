@@ -80,16 +80,6 @@ public class BlockTypeItem implements java.io.Serializable {
      */
     private java.lang.Object _break;
 
-    /**
-     * Field commit.
-     */
-    private java.lang.Object commit;
-
-    /**
-     * Field rollback.
-     */
-    private java.lang.Object rollback;
-
     public BlockTypeItem() {
         super();
     }
@@ -112,15 +102,6 @@ public class BlockTypeItem implements java.io.Serializable {
      */
     public java.lang.Object getChoiceValue() {
         return this._choiceValue;
-    }
-
-    /**
-     * Returns the value of field 'commit'.
-     * 
-     * @return the value of field 'Commit'.
-     */
-    public java.lang.Object getCommit() {
-        return this.commit;
     }
 
     /**
@@ -166,15 +147,6 @@ public class BlockTypeItem implements java.io.Serializable {
      */
     public com.cdoframework.cdolib.database.xsd.Return getReturn() {
         return this._return;
-    }
-
-    /**
-     * Returns the value of field 'rollback'.
-     * 
-     * @return the value of field 'Rollback'.
-     */
-    public java.lang.Object getRollback() {
-        return this.rollback;
     }
 
     /**
@@ -243,16 +215,6 @@ public class BlockTypeItem implements java.io.Serializable {
     }
 
     /**
-     * Sets the value of field 'commit'.
-     * 
-     * @param commit the value of field 'commit'.
-     */
-    public void setCommit(final java.lang.Object commit) {
-        this.commit = commit;
-        this._choiceValue = commit;
-    }
-
-    /**
      * Sets the value of field 'delete'.
      * 
      * @param delete the value of field 'delete'.
@@ -303,16 +265,6 @@ public class BlockTypeItem implements java.io.Serializable {
     public void setReturn(final com.cdoframework.cdolib.database.xsd.Return _return) {
         this._return = _return;
         this._choiceValue = _return;
-    }
-
-    /**
-     * Sets the value of field 'rollback'.
-     * 
-     * @param rollback the value of field 'rollback'.
-     */
-    public void setRollback(final java.lang.Object rollback) {
-        this.rollback = rollback;
-        this._choiceValue = rollback;
     }
 
     /**

@@ -12,9 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import com.cdoframework.cdolib.servicebus.IServicePlugin;
+
 import com.cdoframework.cdolib.database.TransDefine;
+import com.cdoframework.cdolib.servicebus.IServicePlugin;
 import com.cdoframework.cdolib.servicebus.Service;
+
 /**
  * 
  * 
@@ -135,7 +137,6 @@ public class DataService implements java.io.Serializable {
         org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     }
-
     /**
   	 * ***************************************manual  code *************************************************
   	 * 序列化DataService对象
@@ -150,7 +151,15 @@ public class DataService implements java.io.Serializable {
   	private String strServiceName;
   	private IServicePlugin servicePlugin;
 
-  	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
+  	public String getStrServiceName() {
+		return strServiceName;
+	}
+
+	public IServicePlugin getServicePlugin() {
+		return servicePlugin;
+	}
+
+	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
   	public static DataService fromXML(String strXML) throws Exception
   	{
   		StringReader reader=null;
@@ -239,5 +248,6 @@ public class DataService implements java.io.Serializable {
   	public Map<String,TransDefine> getTransMap()
   	{
   		return hmTransDefine;
-  	}    
+  	}    	
+
 }

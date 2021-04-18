@@ -22,7 +22,6 @@ implements java.io.Serializable
      */
     private java.lang.String outputId;
 
-
     /**
      * Field recordCountId.
      */
@@ -92,8 +91,6 @@ implements java.io.Serializable
     public void marshal(final org.xml.sax.ContentHandler handler) throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
         org.exolab.castor.xml.Marshaller.marshal(this, handler);
     }
-
-
 
     /**
      * Sets the value of field 'outputId'.

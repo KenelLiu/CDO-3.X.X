@@ -16,12 +16,21 @@ import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
-import com.cdoframework.transaction.Propagation;
 import com.cdoframework.transaction.TransactionThreadLocal;
+import com.cdoframework.transaction.exception.TransactionException;
 /**
  * 增加事务传播属性
+ * 为了方便处理和事务使用频次,所有定义了transName名称的方法,事务的传播都为Propagation.REQUIRED
+ * XML里SQLTrans的Propagation属性支持可以定义为
+ * REQUIRED,SUPPORTS,MANDATORY
+ * REQUIRES_NEW,
+ * NOT_SUPPORTED
+ * NESTED
+ * 1.由于transName名称的方法定义了REQUIRED,故SQLTrans里的REQUIRED,SUPPORTS,MANDATORY 具有相同的行为
+ * 2.由于transName名称的方法定义了REQUIRED,故SQLTrans里的传播属性Never不能使用.
+ * 3.REQUIRED,SUPPORTS,MANDATORY 是相同行为,暂时用一个REQUIRED替代
+ * @see com.cdoframework.transaction.Propagation 
  * @author Kenel
- *
  */
 public abstract class TransService implements ITransService
 {
@@ -123,21 +132,16 @@ public abstract class TransService implements ITransService
 				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);				
 				commit(transaction);
 				return ret;
-			} catch (IllegalArgumentException e) {
-				logger.error(strTransName+": 参数错误 "+ cdoRequest+",message="+e.getMessage(),e);
-				try{rollback(transaction);} catch (SQLException e1){}
-				return Return.valueOf(-1, strTransName+": 参数错误,message="+e.getMessage());
-			} catch (IllegalAccessException e) {
-				logger.error(strTransName+": 函数访问错误IllegalAccessException,message="+e.getMessage(),e);
-				try{rollback(transaction);} catch (SQLException e1){}
-				return Return.valueOf(-1, strTransName+": 函数访问错误IllegalAccessException,message="+e.getMessage());
-			} catch (InvocationTargetException e) {
-				logger.error(strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage(),e);
+			}catch (SQLException e) {
+				logger.error(strTransName+":调用开启/提交事务时发生错误,message="+e.getMessage(),e);
 				try{rollback(transaction);} catch (SQLException e1){}
 				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
-			} catch (SQLException e) {
-				logger.error(strTransName+":开启事务或提交发生错误,message="+e.getMessage(),e);
+			}catch(Throwable e){
+				logger.error(strTransName+":调用时发生异常,message="+e.getMessage(),e);
 				try{rollback(transaction);} catch (SQLException e1){}
+				if(e  instanceof TransactionException) {
+					return ((TransactionException)e).getRet();
+				}
 				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
 			}
 		} 
@@ -170,6 +174,7 @@ public abstract class TransService implements ITransService
 	public boolean containsTrans(String strTransName) {
 		return transMap.containsKey(strTransName);
 	}
+
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException{
 		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
@@ -177,7 +182,6 @@ public abstract class TransService implements ITransService
 	}
 	@Override
 	public String getDBCharset(String strDataGroupId){
-	
 		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
 		return dataEngine.getDBPool().getCharset();
 	}
