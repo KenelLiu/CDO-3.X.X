@@ -18,15 +18,16 @@ import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.TransactionThreadLocal;
 /**
  * 增加事务传播属性
- * 为了方便处理和事务使用频次,所有定义了transName名称的方法,事务的传播都为Propagation.REQUIRED
+ * 考虑到方便处理及事务传播使用频次,所以在定义了transName名称的方法上,增加事务的传播都属性为Propagation.REQUIRED
  * XML里SQLTrans的Propagation属性支持可以定义为
  * REQUIRED,SUPPORTS,MANDATORY
  * REQUIRES_NEW,
  * NOT_SUPPORTED
  * NESTED
- * 1.由于transName名称的方法定义了REQUIRED,故SQLTrans里的REQUIRED,SUPPORTS,MANDATORY 具有相同的行为
+ * 1.由于在使用xml SQLTrans之前的【定义了transName名称的】方法上有事务传播属性为REQUIRED,
+ *   故SQLTrans里的REQUIRED,SUPPORTS,MANDATORY 具有相同的行为,
+ *   因此使用一个MANDATORY 标识即可.
  * 2.由于transName名称的方法定义了REQUIRED,故SQLTrans里的传播属性Never不能使用.
- * 3.REQUIRED,SUPPORTS,MANDATORY 是相同行为,暂时用一个REQUIRED替代
  * @see com.cdoframework.transaction.Propagation 
  * @author Kenel
  */

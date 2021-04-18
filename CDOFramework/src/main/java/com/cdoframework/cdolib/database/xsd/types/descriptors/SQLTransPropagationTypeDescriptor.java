@@ -11,8 +11,6 @@ package com.cdoframework.cdolib.database.xsd.types.descriptors;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType;
-
 /**
  * 
  * 

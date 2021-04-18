@@ -28,7 +28,7 @@ public class SQLTrans implements java.io.Serializable {
     /**
      * Field propagation.
      */
-    private com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType propagation = com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("REQUIRED");
+    private com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType propagation = com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("MANDATORY");
 
     /**
      * Field zkId.
@@ -52,7 +52,7 @@ public class SQLTrans implements java.io.Serializable {
 
     public SQLTrans() {
         super();
-        setPropagation(com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("REQUIRED"));
+        setPropagation(com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.fromValue("MANDATORY"));
     }
 
     /**

@@ -22,7 +22,7 @@ public enum SQLTransPropagationType {
     /**
      * Constant REQUIRED
      */
-    REQUIRED("REQUIRED"),
+	MANDATORY("MANDATORY"),
     /**
      * Constant REQUIRES_NEW
      */

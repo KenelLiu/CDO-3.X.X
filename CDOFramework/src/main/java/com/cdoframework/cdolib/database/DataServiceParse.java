@@ -541,7 +541,7 @@ public class DataServiceParse
 	};
 	
 	private DataTransaction startTransaction(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{
-		if(propagation==Propagation.REQUIRED){
+		if(propagation==Propagation.MANDATORY){
 			TransactionThreadLocal transaction=new TransactionThreadLocal();
 			return new DataTransaction(transaction.getConnection(strDataGroupId),false,false);
 		}else if(propagation==Propagation.REQUIRES_NEW){
