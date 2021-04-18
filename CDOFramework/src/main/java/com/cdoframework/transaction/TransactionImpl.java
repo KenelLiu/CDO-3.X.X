@@ -22,6 +22,8 @@ public class TransactionImpl implements Transaction {
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
 		try{
 			ConnectionHolder holder=connMap.get(strDataGroupId);
+			if(holder==null)
+				return null;
 			return holder.getCurConnction();
 		}catch(Exception e){
         	logger.error(e.getMessage(),e);
@@ -76,9 +78,10 @@ public class TransactionImpl implements Transaction {
 	      try {
 	    	  ConnectionHolder holder=connMap.get(strDataGroupId);
    			  if(holder==null){
-   				throw new SQLException("["+strDataGroupId+"] ConnectionHolder is null,can't rollback"); 
+   				  //表示之前已rollback过,并被移除了
+   				return; 
   			  }
-   			  conn=holder.getCurConnction();
+   			  conn=holder.getCurConnction();   			  
   			  conn.rollback();
 	        } catch (Exception e) {
 	        	logger.error(e.getMessage(),e);

@@ -41,6 +41,7 @@ import com.cdoframework.cdolib.database.xsd.Update;
 import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.TransactionImpl;
 import com.cdoframework.transaction.TransactionThreadLocal;
 import com.cdoframework.transaction.exception.TransactionException;
 
@@ -524,12 +525,12 @@ public class DataServiceParse
 		return 0;
 	}
 	
-	private class DataTransaction{
+	private class TransactionStatus{
 		Connection connection;
 		boolean isNewConn;
 		boolean isTransaction;
 		boolean isSavePoint;
-		public DataTransaction(Connection connection,boolean isNewConn,boolean isSavePoint) throws SQLException{
+		public TransactionStatus(Connection connection,boolean isNewConn,boolean isSavePoint) throws SQLException{
 			this.connection=connection;
 			this.isNewConn=isNewConn;
 			this.isTransaction=!connection.getAutoCommit();
@@ -540,21 +541,39 @@ public class DataServiceParse
 		}
 	};
 	
-	private DataTransaction startTransaction(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{
+	private TransactionStatus newTransactionStatus(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{
+		Connection conn=null;
 		if(propagation==Propagation.MANDATORY){
 			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			return new DataTransaction(transaction.getConnection(strDataGroupId),false,false);
+			conn=transaction.getConnection(strDataGroupId);
+			if(conn==null){
+				//========抛出异常,由TransService.processTrans处理后续操作=======//
+				throw new SQLException("propagation MANDATORY can't get connnection");
+			}
+			return new TransactionStatus(conn,false,false);
 		}else if(propagation==Propagation.REQUIRES_NEW){
-			Connection conn=dataEngine.getConnection();
+			conn=dataEngine.getConnection();
 			conn.setAutoCommit(false);
-			return new DataTransaction(conn,true,false);
+			return new TransactionStatus(conn,true,false);
 		}else if(propagation==Propagation.NOT_SUPPORTED){
-			Connection conn=dataEngine.getConnection();
+			conn=dataEngine.getConnection();
 			conn.setAutoCommit(true);
-			return new DataTransaction(conn,true,false);
+			return new TransactionStatus(conn,true,false);
 		}else if(propagation==Propagation.NESTED){
 			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			return new DataTransaction(transaction.getConnection(strDataGroupId),false,true);
+			conn=transaction.getConnection(strDataGroupId);
+			if(conn==null){
+				//=====conn is null,表示在Transname方法上设置了denyAutoStartTransaction=true//
+				//=====因此需在此处理ThreadLocal的value,防止内存泄露==========================//
+				ThreadLocal<TransactionImpl> tranManager=transaction.getThreadLocal();
+				if(tranManager.get().isEmpty()){
+					tranManager.remove();
+				}
+				conn=dataEngine.getConnection();
+				conn.setAutoCommit(false);
+				return new TransactionStatus(conn,true,false);
+			}				
+			return new TransactionStatus(conn,false,true);
 		}else{
 			throw new SQLException("unsupport propagation:"+propagation);
 		}
@@ -570,19 +589,19 @@ public class DataServiceParse
 	Connection connection=null;
 	//=========增加SelectTable处理,方便复用SQL条件过滤======//
 	Map<String,String> selTblMap=null;
-	DataTransaction dataTransaction=null;
+	TransactionStatus transactionStatus=null;
 	Savepoint savepoint=null;
 	try{
 			if(dataEngine==null){//DataGroupId错误
 				throw new SQLException("Invalid datagroup id: "+strDataGroupId);
 			}			
-			dataTransaction=startTransaction(propagation, strDataGroupId, dataEngine);
+			transactionStatus=newTransactionStatus(propagation, strDataGroupId, dataEngine);
 			//获取Connection	
-			connection=dataTransaction.getConnection();
+			connection=transactionStatus.getConnection();
 			if(connection==null){
 				throw new SQLException("datagroup id: "+strDataGroupId+",Invalid Connection,Connection is null");
 			}
-			if(dataTransaction.isTransaction && dataTransaction.isSavePoint){
+			if(transactionStatus.isTransaction && transactionStatus.isSavePoint){
 				savepoint = connection.setSavepoint("savepoint"); 
 			}
 			//=========生成Block对象==========//
@@ -657,29 +676,39 @@ public class DataServiceParse
 				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
 			}
 			
-			if(dataTransaction.isNewConn && dataTransaction.isTransaction){
+			if(transactionStatus.isNewConn && transactionStatus.isTransaction){
 				connection.commit();
 			}			
 		}catch(Throwable e){
-		   	if(dataTransaction!=null){
-		   		if(dataTransaction.isNewConn && dataTransaction.isTransaction){
+			String strTransName=cdoRequest.getStringValue("strTransName");
+			logger.error("executeTrans Exception: "+strTransName,e);
+		   	if(transactionStatus!=null && transactionStatus.isTransaction){
+		   		//==========Propagation.REQUIRES_NEW || Propagation.NESTED====// 
+		   		if(transactionStatus.isNewConn){
 		   			try{connection.rollback();}catch(Exception ex){};
+		   			OnException onException=trans.getOnException();
+	   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());		   			
 		   		}
-		   		if(dataTransaction.isTransaction && dataTransaction.isSavePoint){
-		   			if(savepoint!=null)
-		   				try{connection.rollback(savepoint);}catch(Exception ex){}
+		   		//==========Propagation.NESTED=====//
+		   		if(transactionStatus.isSavePoint){
+		   			if(savepoint!=null){
+		   				try{connection.rollback(savepoint);}catch(Exception ex){};
+		   				OnException onException=trans.getOnException();
+		   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
+		   			}		   				
 		   		}
+		   		//=========Propagation.MANDATORY===========//
+		   		TransactionThreadLocal transaction=new TransactionThreadLocal();
+		   		try{transaction.rollback(strDataGroupId);}catch(SQLException ex){};
 		   	}
-		   	String strTransName=cdoRequest.getStringValue("strTransName");
-		   	logger.error("executeTrans Exception: "+strTransName,e);
+		   	//========其它情况处理========//
 			OnException onException=trans.getOnException();
 			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());	
 			throw new TransactionException(ret,e.getMessage(),e);
 		}finally{
 			//关闭连接
-			if(dataTransaction!=null && dataTransaction.isNewConn){
+			if(transactionStatus!=null && transactionStatus.isNewConn){
 				SQLUtil.closeConnection(connection);
-				dataTransaction=null;
 			}
 			if(selTblMap!=null){
 				selTblMap.clear();

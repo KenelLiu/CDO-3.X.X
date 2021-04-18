@@ -48,7 +48,7 @@ public class TransactionThreadLocal implements Transaction {
 		}finally{
 			if(trans.isEmpty())
 				tranManager.remove();
-		}
+		}		
 	}
 
 
