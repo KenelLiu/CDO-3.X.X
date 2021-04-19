@@ -16,18 +16,19 @@ import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.TransactionThreadLocal;
+import com.cdoframework.transaction.exception.TransactionException;
 /**
  * 增加事务传播属性
- * 考虑到方便处理及事务传播使用频次,所以在定义了transName名称的方法上,增加事务的传播都属性为Propagation.REQUIRED
- * XML里SQLTrans的Propagation属性支持可以定义为
- * REQUIRED,SUPPORTS,MANDATORY
+ * 为了方便处理,在定义了transName名称的方法上,
+ * 默认 自动开启事务 @see TransName autoStartTransaction=true,且传播属性值为Propagation.REQUIRED
+ * 在 XML里的SQLTrans的Propagation属性 ,可以定义为
+ * REQUIRED,
+ * SUPPORTS,
+ * MANDATORY
  * REQUIRES_NEW,
  * NOT_SUPPORTED
+ * NEVER
  * NESTED
- * 1.由于在使用xml SQLTrans之前的【定义了transName名称的】方法上有事务传播属性为REQUIRED,
- *   故SQLTrans里的REQUIRED,SUPPORTS,MANDATORY 具有相同的行为,
- *   因此使用一个MANDATORY 标识即可.
- * 2.由于transName名称的方法定义了REQUIRED,故SQLTrans里的传播属性Never不能使用.
  * @see com.cdoframework.transaction.Propagation 
  * @author Kenel
  */
@@ -126,7 +127,7 @@ public abstract class TransService implements ITransService
 		Method method = null;
 		if((method = transMap.get(strTransName)) != null) {
 			TransName transName = method.getAnnotation(TransName.class);					
-			boolean autoStartTransaction=!transName.denyAutoStartTransaction();
+			boolean autoStartTransaction=transName.autoStartTransaction();
 			TransactionThreadLocal transaction=null;
 			try {
 				if(autoStartTransaction){
@@ -141,11 +142,11 @@ public abstract class TransService implements ITransService
 			}catch (SQLException e) {
 				logger.error(strTransName+":调用开启/提交事务时发生错误,message="+e.getMessage(),e);
 				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
-				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
+				return Return.valueOf(-99,"处理数据发生异常,请查看后台日志.");
 			}catch(Throwable e){
-				logger.error(strTransName+":调用时发生异常,message="+e.getMessage(),e);
+				logger.error(strTransName+":函数调用发生错误,message="+e.getMessage(),e);
 				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
-				return Return.valueOf(-1, strTransName+": 函数调用错误InvocationTargetException,message="+e.getMessage());
+				return Return.valueOf(-99, "处理数据发生异常,请查看后台日志.");
 			}
 		} 
 

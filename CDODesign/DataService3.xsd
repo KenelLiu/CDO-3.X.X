@@ -453,12 +453,15 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="Propagation" use="optional" default="MANDATORY">
+			<xs:attribute name="Propagation" use="optional" default="REQUIRED">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
+						<xs:enumeration value="REQUIRED"/>
+						<xs:enumeration value="SUPPORTS"/>
 						<xs:enumeration value="MANDATORY"/>
 						<xs:enumeration value="REQUIRES_NEW"/>
 						<xs:enumeration value="NOT_SUPPORTED"/>
+						<xs:enumeration value="NEVER"/>
 						<xs:enumeration value="NESTED"/>
 					</xs:restriction>
 				</xs:simpleType>

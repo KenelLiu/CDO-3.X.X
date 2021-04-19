@@ -51,7 +51,9 @@ public class TransactionImpl implements Transaction {
         	ConnectionHolder holder=connMap.get(strDataGroupId);
         	if(holder==null){
         		connMap.remove(strDataGroupId);
-        		throw new SQLException("["+strDataGroupId+"] ConnectionHolder is null,can't commit");
+        		//====内部方法回滚了事务,连接关闭并清除,外部方法不能在提交了==//
+   				//====同一连接,处理一次回滚或提交即可,null表示之前已处理过,并被移除了======//
+        		return;
         	}
         	holder.decReference();
         	if(holder.getReferenceCount()==0){
@@ -78,7 +80,7 @@ public class TransactionImpl implements Transaction {
 	      try {
 	    	  ConnectionHolder holder=connMap.get(strDataGroupId);
    			  if(holder==null){
-   				  //表示之前已rollback过,并被移除了
+   				//====同一连接,处理一次回滚或提交即可,null表示之前已处理过,并被移除了======//
    				return; 
   			  }
    			  conn=holder.getCurConnction();   			  

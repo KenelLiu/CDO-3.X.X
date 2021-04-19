@@ -541,57 +541,94 @@ public class DataServiceParse
 		}
 	};
 	
-	private TransactionStatus newTransactionStatus(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{
-		Connection conn=null;
-		if(propagation==Propagation.MANDATORY){
-			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			conn=transaction.getConnection(strDataGroupId);
-			if(conn==null){
-				//========抛出异常,由TransService.processTrans处理后续操作=======//
-				throw new SQLException("propagation MANDATORY can't get connnection");
-			}
-			return new TransactionStatus(conn,false,false);
-		}else if(propagation==Propagation.REQUIRES_NEW){
-			conn=dataEngine.getConnection();
-			conn.setAutoCommit(false);
-			return new TransactionStatus(conn,true,false);
-		}else if(propagation==Propagation.NOT_SUPPORTED){
-			conn=dataEngine.getConnection();
-			conn.setAutoCommit(true);
-			return new TransactionStatus(conn,true,false);
-		}else if(propagation==Propagation.NESTED){
-			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			conn=transaction.getConnection(strDataGroupId);
-			if(conn==null){
-				//=====conn is null,表示在Transname方法上设置了denyAutoStartTransaction=true//
-				//=====因此需在此处理ThreadLocal的value,防止内存泄露==========================//
-				ThreadLocal<TransactionImpl> tranManager=transaction.getThreadLocal();
-				if(tranManager.get().isEmpty()){
-					tranManager.remove();
-				}
-				conn=dataEngine.getConnection();
-				conn.setAutoCommit(false);
-				return new TransactionStatus(conn,true,false);
-			}				
-			return new TransactionStatus(conn,false,true);
-		}else{
-			throw new SQLException("unsupport propagation:"+propagation);
+	/**
+	 * 处理在TransName定义的方法上,自动开启了事务情况.
+	 * @see TransName  autoStartTransaction=true
+	 * @param propagation
+	 * @param threadLocalConnection
+	 * @param dataEngine
+	 * @return
+	 * @throws SQLException
+	 */
+	private TransactionStatus handleExistTransaction(Propagation propagation,Connection threadLocalConnection,IDataEngine dataEngine) throws SQLException{
+		if(propagation==Propagation.REQUIRED 
+				|| propagation==Propagation.SUPPORTS
+				|| propagation==Propagation.MANDATORY){
+			return new TransactionStatus(threadLocalConnection,false,false);
 		}
+		if(propagation==Propagation.REQUIRES_NEW 
+				|| propagation==Propagation.NOT_SUPPORTED){
+			Connection conn=dataEngine.getConnection();
+			if(propagation==Propagation.REQUIRES_NEW){
+				conn.setAutoCommit(false);
+			}else{
+				conn.setAutoCommit(true);
+			}
+			return new TransactionStatus(conn,true,false); 
+		}
+		if(propagation==Propagation.NESTED){
+			//========发生异常时 要回滚到savepoint====//
+			return new TransactionStatus(threadLocalConnection,false,true); 
+		}
+		//==========PROPAGATION_NEVER===========//
+		//========抛出异常,由TransService.processTrans处理后续操作=======//
+		throw new SQLException("There an active transaction,Propagation NEVER Can't execute");
+	}
+	/**
+	 * 处理在TransName定义的方法上,禁止开启事务情况.
+	 * @see TransName  autoStartTransaction=false
+	 * @param propagation
+	 * @param dataEngine
+	 * @return
+	 * @throws SQLException
+	 */
+	private TransactionStatus handleNonTransaction(Propagation propagation,IDataEngine dataEngine) throws SQLException{		
+		if(propagation==Propagation.MANDATORY){
+			//========抛出异常,由TransService.processTrans处理后续操作=======//
+			throw new SQLException("There isn't an active transaction,Propagation MANDATORY Can't execute");
+		}
+		boolean autoCommit=true;
+		if(propagation==Propagation.REQUIRED 
+				|| propagation==Propagation.REQUIRES_NEW
+				|| propagation==Propagation.NESTED){
+			autoCommit=false;
+		}		
+		//======Propagation.SUPPORTS,NOT_SUPPORTED,PROPAGATION_NEVER 非事务执行===//
+		Connection conn=dataEngine.getConnection();
+		conn.setAutoCommit(autoCommit);
+		return new TransactionStatus(conn,true,false); 
+	}
+		
+	
+	private TransactionStatus newTransactionStatus(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{		
+		TransactionThreadLocal transaction=new TransactionThreadLocal();
+		Connection  threadLocalConnection=transaction.getConnection(strDataGroupId);		
+		if(threadLocalConnection!=null){
+			//======说明:TransName定义的方法上,自动开启了事务=====//
+			return handleExistTransaction(propagation, threadLocalConnection, dataEngine);
+		}
+		//=====threadLocalConnection is null,表示在Transname方法上设置了autoStartTransaction=false//
+		//=====因此需在此处理ThreadLocal的value,防止内存泄露==========================//
+		ThreadLocal<TransactionImpl> tranManager=transaction.getThreadLocal();
+		if(tranManager.get().isEmpty()){
+			tranManager.remove();
+		}
+		return handleNonTransaction(propagation, dataEngine);
 	}
 	
 	protected Return executeTrans(HashMap<String,IDataEngine> hmDataEngine,SQLTrans trans,CDO cdoRequest,CDO cdoResponse){
-   	//==========处理事务,加入事务传播==========//   	
-	Return ret=new Return();
-   	String strDataGroupId=trans.getDataGroupId();
-   	IDataEngine dataEngine=hmDataEngine.get(strDataGroupId);
-   	Propagation propagation=Propagation.getPropagation(trans.getPropagation().value());
-   	//========根据传播属性,获取对应的connection======//
-	Connection connection=null;
-	//=========增加SelectTable处理,方便复用SQL条件过滤======//
-	Map<String,String> selTblMap=null;
-	TransactionStatus transactionStatus=null;
-	Savepoint savepoint=null;
-	try{
+	   	//==========处理事务,加入事务传播==========//   	
+		Return ret=new Return();
+	   	String strDataGroupId=trans.getDataGroupId();
+	   	IDataEngine dataEngine=hmDataEngine.get(strDataGroupId);
+	   	Propagation propagation=Propagation.getPropagation(trans.getPropagation().value());
+	   	//========根据传播属性,获取对应的connection======//
+		Connection connection=null;
+		//=========增加SelectTable处理,方便复用SQL条件过滤======//
+		Map<String,String> selTblMap=null;
+		TransactionStatus transactionStatus=null;
+		Savepoint savepoint=null;
+		try{
 			if(dataEngine==null){//DataGroupId错误
 				throw new SQLException("Invalid datagroup id: "+strDataGroupId);
 			}			
@@ -682,14 +719,14 @@ public class DataServiceParse
 		}catch(Throwable e){
 			String strTransName=cdoRequest.getStringValue("strTransName");
 			logger.error("executeTrans Exception: "+strTransName,e);
-		   	if(transactionStatus!=null && transactionStatus.isTransaction){
-		   		//==========Propagation.REQUIRES_NEW || Propagation.NESTED====// 
+		   	if(transactionStatus!=null && transactionStatus.isTransaction){		
+		   		//===========本次连接============//
 		   		if(transactionStatus.isNewConn){
 		   			try{connection.rollback();}catch(Exception ex){};
 		   			OnException onException=trans.getOnException();
 	   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());		   			
 		   		}
-		   		//==========Propagation.NESTED=====//
+		   		//==========threadLocalConnection Propagation.NESTED=====//
 		   		if(transactionStatus.isSavePoint){
 		   			if(savepoint!=null){
 		   				try{connection.rollback(savepoint);}catch(Exception ex){};
@@ -697,7 +734,7 @@ public class DataServiceParse
 		   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
 		   			}		   				
 		   		}
-		   		//=========Propagation.MANDATORY===========//
+		   		//==========threadLocalConnection  ==========//
 		   		TransactionThreadLocal transaction=new TransactionThreadLocal();
 		   		try{transaction.rollback(strDataGroupId);}catch(SQLException ex){};
 		   	}

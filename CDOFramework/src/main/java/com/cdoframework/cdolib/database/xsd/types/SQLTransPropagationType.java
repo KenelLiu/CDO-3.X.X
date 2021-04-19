@@ -22,15 +22,27 @@ public enum SQLTransPropagationType {
     /**
      * Constant REQUIRED
      */
-	MANDATORY("MANDATORY"),
+	REQUIRED("REQUIRED"),
+    /**
+     * Constant REQUIRED
+     */
+	SUPPORTS("SUPPORTS"),	
+    /**
+     * Constant REQUIRED
+     */
+	MANDATORY("MANDATORY"),		
     /**
      * Constant REQUIRES_NEW
      */
-    REQUIRES_NEW("REQUIRES_NEW"),
+	REQUIRES_NEW("REQUIRES_NEW"),
     /**
      * Constant NOT_SUPPORTED
      */
-    NOT_SUPPORTED("NOT_SUPPORTED"),
+	NOT_SUPPORTED("NOT_SUPPORTED"),
+    /**
+     * Constant NOT_SUPPORTED
+     */
+	NEVER("NEVER"),		
     /**
      * Constant NESTED
      */

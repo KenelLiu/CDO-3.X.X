@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 public @interface TransName {
 	//=======TransName的名字，默认是空串=========//
 	String name() default ""; 
-	//====禁止进入该方法前,自动启动事务,创建数据库连接=======//
-	boolean denyAutoStartTransaction() default false;
+	//====是否在进入TransName定义的方法前,自动开启事务,默认自动开启事务,且传播属性值为Propagation.REQUIRED=======//
+	boolean autoStartTransaction() default true;
 }
