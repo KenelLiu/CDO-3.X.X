@@ -144,7 +144,6 @@ public abstract class ActiveService extends ThreadExt implements IActiveService
 	 * @return
 	 * @throws SQLException
 	 */
-	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException{
 		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);		
 		return dataEngine.getConnection();

@@ -161,6 +161,46 @@ public abstract class TransService implements ITransService
 
 		return null;
 	}
+	
+	
+	@Override
+	public boolean containsTrans(String strTransName) {
+		return transMap.containsKey(strTransName);
+	}
+
+	/**
+	 * 从threadlocal里获取数据库连接,
+	 * 进入TransName定义的方法前,自动开启事务Transname.autoStartTransaction=true时,
+	 * 才能获得到连接,否则为null
+	 * @param strDataGroupId
+	 * @return
+	 * @throws SQLException
+	 */
+	public Connection getConnectionFromThreadLocal(String strDataGroupId) throws SQLException{
+		TransactionThreadLocal transaction=new TransactionThreadLocal();
+		return transaction.getConnection(strDataGroupId);
+	}
+	/**
+	 * 提供连接池里的connection
+	 * @param strDataGroupId
+	 * @return
+	 * @throws SQLException
+	 */
+	public Connection getConnection(String strDataGroupId) throws SQLException{
+		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
+		return dataEngine.getConnection();
+	}
+	/**
+	 * 获取数据库所在系统的编码
+	 * @param strDataGroupId
+	 * @return
+	 */
+	public String getDBCharset(String strDataGroupId){
+		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
+		return dataEngine.getDBPool().getCharset();
+	}
+	
+	//=======================threadlocal ==================//
 	void push(TransactionChainThreadLocal transactionChain,boolean autoStartTransaction){
 		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
 		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
@@ -194,21 +234,5 @@ public abstract class TransService implements ITransService
 			 transaction.rollback(it.next());
 		 }
 	 }
-	
-	
-	@Override
-	public boolean containsTrans(String strTransName) {
-		return transMap.containsKey(strTransName);
-	}
-
-	@Override
-	public Connection getConnection(String strDataGroupId) throws SQLException{
-		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
-		return dataEngine.getConnection();
-	}
-	@Override
-	public String getDBCharset(String strDataGroupId){
-		IDataEngine dataEngine=this.serviceBus.getHMDataEngine().get(strDataGroupId);
-		return dataEngine.getDBPool().getCharset();
-	}
+		
 }

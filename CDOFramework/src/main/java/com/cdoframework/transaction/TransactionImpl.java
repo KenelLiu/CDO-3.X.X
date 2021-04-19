@@ -22,8 +22,10 @@ public class TransactionImpl implements Transaction {
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
 		try{
 			ConnectionHolder holder=connMap.get(strDataGroupId);
-			if(holder==null)
+			if(holder==null){
+				connMap.remove(strDataGroupId);
 				return null;
+			}				
 			return holder.getCurConnction();
 		}catch(Exception e){
         	logger.error(e.getMessage(),e);
@@ -50,16 +52,17 @@ public class TransactionImpl implements Transaction {
         try {    
         	ConnectionHolder holder=connMap.get(strDataGroupId);
         	if(holder==null){
-        		connMap.remove(strDataGroupId);
         		//====内部方法回滚了事务,连接关闭并清除,外部方法不能在提交了==//
    				//====同一连接,处理一次回滚或提交即可,null表示之前已处理过,并被移除了======//
+        		connMap.remove(strDataGroupId);
         		return;
         	}
         	holder.decReference();
         	if(holder.getReferenceCount()==0){
         		try{
         			conn=holder.getCurConnction();
-        			conn.commit();
+        			if(!conn.isClosed() && conn.getAutoCommit()==false)
+        				conn.commit();
         		 }finally{
         			//=====事务能提交,则所有任务已结束====//
         			 connMap.remove(strDataGroupId);
@@ -80,17 +83,18 @@ public class TransactionImpl implements Transaction {
 	      try {
 	    	  ConnectionHolder holder=connMap.get(strDataGroupId);
    			  if(holder==null){
-   				//====同一连接,处理一次回滚或提交即可,null表示之前已处理过,并被移除了======//
+   				//====同一连接,处理一次回滚或提交即可,null表示之前已处理过,并被移除了======//   				  
    				return; 
   			  }
-   			  conn=holder.getCurConnction();   			  
-  			  conn.rollback();
-	        } catch (Exception e) {
+   			  conn=holder.getCurConnction();  
+   			  if(!conn.isClosed() && conn.getAutoCommit()==false)
+   				  conn.rollback();
+	        }catch (Exception e) {
 	        	logger.error(e.getMessage(),e);
 	            throw new SQLException(e.getMessage(),e);
 	        }finally{
 	        	try{if(conn!=null)conn.close();}catch(Exception ex){}
-	        	//=====事务回滚,所有任务结束====//
+	        	//=====事务回滚或为null,所有任务结束====//
 	        	connMap.remove(strDataGroupId);
 	        }		
 	}

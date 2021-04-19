@@ -64,18 +64,6 @@ public interface ITransService extends IServiceObject
 	
 	/**同一服务,是否已经包含该transName**/
 	boolean containsTrans(String strTransName);
-	/**
-	 * 提供普通数据库connection
-	 * @param strDataGroupId
-	 * @return
-	 * @throws SQLException
-	 */
-	public Connection getConnection(String strDataGroupId) throws SQLException;
-	/**
-	 * 获取数据库的编码字符
-	 * @param strDataGroupId
-	 * @return
-	 */
-	public String getDBCharset(String strDataGroupId);
+
 	
 }
