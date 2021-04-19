@@ -16,6 +16,7 @@ import com.cdoframework.cdolib.database.DataServiceParse;
 import com.cdoframework.cdolib.database.TransDefine;
 
 import com.cdoframework.cdolib.database.xsd.SQLTrans;
+import com.cdoframework.transaction.TransactionChainThreadLocal;
 import com.cdoframework.transaction.TransactionThreadLocal;
 
 /**
@@ -181,16 +182,20 @@ public class Service implements IService
 		}				
 		if(ret==null){
 			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			String strDataGroupId=getDataGroupId(strTransName);
+			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();
+			String strDataGroupId=getDataGroupId(strTransName);	
 			try{
-				//========对未经过TransService直接调用xml里的SQL语句========//				
-				transaction.doBegin(strDataGroupId);
+				//========对未经过TransService直接调用xml里的SQL语句========//
+				transactionChain.pushAutoStartTransaction(strDataGroupId,true);
+				transaction.doBegin(strDataGroupId);				
 				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
-				transaction.commit(strDataGroupId);
+				transaction.commit(strDataGroupId);				
 			}catch(Throwable e){
 				try{transaction.rollback(strDataGroupId);} catch (SQLException e1){}
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);
 				return Return.valueOf(-1,e.getMessage(),e);
+			}finally{
+				transactionChain.popAutoStartTransaction(strDataGroupId);
 			}
 		}
 		

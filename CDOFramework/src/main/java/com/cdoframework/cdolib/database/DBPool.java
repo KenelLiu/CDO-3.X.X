@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.log4j.Logger;
 
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.Return;
 
 public class DBPool extends DBCP2Config{
-	protected BasicDataSource ds;   
-	
+	protected BasicDataSource ds;   	
 	public boolean isOpened(){
 		if(ds==null){
 			return false;
@@ -23,8 +23,9 @@ public class DBPool extends DBCP2Config{
 		if(!isOpened()){
 			return null;
 		}
-		return ds.getConnection();
+		return ds.getConnection();		
 	}
+	
 	/**
 	 * 初始化连接池
 	 */
@@ -42,7 +43,7 @@ public class DBPool extends DBCP2Config{
 	        ds.setUrl(strURI);   
 	        
 	        ds.setInitialSize(Math.max(nInitialSize,1));//initialSize
-	        ds.setMinIdle(Math.max(nMinIdle,1));	//minIdle
+	        ds.setMinIdle(Math.max(nMinIdle,5));	//minIdle
 	        ds.setMaxIdle(Math.max(nMaxIdle, 5));   // maxIdle     
 	        ds.setMaxTotal(Math.max(nMaxTotal,5));//maxTotal
 	        
@@ -68,5 +69,7 @@ public class DBPool extends DBCP2Config{
 	
 	}
 	
-	
+	public BasicDataSource getDataSource(){
+		return this.ds;
+	}
 }

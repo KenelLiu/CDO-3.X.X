@@ -19,7 +19,14 @@ public class TransactionThreadLocal implements Transaction {
 	
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException {
-		return tranManager.get().getConnection(strDataGroupId);
+		TransactionImpl trans=tranManager.get();
+		try{
+			return trans.getConnection(strDataGroupId);
+		}finally{
+			if(trans.isEmpty()){
+				tranManager.remove();				
+			}
+		}		
 	}
 
 	@Override
@@ -34,8 +41,9 @@ public class TransactionThreadLocal implements Transaction {
 		try{
 			trans.commit(strDataGroupId);
 		}finally{
-			if(trans.isEmpty())
-				tranManager.remove();
+			if(trans.isEmpty()){
+				tranManager.remove();				
+			}
 		}
 	
 	}
@@ -46,8 +54,9 @@ public class TransactionThreadLocal implements Transaction {
 		try{
 			trans.rollback(strDataGroupId);
 		}finally{
-			if(trans.isEmpty())
-				tranManager.remove();
+			if(trans.isEmpty()){
+				tranManager.remove();				
+			}
 		}		
 	}
 

@@ -15,6 +15,7 @@ import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
+import com.cdoframework.transaction.TransactionChainThreadLocal;
 import com.cdoframework.transaction.TransactionThreadLocal;
 import com.cdoframework.transaction.exception.TransactionException;
 /**
@@ -129,14 +130,20 @@ public abstract class TransService implements ITransService
 			TransName transName = method.getAnnotation(TransName.class);					
 			boolean autoStartTransaction=transName.autoStartTransaction();
 			TransactionThreadLocal transaction=null;
+			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();			
 			try {
+				//=======当前方法autoStartTransaction属性值入栈==//
+				push(transactionChain, autoStartTransaction);
+				//=======当前方法是否是自动启动事务,开启事务================//
 				if(autoStartTransaction){
 					transaction=new TransactionThreadLocal();
-					doBegin(transaction);
+					doBegin(transaction);					
 				}		
-				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);	
+				//============具体方法调用====================//
+				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);
+				//============当前方法是否是自动启动事务,提交处理====================//
 				if(autoStartTransaction){
-					commit(transaction);
+					commit(transaction);					
 				}
 				return ret;			
 			}catch (SQLException e) {
@@ -147,10 +154,24 @@ public abstract class TransService implements ITransService
 				logger.error(strTransName+":函数调用发生错误,message="+e.getMessage(),e);
 				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
 				return Return.valueOf(-99, "处理数据发生异常,请查看后台日志.");
+			}finally{
+				pop(transactionChain);
 			}
 		} 
 
 		return null;
+	}
+	void push(TransactionChainThreadLocal transactionChain,boolean autoStartTransaction){
+		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
+		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+			 transactionChain.pushAutoStartTransaction(it.next(), autoStartTransaction);
+		 }
+	}
+	void pop(TransactionChainThreadLocal transactionChain){
+		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
+		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+			 transactionChain.popAutoStartTransaction(it.next());
+		 }
 	}
 	
 	void doBegin(TransactionThreadLocal transaction) throws SQLException{

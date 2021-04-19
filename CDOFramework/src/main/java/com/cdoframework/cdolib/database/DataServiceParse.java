@@ -21,7 +21,6 @@ import com.cdoframework.cdolib.database.xsd.Else;
 import com.cdoframework.cdolib.database.xsd.For;
 import com.cdoframework.cdolib.database.xsd.If;
 import com.cdoframework.cdolib.database.xsd.Insert;
-import com.cdoframework.cdolib.database.xsd.OnError;
 import com.cdoframework.cdolib.database.xsd.OnException;
 import com.cdoframework.cdolib.database.xsd.SQLBlockType;
 import com.cdoframework.cdolib.database.xsd.SQLBlockTypeItem;
@@ -41,6 +40,7 @@ import com.cdoframework.cdolib.database.xsd.Update;
 import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 import com.cdoframework.transaction.Propagation;
+import com.cdoframework.transaction.TransactionChainThreadLocal;
 import com.cdoframework.transaction.TransactionImpl;
 import com.cdoframework.transaction.TransactionThreadLocal;
 import com.cdoframework.transaction.exception.TransactionException;
@@ -529,12 +529,12 @@ public class DataServiceParse
 		Connection connection;
 		boolean isNewConn;
 		boolean isTransaction;
-		boolean isSavePoint;
-		public TransactionStatus(Connection connection,boolean isNewConn,boolean isSavePoint) throws SQLException{
+		boolean isSavepoint;
+		public TransactionStatus(Connection connection,boolean isNewConn,boolean isSavepoint) throws SQLException{
 			this.connection=connection;
 			this.isNewConn=isNewConn;
 			this.isTransaction=!connection.getAutoCommit();
-			this.isSavePoint=isSavePoint;
+			this.isSavepoint=isSavepoint;
 		}
 		public Connection getConnection() {
 			return this.connection;
@@ -550,21 +550,35 @@ public class DataServiceParse
 	 * @return
 	 * @throws SQLException
 	 */
-	private TransactionStatus handleExistTransaction(Propagation propagation,Connection threadLocalConnection,IDataEngine dataEngine) throws SQLException{
+	private TransactionStatus handleExistTransaction(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{
+		if(propagation==Propagation.REQUIRES_NEW 
+				|| propagation==Propagation.NOT_SUPPORTED){			
+				
+				Connection conn=dataEngine.getConnection();			
+				if(propagation==Propagation.REQUIRES_NEW){
+					conn.setAutoCommit(false);
+				}else{
+					conn.setAutoCommit(true);
+				}
+				return new TransactionStatus(conn,true,false); 
+		 }
+		
+		TransactionThreadLocal transaction=new TransactionThreadLocal();
+		Connection  threadLocalConnection=transaction.getConnection(strDataGroupId);
+		if(threadLocalConnection==null){
+			//=====threadLocalConnection is null,隶属对象可能还存在=========================//
+			//=====因此需在此处理ThreadLocal的value,防止内存泄露==========================//
+			ThreadLocal<TransactionImpl> tranManager=transaction.getThreadLocal();
+			if(tranManager.get().isEmpty()){
+				tranManager.remove();
+			}
+			throw new SQLException("There an active transaction,but threadLocal Connection is null");
+		}
+		
 		if(propagation==Propagation.REQUIRED 
 				|| propagation==Propagation.SUPPORTS
 				|| propagation==Propagation.MANDATORY){
 			return new TransactionStatus(threadLocalConnection,false,false);
-		}
-		if(propagation==Propagation.REQUIRES_NEW 
-				|| propagation==Propagation.NOT_SUPPORTED){
-			Connection conn=dataEngine.getConnection();
-			if(propagation==Propagation.REQUIRES_NEW){
-				conn.setAutoCommit(false);
-			}else{
-				conn.setAutoCommit(true);
-			}
-			return new TransactionStatus(conn,true,false); 
 		}
 		if(propagation==Propagation.NESTED){
 			//========发生异常时 要回滚到savepoint====//
@@ -593,7 +607,7 @@ public class DataServiceParse
 				|| propagation==Propagation.NESTED){
 			autoCommit=false;
 		}		
-		//======Propagation.SUPPORTS,NOT_SUPPORTED,PROPAGATION_NEVER 非事务执行===//
+		//======其它 Propagation.SUPPORTS,Propagation.NOT_SUPPORTED,Propagation.NEVER 则以非事务执行===//
 		Connection conn=dataEngine.getConnection();
 		conn.setAutoCommit(autoCommit);
 		return new TransactionStatus(conn,true,false); 
@@ -601,18 +615,14 @@ public class DataServiceParse
 		
 	
 	private TransactionStatus newTransactionStatus(Propagation propagation,String strDataGroupId,IDataEngine dataEngine) throws SQLException{		
-		TransactionThreadLocal transaction=new TransactionThreadLocal();
-		Connection  threadLocalConnection=transaction.getConnection(strDataGroupId);		
-		if(threadLocalConnection!=null){
-			//======说明:TransName定义的方法上,自动开启了事务=====//
-			return handleExistTransaction(propagation, threadLocalConnection, dataEngine);
+
+		TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();
+		
+		if(transactionChain.getCurrentAutoStartTransaction(strDataGroupId)){
+			//======TransName定义的方法上,自动开启了事务,即存在事务情况=====//
+			return handleExistTransaction(propagation,strDataGroupId, dataEngine);
 		}
-		//=====threadLocalConnection is null,表示在Transname方法上设置了autoStartTransaction=false//
-		//=====因此需在此处理ThreadLocal的value,防止内存泄露==========================//
-		ThreadLocal<TransactionImpl> tranManager=transaction.getThreadLocal();
-		if(tranManager.get().isEmpty()){
-			tranManager.remove();
-		}
+		//======TransName定义的方法上,禁用了自动开启事务,即无事务情况=====//
 		return handleNonTransaction(propagation, dataEngine);
 	}
 	
@@ -638,8 +648,8 @@ public class DataServiceParse
 			if(connection==null){
 				throw new SQLException("datagroup id: "+strDataGroupId+",Invalid Connection,Connection is null");
 			}
-			if(transactionStatus.isTransaction && transactionStatus.isSavePoint){
-				savepoint = connection.setSavepoint("savepoint"); 
+			if(transactionStatus.isTransaction && transactionStatus.isSavepoint){
+				savepoint = connection.setSavepoint("sysSavepoint"); 
 			}
 			//=========生成Block对象==========//
 			BlockType block=new BlockType();
@@ -727,18 +737,18 @@ public class DataServiceParse
 	   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());		   			
 		   		}
 		   		//==========threadLocalConnection Propagation.NESTED=====//
-		   		if(transactionStatus.isSavePoint){
+		   		if(transactionStatus.isSavepoint){
 		   			if(savepoint!=null){
 		   				try{connection.rollback(savepoint);}catch(Exception ex){};
 		   				OnException onException=trans.getOnException();
 		   				return Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());
 		   			}		   				
 		   		}
-		   		//==========threadLocalConnection  ==========//
+		   		//==========threadLocal Connection rollback==========//
 		   		TransactionThreadLocal transaction=new TransactionThreadLocal();
 		   		try{transaction.rollback(strDataGroupId);}catch(SQLException ex){};
 		   	}
-		   	//========其它情况处理========//
+		   	//========其它异常情况处理========//
 			OnException onException=trans.getOnException();
 			ret=Return.valueOf(onException.getReturn().getCode(),onException.getReturn().getText(),onException.getReturn().getInfo());	
 			throw new TransactionException(ret,e.getMessage(),e);

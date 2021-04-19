@@ -17,7 +17,7 @@ import com.cdoframework.cdolib.database.DBPoolManager;
 public class TransactionImpl implements Transaction {
 	//================保存每个数据库事务连接===============//
 	private Map<String,ConnectionHolder> connMap=new HashMap<String,ConnectionHolder>();
-	private Logger logger=Logger.getLogger(TransactionManagerImpl.class);
+	private Logger logger=Logger.getLogger(TransactionChainImpl.class);
 	@Override
 	public Connection getConnection(String strDataGroupId) throws SQLException 	{
 		try{

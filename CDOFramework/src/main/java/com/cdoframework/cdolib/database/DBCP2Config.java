@@ -166,6 +166,8 @@ public class DBCP2Config {
 	public String getSystemCharset(){
 		return this.getSystemCharset();
 	}
+	
+ 
 	public DBCP2Config(){
 		strDriver="";
 		strURI="";
