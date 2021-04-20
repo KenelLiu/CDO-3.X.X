@@ -129,30 +129,31 @@ public abstract class TransService implements ITransService
 		if((method = transMap.get(strTransName)) != null) {
 			TransName transName = method.getAnnotation(TransName.class);					
 			boolean autoStartTransaction=transName.autoStartTransaction();
+			String dataGroupId=transName.dataGroupId();
 			TransactionThreadLocal transaction=null;
 			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();			
 			try {
 				//=======当前方法autoStartTransaction属性值入栈==//
-				push(transactionChain, autoStartTransaction);
+				push(transactionChain,dataGroupId,autoStartTransaction);
 				//=======当前方法是否是自动启动事务,开启事务================//
 				if(autoStartTransaction){
 					transaction=new TransactionThreadLocal();
-					doBegin(transaction);					
+					doBegin(transaction,dataGroupId);					
 				}		
 				//============具体方法调用====================//
 				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);
 				//============当前方法是否是自动启动事务,提交处理====================//
 				if(autoStartTransaction){
-					commit(transaction);					
+					commit(transaction,dataGroupId);					
 				}
 				return ret;			
 			}catch (SQLException e) {
 				logger.error(strTransName+":调用开启/提交事务时发生错误,message="+e.getMessage(),e);
-				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
+				if(autoStartTransaction){try{rollback(transaction,dataGroupId);} catch (SQLException e1){}}
 				return Return.valueOf(-99,"处理数据发生异常,请查看后台日志.");
 			}catch(Throwable e){
 				logger.error(strTransName+":函数调用发生错误,message="+e.getMessage(),e);
-				if(autoStartTransaction){try{rollback(transaction);} catch (SQLException e1){}}
+				if(autoStartTransaction){try{rollback(transaction,dataGroupId);} catch (SQLException e1){}}
 				return Return.valueOf(-99, "处理数据发生异常,请查看后台日志.");
 			}finally{
 				pop(transactionChain);
@@ -201,36 +202,64 @@ public abstract class TransService implements ITransService
 	}
 	
 	//=======================threadlocal ==================//
-	void push(TransactionChainThreadLocal transactionChain,boolean autoStartTransaction){
-		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
-		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+	void push(TransactionChainThreadLocal transactionChain,String dataGroupId,boolean autoStartTransaction){
+		 Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();
+		 if(autoStartTransaction &&
+				 dataGroupId!=null && dataGroupId.length()>0){
+			  //==============指定了对某一数据源开启事务======//
+			 for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
+				 String curDataGroup=it.next();
+				 if(curDataGroup.equals(dataGroupId)){
+					 transactionChain.pushAutoStartTransaction(curDataGroup, autoStartTransaction); 
+				 }else{
+					 //其他数据源设置为未开启事务
+					 transactionChain.pushAutoStartTransaction(curDataGroup,false);
+				 }					 
+			 }			 
+			 return;
+		 }		 		
+		 //==========未指定对应某一数据源开启事务=========//
+		 for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transactionChain.pushAutoStartTransaction(it.next(), autoStartTransaction);
-		 }
+		}
 	}
+	
 	void pop(TransactionChainThreadLocal transactionChain){
-		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
-		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+		Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();	
+		for( Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transactionChain.popAutoStartTransaction(it.next());
-		 }
+		}
 	}
 	
-	void doBegin(TransactionThreadLocal transaction) throws SQLException{
-		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
-		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+	void doBegin(TransactionThreadLocal transaction,String dataGroupId) throws SQLException{
+		if(dataGroupId!=null && dataGroupId.length()>0){
+			transaction.doBegin(dataGroupId);
+			return;
+		}		
+		Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();	
+		for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transaction.doBegin(it.next());
-		 }
+		}
 	}
 	
-	void commit(TransactionThreadLocal transaction) throws SQLException{
-		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
-		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+	void commit(TransactionThreadLocal transaction,String dataGroupId) throws SQLException{
+		if(dataGroupId!=null && dataGroupId.length()>0){
+			transaction.commit(dataGroupId);
+			return;
+		}
+		Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();
+		for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transaction.commit(it.next());
 		 }
 	}
 	
-	 void rollback(TransactionThreadLocal transaction) throws SQLException{
-		 Map<String, DBPool> HmDBPool=DBPoolManager.getInstances().getHmDBPool();
-		 for( Iterator<String> it=HmDBPool.keySet().iterator();it.hasNext();){
+	 void rollback(TransactionThreadLocal transaction,String dataGroupId) throws SQLException{
+		if(dataGroupId!=null && dataGroupId.length()>0){
+			transaction.rollback(dataGroupId);
+			return;
+		}		 
+		Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();
+		for( Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transaction.rollback(it.next());
 		 }
 	 }
