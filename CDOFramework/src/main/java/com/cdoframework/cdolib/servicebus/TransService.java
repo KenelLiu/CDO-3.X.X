@@ -131,14 +131,17 @@ public abstract class TransService implements ITransService
 			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();			
 			try {
 				//=======当前方法autoStartTransaction属性值入栈==//
-				push(transactionChain,dataGroupId,autoStartTransaction);
+				Return ret=push(transactionChain,dataGroupId,autoStartTransaction);
+				if(ret.getCode()!=Return.OK.getCode()){
+					return Return.valueOf(-1,strTransName+ret.getText());
+				}
 				//=======当前方法是否是自动启动事务,开启事务================//
 				if(autoStartTransaction){
 					transaction=new TransactionThreadLocal();
 					doBegin(transaction,dataGroupId);					
 				}		
 				//============具体方法调用====================//
-				Return ret=(Return) method.invoke(this, cdoRequest, cdoResponse);
+				ret=(Return) method.invoke(this, cdoRequest, cdoResponse);
 				//============当前方法是否是自动启动事务,提交处理====================//
 				if(autoStartTransaction){
 					commit(transaction,dataGroupId);					
@@ -199,26 +202,32 @@ public abstract class TransService implements ITransService
 	}
 	
 	//=======================threadlocal ==================//
-	void push(TransactionChainThreadLocal transactionChain,String dataGroupId,boolean autoStartTransaction){
+	Return push(TransactionChainThreadLocal transactionChain,String dataGroupId,boolean autoStartTransaction){
 		 Map<String,IDataEngine> hmEngine=this.serviceBus.getHMDataEngine();
 		 if(autoStartTransaction &&
 				 dataGroupId!=null && dataGroupId.length()>0){
 			  //==============指定了对某一数据源开启事务======//
+			 boolean bFind=false;
 			 for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 				 String curDataGroup=it.next();
 				 if(curDataGroup.equals(dataGroupId)){
-					 transactionChain.pushAutoStartTransaction(curDataGroup, autoStartTransaction); 
+					 transactionChain.pushAutoStartTransaction(curDataGroup, autoStartTransaction);
+					 bFind=true;
 				 }else{
 					 //其他数据源设置为未开启事务
 					 transactionChain.pushAutoStartTransaction(curDataGroup,false);
 				 }					 
-			 }			 
-			 return;
+			 }	
+			 if(!bFind){
+				 return Return.valueOf(-1, " Invalid datagroup id: "+dataGroupId);
+			 }	
+			 return Return.OK;
 		 }		 		
 		 //==========未指定对应某一数据源开启事务=========//
 		 for(Iterator<String> it=hmEngine.keySet().iterator();it.hasNext();){
 			 transactionChain.pushAutoStartTransaction(it.next(), autoStartTransaction);
-		}
+		 }
+		 return Return.OK; 
 	}
 	
 	void pop(TransactionChainThreadLocal transactionChain){
