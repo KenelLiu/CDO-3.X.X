@@ -181,17 +181,16 @@ public class Service implements IService
 			}
 		}				
 		if(ret==null){
-			TransactionThreadLocal transaction=new TransactionThreadLocal();
-			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();
 			String strDataGroupId=getDataGroupId(strTransName);	
+			if(strDataGroupId==null){
+				return null;
+			}			
+			TransactionChainThreadLocal transactionChain=new TransactionChainThreadLocal();			
 			try{
 				//========对未经过TransService直接调用xml里的SQL语句========//
-				transactionChain.pushAutoStartTransaction(strDataGroupId,true);
-				transaction.doBegin(strDataGroupId);				
-				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);
-				transaction.commit(strDataGroupId);				
-			}catch(Throwable e){
-				try{transaction.rollback(strDataGroupId);} catch (SQLException e1){}
+				transactionChain.pushAutoStartTransaction(strDataGroupId,false);			
+				ret = this.executeDataServiceTrans(strTransName,cdoRequest,cdoResponse);							
+			}catch(Throwable e){				
 				logger.error("When handle data service "+strServiceName+"."+strTransName,e);
 				return Return.valueOf(-1,e.getMessage(),e);
 			}finally{

@@ -12,12 +12,9 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.annotation.TransName;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
-import com.cdoframework.cdolib.database.DBPool;
-import com.cdoframework.cdolib.database.DBPoolManager;
 import com.cdoframework.cdolib.database.IDataEngine;
 import com.cdoframework.transaction.TransactionChainThreadLocal;
 import com.cdoframework.transaction.TransactionThreadLocal;
-import com.cdoframework.transaction.exception.TransactionException;
 /**
  * 增加事务传播属性
  * 为了方便处理,在定义了transName名称的方法上,
