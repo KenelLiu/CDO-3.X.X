@@ -1,32 +1,3 @@
-/**
- * www.cdoforum.com 2007版权所有
- * 
- * $Header: /CVSData/Frank/CVSROOT/CDOForum/CDODatabase/Source/com/cdoframework/cdolib/database/IDataEngine.java,v 1.1
- * 2008/04/12 13:35:46 Frank Exp $
- * 
- * $Log: IDataEngine.java,v $ Revision 1.1 2008/04/12 13:35:46 Frank *** empty log message ***
- * 
- * Revision 1.1 2008/03/05 01:34:58 Frank *** empty log message ***
- * 
- * Revision 1.8 2008/02/23 05:18:43 Frank *** empty log message ***
- * 
- * Revision 1.7 2008/01/11 12:31:44 Frank *** empty log message ***
- * 
- * Revision 1.6 2008/01/07 10:55:25 Frank *** empty log message ***
- * 
- * Revision 1.5 2008/01/04 13:20:34 Frank *** empty log message ***
- * 
- * Revision 1.4 2007/12/27 12:28:06 Frank *** empty log message ***
- * 
- * Revision 1.3 2007/12/15 09:35:39 Frank *** empty log message ***
- * 
- * Revision 1.2 2007/12/15 09:07:13 Frank *** empty log message ***
- * 
- * Revision 1.1 2007/11/03 03:00:58 Frank *** empty log message ***
- * 
- * 
- */
-
 package com.cdoframework.cdolib.database;
 
 import java.io.IOException;
@@ -34,32 +5,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
 
 import com.cdo.field.Field;
-import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
-import com.cdoframework.cdolib.database.xsd.SQLTrans;
 
-public interface IDataEngine
-{
-	
-
-	/**
-	 * 获取一个数据库连接
-	 * 
-	 * @return
-	 */
+public interface IDataEngine{
+	//==============数据库连接=======//
 	public Connection getConnection() throws SQLException;
 	
 	public void setDBPool(DBPool dbPool);
 	
 	public DBPool getDBPool();
-
 	/**
 	 * 
 	 * @param conn

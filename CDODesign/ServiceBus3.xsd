@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 被2013 sp1 () 使用XMLSpy v编辑的 (http://www.altova.com) by -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="DataGroup">
 		<xs:complexType>
@@ -94,12 +95,6 @@
 	<xs:element name="ServicePlugin">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="Name" type="xs:string" use="required"/>
-						<xs:attribute name="Value" type="xs:string" use="required"/>
-					</xs:complexType>
-				</xs:element>
 				<xs:element name="ServiceConfig" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:attribute name="Id" use="required">

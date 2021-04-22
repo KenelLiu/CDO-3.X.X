@@ -874,32 +874,19 @@ public class ServiceBus implements java.io.Serializable {
 
     /**
   	 * ***************************************manual  code *************************************************
-  	 * 序列化ServiceBus对象
   	 */
-    static Logger logger = Logger.getLogger(ServiceBus.class);
-    
-    public static ServiceBus   fromXML(java.lang.String strXML) throws Exception
-    {
+    static Logger logger = Logger.getLogger(ServiceBus.class);    
+    public static ServiceBus  fromXML(java.lang.String strXML) throws Exception{
     	StringReader reader=null;
-    	try
-    	{
-    		reader=new StringReader(strXML);
-    		ServiceBus serviceBus = (ServiceBus)ServiceBus.unmarshal(reader);
-    		return serviceBus;
-    	}
-    	finally
-    	{
-    		if(reader!=null)
-    		{
-    			try
-    			{
-    				reader.close();
-    			}
-    			catch(Exception e)
-    			{
+    	try{
+    		reader=new StringReader(strXML);    		
+    		return ServiceBus.unmarshal(reader);
+    	}finally{
+    		if(reader!=null){
+    			try{reader.close();}catch(Exception e){
     				logger.error("fromXML:"+e.getMessage(),e);
     			}
     		}
     	}
-    }    
+    }   
 }

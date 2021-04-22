@@ -1,8 +1,3 @@
-/**
-
- *
- */
-
 package com.cdoframework.cdolib.servicebus;
 
 import java.util.ArrayList;
@@ -91,36 +86,37 @@ public class ServiceBus implements IServiceBus
 	// 公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
 	/**
-	 * 	
-	 * 根据strServiceBusXML 初始化 ServiceBus对象,	
+	 * ServiceBus.xsd 由 ServiceBusResource.xsd  和 PluginsConfig.xsd 组成，分拆主要是为了部署方便，将不变和经常变化的分开。
+   	 * ServiceBusResource.xsd 主要定义了 关系型数据库源
+   	 * PluginsConfig.xsd   定义了使用插件的配置
+   	 * 将ServiceBus.xml转化为java对象	
 	 * @param strServiceBusXML  
 	 * @return
 	 */
 	public Return init(String strServiceBusXML){
-		//将XML转换成对象
+		//==========将XML转换成对象==========//
 		com.cdoframework.cdolib.servicebus.xsd.ServiceBus serviceBus=null;
-		try
-		{
+		try{
 			serviceBus=com.cdoframework.cdolib.servicebus.xsd.ServiceBus.fromXML(strServiceBusXML);
 		}catch(Exception e){
 			logger.error("When parse serviceBus.xml , caught exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
 		}
-		// 初始化插件参数
+		//==============初始化插件参数========//
 		int nParameterCount=serviceBus.getParameterCount();
 		for(int i=0;i<nParameterCount;i++){
 			Parameter para=serviceBus.getParameter(i);
 			this.hmParameterMap.put(para.getName(),para.getValue());
 		}
-		//加载和初始化全局DataGroup
+		//============加载和初始化 数据库连接DataGroup=============//
 		this.hmDataEngine=new HashMap<String,IDataEngine>(6);
 		DataGroup[] dgs=serviceBus.getDataGroup();
 		DBPoolManager dbPoolManager=DBPoolManager.getInstances();
-		try
-		{			
-			for(int i=0;i<dgs.length;i++){				
-				this.hmDataEngine.put(dgs[i].getId(),dgs[i].init());	
-				DBPool dbPool=dbPoolManager.addDBPool(dgs[i].getId(),dgs[i].getDBPool());
+		try{			
+			for(int i=0;i<dgs.length;i++){			
+				IDataEngine dataEngine=dgs[i].init();
+				this.hmDataEngine.put(dgs[i].getId(),dataEngine);	
+				DBPool dbPool=dbPoolManager.addDBPool(dgs[i].getId(),dataEngine.getDBPool());
 				if(dbPool!=null){
 					throw new RuntimeException("duplicated DataGroupId:"+dgs[i].getId());
 				}
@@ -132,8 +128,7 @@ public class ServiceBus implements IServiceBus
 			logger.error("When parse DataGroup , caught exception: ",e);
 			return Return.valueOf(-1,"Init ServiceBus Failed: "+e.getLocalizedMessage());
 		}						
-
-		//初始化ClusterController
+		//===========初始化ClusterController=========//
 		com.cdoframework.cdolib.servicebus.xsd.ClusterController ccDefine=serviceBus.getClusterController();
 		if(ccDefine!=null){
 			if(logger.isInfoEnabled()){logger.info("Staring initialize  cluster controller ....................");}
@@ -149,7 +144,7 @@ public class ServiceBus implements IServiceBus
 			clusterController.setPulseSecond(ccDefine.getPulseSecond());
 			if(logger.isInfoEnabled()){logger.info("initialize  cluster controller successfully....................");}
 		}
-		//初始化事件处理器
+		//===============初始化事件处理器==============//
 		if(logger.isInfoEnabled()){logger.info("starting to init Event handler....................");}
 		com.cdoframework.cdolib.servicebus.xsd.EventProcessor eventProcessorDefine = serviceBus.getEventProcessor();
 		if(eventProcessorDefine != null){
@@ -164,10 +159,8 @@ public class ServiceBus implements IServiceBus
 		if(logger.isInfoEnabled()){logger.info("Staring load  plugins ....................");}
 		int nPluginCount=serviceBus.getPluginXMLResourceCount();
 		this.plugins=new ServicePlugin[nPluginCount];
-		try
-		{
-			for(int i=0;i<nPluginCount;i++)
-			{
+		try{
+			for(int i=0;i<nPluginCount;i++){
 				String strXMLResource=serviceBus.getPluginXMLResource(i);
 				if(logger.isInfoEnabled()){logger.info("loading "+strXMLResource+"..............................");}
 				String strXML=Utility.readTextResource(strXMLResource,"utf-8");

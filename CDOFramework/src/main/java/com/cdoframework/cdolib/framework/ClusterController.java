@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
+import com.cdo.util.http.IPUtil;
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.IActiveObject;
@@ -272,7 +273,7 @@ public class ClusterController extends ThreadGroup
 
 	public Return start()
 	{
-		strServerIP	=Utility.getLocalIp();
+		strServerIP	=IPUtil.getLocalIp();		
 		if(strServerIP==null)
 		{
 			return Return.valueOf(-1,"Get IP Address Error");

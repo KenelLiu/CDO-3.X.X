@@ -2,6 +2,7 @@ package com.cdo.util.http;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,7 @@ public class IPUtil {
 		  String serverIP = "";
 		  InetAddress ip = null;
 		  try {
+				
 		   //如果是Windows操作系统
 		   if(isWindowsOS()){
 			   ip = InetAddress.getLocalHost();
@@ -110,5 +112,5 @@ public class IPUtil {
 		    return isWindowsOS;
 		  }
 	  	 
-	  
+
 }

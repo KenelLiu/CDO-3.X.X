@@ -8,12 +8,9 @@
 package com.cdoframework.cdolib.servicebus.xsd;
 
 import java.util.Properties;
-
-import com.cdoframework.cdolib.base.CycleList;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.database.DBPool;
 import com.cdoframework.cdolib.database.IDataEngine;
-
 /**
  * 
  * 
@@ -212,16 +209,11 @@ public class DataGroup implements java.io.Serializable {
   	 * ***************************************manual  code *************************************************
   	 * 序列化DataGroup对象
   	 */
-    private DBPool dbPool;
-    
-    public DBPool getDBPool(){
-    	return this.dbPool;
-    }
-  	public IDataEngine init() throws Exception
-  	{
+
+  	public IDataEngine init() throws Exception{
   
   		Database dbs=this.getDatabase();
-  		dbPool=new DBPool();
+  		DBPool dbPool=new DBPool();
   		dbPool.setDriver(this.getDriver());
   		dbPool.setURI(dbs.getURI());
   		dbPool.setCharset(this.getCharset());
@@ -264,6 +256,4 @@ public class DataGroup implements java.io.Serializable {
 		dataEngine.setDBPool(dbPool);
   		return dataEngine;
   	}
-  	
-  	
 }

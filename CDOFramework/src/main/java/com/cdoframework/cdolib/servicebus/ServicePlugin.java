@@ -36,21 +36,8 @@ public class ServicePlugin implements IServicePlugin
 	// 静态对象,所有static在此声明并初始化------------------------------------------------------------------------
 	static Logger logger=Logger.getLogger(ServicePlugin.class);
 	// 内部对象,所有在本类中创建并使用的对象在此声明--------------------------------------------------------------
-
-	private HashMap<String,String> hmParameterMap;//配置参数
-
 	private HashMap<String,Service> hmService;
-
-	
-	public void setParameterMap(HashMap<String,String> hmParameterMap)
-	{
-		this.hmParameterMap=hmParameterMap;
-	}
-	
-	
-
 	// 属性对象,所有在本类中创建，并允许外部访问的对象在此声明并提供get/set方法-----------------------------------
-
 	// 引用对象,所有在外部创建并传入使用的对象在此声明并提供set方法-----------------------------------------------
 	private String strPluginName;
 	private ServiceBus serviceBus;
@@ -78,41 +65,21 @@ public class ServicePlugin implements IServicePlugin
 	
 	
 	public void init(String strPluginName,ServiceBus serviceBus,com.cdoframework.cdolib.servicebus.xsd.ServicePlugin pluginDefine)
-					throws Exception
-	{
+					throws Exception{
 		
-		//TODO 初始化Service
+		
 		int nServiceCount = pluginDefine.getServiceConfigCount();
 		if(nServiceCount==0){
 			throw new Exception("no server define");
 		}		
 		this.serviceBus = serviceBus;
 		this.strPluginName = strPluginName;
-		// 初始化插件参数
-		int nParameterCount=pluginDefine.getParameterCount();
-		for(int i=0;i<nParameterCount;i++)
-		{
-			Parameter para=pluginDefine.getParameter(i);
-			this.hmParameterMap.put(para.getName(),para.getValue());
-		}
-
-		//==== 不再使用插件配置数据源,加载和初始化插件DataGroup=======//
-		/**
-		DataGroup[] dgs=pluginDefine.getDataGroup();
-		for(int i=0;i<dgs.length;i++)
-		{
-	
-			this.hmLocalDataGroup.put(dgs[i].getId(),dgs[i].init());
-			this.hmAllDataGroup.put(dgs[i].getId(),dgs[i].init());
-		}
-		**/
 		
 		ServiceConfig[] serviceConfigs = pluginDefine.getServiceConfig();
-		//保存每一个plugin.xml插件里的使用 zk 的service
+		//保存每一个plugin.xml插件里的使用 zk的service
 		Map<String , ZkParameter> zkProducerMap=new HashMap<String,ZkParameter>();
 		
-		for(ServiceConfig sc:serviceConfigs)
-		{
+		for(ServiceConfig sc:serviceConfigs){
 			Service service = new Service();
 			service.setDataServiceParse(serviceBus.getDataServiceParse());			
 			if(logger.isInfoEnabled()){logger.info("init service: "+ sc.getId());}
@@ -135,13 +102,9 @@ public class ServicePlugin implements IServicePlugin
 				zkProducerMap.put(sc.getId(), zkParameter);				
 			}
 		}
-		
-		
-		
 		// =============初始化DataService====================//
 		int nDataServiceCount=pluginDefine.getDataServiceCount();
-		try
-		{
+		try{
 			for(int i=0;i<nDataServiceCount;i++)
 			{
 				com.cdoframework.cdolib.servicebus.xsd.DataService dataServiceDefine=pluginDefine.getDataService(i);
@@ -177,8 +140,7 @@ public class ServicePlugin implements IServicePlugin
 
 		//=================== 初始化TransService================//
 		int nTransServiceCount=pluginDefine.getTransServiceCount();
-		try
-		{
+		try{
 			for(int i=0;i<nTransServiceCount;i++)
 			{
 				
@@ -232,8 +194,7 @@ public class ServicePlugin implements IServicePlugin
 
 		// =================初始化ActiveService=================//
 		int nActiveServiceCount=pluginDefine.getActiveServiceCount();
-		try
-		{
+		try{
 			for(int i=0;i<nActiveServiceCount;i++)
 			{
 				ActiveService activeService=pluginDefine.getActiveService(i);
@@ -346,33 +307,13 @@ public class ServicePlugin implements IServicePlugin
 		return service.handleDataTrans(cdoRequest,cdoResponse);
 	}
 
-
-	public String getParameter(String strName,String strDefaultValue)
-	{
-		String strValue=hmParameterMap.get(strName);
-		if(strValue==null)
-		{
-			return strDefaultValue;
-		}
-		return strValue;
-	}
-
-	public String getParameter(String strName)
-	{
-		return hmParameterMap.get(strName);
-	}
-
-
-
 	// 事件处理,所有重载派生类的事件类方法(一般为on...ed)在此定义-------------------------------------------------
 
 	// 事件定义,所有在本类中定义并调用，由派生类实现或重载的事件类方法(一般为on...ed)在此定义---------------------
 
 	// 构造函数,所有构造函数在此定义------------------------------------------------------------------------------
 
-	public ServicePlugin()
-	{
+	public ServicePlugin(){
 		hmService 			= new HashMap<String,Service>(5);
-		hmParameterMap			= new HashMap<String,String>(10);			
 	}
 }

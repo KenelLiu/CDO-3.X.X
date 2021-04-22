@@ -19,10 +19,6 @@ import org.apache.log4j.Logger;
 @SuppressWarnings("serial")
 public class ServicePlugin implements java.io.Serializable {
 
-    private java.util.List<com.cdoframework.cdolib.servicebus.xsd.Parameter> parameterList;
-
-    private java.util.List<com.cdoframework.cdolib.servicebus.xsd.DataGroup> dataGroupList;
-
     private java.util.List<com.cdoframework.cdolib.servicebus.xsd.ServiceConfig> serviceConfigList;
 
     private java.util.List<com.cdoframework.cdolib.servicebus.xsd.DataService> dataServiceList;
@@ -33,8 +29,6 @@ public class ServicePlugin implements java.io.Serializable {
 
     public ServicePlugin() {
         super();
-        this.parameterList = new java.util.ArrayList<com.cdoframework.cdolib.servicebus.xsd.Parameter>();
-        this.dataGroupList = new java.util.ArrayList<com.cdoframework.cdolib.servicebus.xsd.DataGroup>();
         this.serviceConfigList = new java.util.ArrayList<com.cdoframework.cdolib.servicebus.xsd.ServiceConfig>();
         this.dataServiceList = new java.util.ArrayList<com.cdoframework.cdolib.servicebus.xsd.DataService>();
         this.transServiceList = new java.util.ArrayList<com.cdoframework.cdolib.servicebus.xsd.TransService>();
@@ -67,29 +61,6 @@ public class ServicePlugin implements java.io.Serializable {
     /**
      * 
      * 
-     * @param vDataGroup
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void addDataGroup(final com.cdoframework.cdolib.servicebus.xsd.DataGroup vDataGroup) throws java.lang.IndexOutOfBoundsException {
-        this.dataGroupList.add(vDataGroup);
-    }
-
-    /**
-     * 
-     * 
-     * @param index
-     * @param vDataGroup
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void addDataGroup(final int index,final com.cdoframework.cdolib.servicebus.xsd.DataGroup vDataGroup) throws java.lang.IndexOutOfBoundsException {
-        this.dataGroupList.add(index, vDataGroup);
-    }
-
-    /**
-     * 
-     * 
      * @param vDataService
      * @throws java.lang.IndexOutOfBoundsException if the index
      * given is outside the bounds of the collection
@@ -108,29 +79,6 @@ public class ServicePlugin implements java.io.Serializable {
      */
     public void addDataService(final int index,final com.cdoframework.cdolib.servicebus.xsd.DataService vDataService) throws java.lang.IndexOutOfBoundsException {
         this.dataServiceList.add(index, vDataService);
-    }
-
-    /**
-     * 
-     * 
-     * @param vParameter
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void addParameter(final com.cdoframework.cdolib.servicebus.xsd.Parameter vParameter) throws java.lang.IndexOutOfBoundsException {
-        this.parameterList.add(vParameter);
-    }
-
-    /**
-     * 
-     * 
-     * @param index
-     * @param vParameter
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void addParameter(final int index,final com.cdoframework.cdolib.servicebus.xsd.Parameter vParameter) throws java.lang.IndexOutOfBoundsException {
-        this.parameterList.add(index, vParameter);
     }
 
     /**
@@ -190,16 +138,6 @@ public class ServicePlugin implements java.io.Serializable {
     }
 
     /**
-     * Method enumerateDataGroup.
-     * 
-     * @return an Enumeration over all possible elements of this
-     * collection
-     */
-    public java.util.Enumeration<? extends com.cdoframework.cdolib.servicebus.xsd.DataGroup> enumerateDataGroup() {
-        return java.util.Collections.enumeration(this.dataGroupList);
-    }
-
-    /**
      * Method enumerateDataService.
      * 
      * @return an Enumeration over all possible elements of this
@@ -207,16 +145,6 @@ public class ServicePlugin implements java.io.Serializable {
      */
     public java.util.Enumeration<? extends com.cdoframework.cdolib.servicebus.xsd.DataService> enumerateDataService() {
         return java.util.Collections.enumeration(this.dataServiceList);
-    }
-
-    /**
-     * Method enumerateParameter.
-     * 
-     * @return an Enumeration over all possible elements of this
-     * collection
-     */
-    public java.util.Enumeration<? extends com.cdoframework.cdolib.servicebus.xsd.Parameter> enumerateParameter() {
-        return java.util.Collections.enumeration(this.parameterList);
     }
 
     /**
@@ -283,48 +211,6 @@ public class ServicePlugin implements java.io.Serializable {
     }
 
     /**
-     * Method getDataGroup.
-     * 
-     * @param index
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     * @return the value of the
-     * com.cdoframework.cdolib.servicebus.xsd.DataGroup at the
-     * given index
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.DataGroup getDataGroup(final int index) throws java.lang.IndexOutOfBoundsException {
-        // check bounds for index
-        if (index < 0 || index >= this.dataGroupList.size()) {
-            throw new IndexOutOfBoundsException("getDataGroup: Index value '" + index + "' not in range [0.." + (this.dataGroupList.size() - 1) + "]");
-        }
-
-        return dataGroupList.get(index);
-    }
-
-    /**
-     * Method getDataGroup.Returns the contents of the collection
-     * in an Array.  <p>Note:  Just in case the collection contents
-     * are changing in another thread, we pass a 0-length Array of
-     * the correct type into the API call.  This way we <i>know</i>
-     * that the Array returned is of exactly the correct length.
-     * 
-     * @return this collection as an Array
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.DataGroup[] getDataGroup() {
-        com.cdoframework.cdolib.servicebus.xsd.DataGroup[] array = new com.cdoframework.cdolib.servicebus.xsd.DataGroup[0];
-        return this.dataGroupList.toArray(array);
-    }
-
-    /**
-     * Method getDataGroupCount.
-     * 
-     * @return the size of this collection
-     */
-    public int getDataGroupCount() {
-        return this.dataGroupList.size();
-    }
-
-    /**
      * Method getDataService.
      * 
      * @param index
@@ -364,48 +250,6 @@ public class ServicePlugin implements java.io.Serializable {
      */
     public int getDataServiceCount() {
         return this.dataServiceList.size();
-    }
-
-    /**
-     * Method getParameter.
-     * 
-     * @param index
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     * @return the value of the
-     * com.cdoframework.cdolib.servicebus.xsd.Parameter at the
-     * given index
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.Parameter getParameter(final int index) throws java.lang.IndexOutOfBoundsException {
-        // check bounds for index
-        if (index < 0 || index >= this.parameterList.size()) {
-            throw new IndexOutOfBoundsException("getParameter: Index value '" + index + "' not in range [0.." + (this.parameterList.size() - 1) + "]");
-        }
-
-        return parameterList.get(index);
-    }
-
-    /**
-     * Method getParameter.Returns the contents of the collection
-     * in an Array.  <p>Note:  Just in case the collection contents
-     * are changing in another thread, we pass a 0-length Array of
-     * the correct type into the API call.  This way we <i>know</i>
-     * that the Array returned is of exactly the correct length.
-     * 
-     * @return this collection as an Array
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.Parameter[] getParameter() {
-        com.cdoframework.cdolib.servicebus.xsd.Parameter[] array = new com.cdoframework.cdolib.servicebus.xsd.Parameter[0];
-        return this.parameterList.toArray(array);
-    }
-
-    /**
-     * Method getParameterCount.
-     * 
-     * @return the size of this collection
-     */
-    public int getParameterCount() {
-        return this.parameterList.size();
     }
 
     /**
@@ -519,16 +363,6 @@ public class ServicePlugin implements java.io.Serializable {
     }
 
     /**
-     * Method iterateDataGroup.
-     * 
-     * @return an Iterator over all possible elements in this
-     * collection
-     */
-    public java.util.Iterator<? extends com.cdoframework.cdolib.servicebus.xsd.DataGroup> iterateDataGroup() {
-        return this.dataGroupList.iterator();
-    }
-
-    /**
      * Method iterateDataService.
      * 
      * @return an Iterator over all possible elements in this
@@ -536,16 +370,6 @@ public class ServicePlugin implements java.io.Serializable {
      */
     public java.util.Iterator<? extends com.cdoframework.cdolib.servicebus.xsd.DataService> iterateDataService() {
         return this.dataServiceList.iterator();
-    }
-
-    /**
-     * Method iterateParameter.
-     * 
-     * @return an Iterator over all possible elements in this
-     * collection
-     */
-    public java.util.Iterator<? extends com.cdoframework.cdolib.servicebus.xsd.Parameter> iterateParameter() {
-        return this.parameterList.iterator();
     }
 
     /**
@@ -626,20 +450,8 @@ public class ServicePlugin implements java.io.Serializable {
 
     /**
      */
-    public void removeAllDataGroup() {
-        this.dataGroupList.clear();
-    }
-
-    /**
-     */
     public void removeAllDataService() {
         this.dataServiceList.clear();
-    }
-
-    /**
-     */
-    public void removeAllParameter() {
-        this.parameterList.clear();
     }
 
     /**
@@ -652,28 +464,6 @@ public class ServicePlugin implements java.io.Serializable {
      */
     public void removeAllTransService() {
         this.transServiceList.clear();
-    }
-
-    /**
-     * Method removeDataGroup.
-     * 
-     * @param vDataGroup
-     * @return true if the object was removed from the collection.
-     */
-    public boolean removeDataGroup(final com.cdoframework.cdolib.servicebus.xsd.DataGroup vDataGroup) {
-        boolean removed = dataGroupList.remove(vDataGroup);
-        return removed;
-    }
-
-    /**
-     * Method removeDataGroupAt.
-     * 
-     * @param index
-     * @return the element removed from the collection
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.DataGroup removeDataGroupAt(final int index) {
-        java.lang.Object obj = this.dataGroupList.remove(index);
-        return (com.cdoframework.cdolib.servicebus.xsd.DataGroup) obj;
     }
 
     /**
@@ -696,28 +486,6 @@ public class ServicePlugin implements java.io.Serializable {
     public com.cdoframework.cdolib.servicebus.xsd.DataService removeDataServiceAt(final int index) {
         java.lang.Object obj = this.dataServiceList.remove(index);
         return (com.cdoframework.cdolib.servicebus.xsd.DataService) obj;
-    }
-
-    /**
-     * Method removeParameter.
-     * 
-     * @param vParameter
-     * @return true if the object was removed from the collection.
-     */
-    public boolean removeParameter(final com.cdoframework.cdolib.servicebus.xsd.Parameter vParameter) {
-        boolean removed = parameterList.remove(vParameter);
-        return removed;
-    }
-
-    /**
-     * Method removeParameterAt.
-     * 
-     * @param index
-     * @return the element removed from the collection
-     */
-    public com.cdoframework.cdolib.servicebus.xsd.Parameter removeParameterAt(final int index) {
-        java.lang.Object obj = this.parameterList.remove(index);
-        return (com.cdoframework.cdolib.servicebus.xsd.Parameter) obj;
     }
 
     /**
@@ -799,37 +567,6 @@ public class ServicePlugin implements java.io.Serializable {
      * 
      * 
      * @param index
-     * @param vDataGroup
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void setDataGroup(final int index,final com.cdoframework.cdolib.servicebus.xsd.DataGroup vDataGroup) throws java.lang.IndexOutOfBoundsException {
-        // check bounds for index
-        if (index < 0 || index >= this.dataGroupList.size()) {
-            throw new IndexOutOfBoundsException("setDataGroup: Index value '" + index + "' not in range [0.." + (this.dataGroupList.size() - 1) + "]");
-        }
-
-        this.dataGroupList.set(index, vDataGroup);
-    }
-
-    /**
-     * 
-     * 
-     * @param vDataGroupArray
-     */
-    public void setDataGroup(final com.cdoframework.cdolib.servicebus.xsd.DataGroup[] vDataGroupArray) {
-        //-- copy array
-        dataGroupList.clear();
-
-        for (int i = 0; i < vDataGroupArray.length; i++) {
-                this.dataGroupList.add(vDataGroupArray[i]);
-        }
-    }
-
-    /**
-     * 
-     * 
-     * @param index
      * @param vDataService
      * @throws java.lang.IndexOutOfBoundsException if the index
      * given is outside the bounds of the collection
@@ -854,37 +591,6 @@ public class ServicePlugin implements java.io.Serializable {
 
         for (int i = 0; i < vDataServiceArray.length; i++) {
                 this.dataServiceList.add(vDataServiceArray[i]);
-        }
-    }
-
-    /**
-     * 
-     * 
-     * @param index
-     * @param vParameter
-     * @throws java.lang.IndexOutOfBoundsException if the index
-     * given is outside the bounds of the collection
-     */
-    public void setParameter(final int index,final com.cdoframework.cdolib.servicebus.xsd.Parameter vParameter) throws java.lang.IndexOutOfBoundsException {
-        // check bounds for index
-        if (index < 0 || index >= this.parameterList.size()) {
-            throw new IndexOutOfBoundsException("setParameter: Index value '" + index + "' not in range [0.." + (this.parameterList.size() - 1) + "]");
-        }
-
-        this.parameterList.set(index, vParameter);
-    }
-
-    /**
-     * 
-     * 
-     * @param vParameterArray
-     */
-    public void setParameter(final com.cdoframework.cdolib.servicebus.xsd.Parameter[] vParameterArray) {
-        //-- copy array
-        parameterList.clear();
-
-        for (int i = 0; i < vParameterArray.length; i++) {
-                this.parameterList.add(vParameterArray[i]);
         }
     }
 
@@ -976,35 +682,21 @@ public class ServicePlugin implements java.io.Serializable {
         validator.validate(this);
     }
     /**
-  	 * ***************************************manual  code *************************************************
-  	 * 序列化ServicePlugin对象
-  	 */
-    static Logger logger = Logger.getLogger(ServicePlugin.class);
-    
-    public static ServicePlugin   fromXML(String strXML) throws Exception
-    {
-    	StringReader reader=null;
-    	try
-    	{
-    		reader=new StringReader(strXML);
-    		ServicePlugin servicePlugin = (ServicePlugin)ServicePlugin.unmarshal(reader);
-
-
-    		return servicePlugin;
-    	}
-    	finally
-    	{
-    		if(reader!=null)
-    		{
-    			try
-    			{
-    				reader.close();
-    			}
-    			catch(Exception e)
-    			{
-    				logger.error("fromXML:"+e.getMessage(),e);
-    			}
-    		}
-    	}
-    }
+	 * ***************************************manual  code *************************************************
+	 * 序列化ServicePlugin对象
+	 */
+	static Logger logger = Logger.getLogger(ServicePlugin.class);
+	
+	public static ServicePlugin   fromXML(String strXML) throws Exception{
+		StringReader reader=null;
+		try{
+			reader=new StringReader(strXML);
+			return ServicePlugin.unmarshal(reader);
+		}finally{
+			if(reader!=null){try{reader.close();}catch(Exception e){
+					logger.error("fromXML:"+e.getMessage(),e);
+				}
+			}
+		}
+	}
 }

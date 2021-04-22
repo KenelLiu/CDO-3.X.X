@@ -106,7 +106,7 @@ public class ConnectionPool implements java.io.Serializable {
     /**
      * Field validationQuery.
      */
-    private java.lang.String validationQuery = "SELECT 1 FROM DUAL";
+    private java.lang.String validationQuery = "SELECT 1";
 
     /**
      * Field poolPreparedStatements.
@@ -143,7 +143,7 @@ public class ConnectionPool implements java.io.Serializable {
 
     public ConnectionPool() {
         super();
-        setValidationQuery("SELECT 1 FROM DUAL");
+        setValidationQuery("SELECT 1");
     }
 
     /**
