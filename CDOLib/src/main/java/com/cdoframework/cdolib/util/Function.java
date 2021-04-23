@@ -191,7 +191,10 @@ public class Function
 	        break;
 		  case ' ':
 			 sb.append("&nbsp;");
-			 break;        
+			 break;  
+	      case '\t':	
+	    	  sb.append("\\t");
+	    	  break;			 
 	      case '\r':
 	        break;
 	      case '\n':

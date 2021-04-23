@@ -1,19 +1,20 @@
 //required jquery.js 1.12+ ,json2.js,CDO.js/
 function Field(){
 	this.hmItem ={};	
-	this.exists=function(strFieldId) {
+}
+Field.prototype.exists=function(strFieldId) {
 		if(this.hmItem.hasOwnProperty(strFieldId)){
 			return true;
 		}
 		return false;
 	};	
-	this.getType=function (strFieldId) {
+Field.prototype.getType=function (strFieldId) {
 		if(this.exists(strFieldId)){
 			return this.hmItem[strFieldId];			
 		}
 		return null;
 	};	
-	this.setType=function(strFieldId,strType) {
+Field.prototype.setType=function(strFieldId,strType) {
 		var rules="^[a-zA-Z][0-9A-Za-z\\-_]{0,15}$"
 		var exp = new RegExp(rules);
 		var bFlag=exp.test(strFieldId);
@@ -34,8 +35,13 @@ function Field(){
 			}
 		}
 		console.error("setType occur error, Invalid FieldId " + strFieldId+",value  must  be one of them "+JSON.stringify(fieldTypes));
-	};			
-}
+};			
+/**
+ * CDO 工具
+ * 1 CDO数组转换成字符串
+ * 2 字符串转换成CDO
+ * 3 json转成CDO
+ */
 var CDOUtil={
 	//yyyy-MM-dd 或 yyyy-MM-dd hh:mm:ss
 	dateFormat:function(date,fmt){

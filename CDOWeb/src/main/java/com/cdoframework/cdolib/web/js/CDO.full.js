@@ -1,26 +1,29 @@
 //required jquery.js 1.12+ ,json2.js//
 function CDO() {
 	this.hmItem ={};	
-	this.exists=function(strKey) {
+};
+//====================通用方法===================//
+	CDO.prototype.exists=function(strKey) {
 		if(this.hmItem.hasOwnProperty(strKey)){
 			return true;
 		}
 		return false;
 	};	
-	this.get=function (strKey) {
+	CDO.prototype.get=function (strKey) {
 		if(this.exists(strKey)){
 			return this.hmItem[strKey];			
 		}
 		return null;
 	};	
-	this.put=function(strKey, objValue) {
+	CDO.prototype.put=function(strKey, objValue) {
 		this.hmItem[strKey]=objValue;
-	};		
-	this.getFieldValue = function (strFieldId) {
+	};	
+	
+	CDO.prototype.getFieldValue = function (strFieldId) {
 		return this.get(strFieldId);	
 	};
-
-	this.getByteValue = function (strFieldId) {
+//=========================获取数据=======================//
+	CDO.prototype.getByteValue = function (strFieldId) {
 		var value= this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -32,7 +35,7 @@ function CDO() {
 			return null;
 		}		
 	};
-	this.getShortValue = function (strFieldId) {
+	CDO.prototype.getShortValue = function (strFieldId) {
 		var value= this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -44,7 +47,7 @@ function CDO() {
 			return null;
 		}			
 	};
-	this.getIntegerValue = function (strFieldId) {
+	CDO.prototype.getIntegerValue = function (strFieldId) {
 		var value= this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -56,7 +59,7 @@ function CDO() {
 			return null;
 		}			
 	};
-	this.getLongValue = function (strFieldId) {
+	CDO.prototype.getLongValue = function (strFieldId) {
 		var value= this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -68,7 +71,7 @@ function CDO() {
 			return null;
 		}			
 	};
-	this.getBooleanValue = function (strFieldId) {		
+	CDO.prototype.getBooleanValue = function (strFieldId) {		
 		var value=this.getFieldValue(strFieldId);
 		if(value==null) return null;
 		try{
@@ -80,7 +83,7 @@ function CDO() {
 			return null;
 		}			
 	};	
-	this.getFloatValue = function (strFieldId) {
+	CDO.prototype.getFloatValue = function (strFieldId) {
 		var value= this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -92,7 +95,7 @@ function CDO() {
 			return null;
 		}			
 	};	
-	this.getDoubleValue = function (strFieldId) {
+	CDO.prototype.getDoubleValue = function (strFieldId) {
 		var value=this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -104,7 +107,7 @@ function CDO() {
 			return null;
 		}
 	};	
-	this.getStringValue = function (strFieldId) {		 
+	CDO.prototype.getStringValue = function (strFieldId) {		 
 		 var value=this.getFieldValue(strFieldId);
 		 if(value==null) return null;
 		 var objType=$.type(value);
@@ -120,7 +123,7 @@ function CDO() {
 		 return value;
 	};
 
-	this.getDateValue = function (strFieldId) {		
+	CDO.prototype.getDateValue = function (strFieldId) {		
 		var value=this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -132,7 +135,7 @@ function CDO() {
 			return null;
 		}
 	};
-	this.getTimeValue = function (strFieldId) {		
+	CDO.prototype.getTimeValue = function (strFieldId) {		
 		var value=this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -144,7 +147,7 @@ function CDO() {
 			return null;
 		}
 	};
-	this.getDateTimeValue = function (strFieldId) {
+	CDO.prototype.getDateTimeValue = function (strFieldId) {
 		var value=this.getFieldValue(strFieldId);
 		if(value==null)return null;
 		try{
@@ -157,7 +160,7 @@ function CDO() {
 		}	
 	};
 	
-	this.getCDOValue = function (strFieldId) {
+	CDO.prototype.getCDOValue = function (strFieldId) {
 		var cdoValue=this.getFieldValue(strFieldId);
 		if(value==null) return null;
 		if(cdoValue instanceof CDO){
@@ -166,7 +169,7 @@ function CDO() {
 			 console.warn("getCDOValue occur error,Invalid FieldId "+strFieldId+",value is not CDO"); 
 		}
 	};
-	this.getByteArrayValue = function (strFieldId) {
+	CDO.prototype.getByteArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -176,7 +179,7 @@ function CDO() {
 			return null;
 		}		
 	};
-	this.getShortArrayValue = function (strFieldId) {
+	CDO.prototype.getShortArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -186,7 +189,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getIntegerArrayValue = function (strFieldId) {
+	CDO.prototype.getIntegerArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -196,7 +199,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getLongArrayValue = function (strFieldId) {
+	CDO.prototype.getLongArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -206,7 +209,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getBooleanArrayValue = function (strFieldId) {		
+	CDO.prototype.getBooleanArrayValue = function (strFieldId) {		
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -216,7 +219,7 @@ function CDO() {
 			return null;
 		}	
 	};	
-	this.getFloatArrayValue = function (strFieldId) {
+	CDO.prototype.getFloatArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -226,7 +229,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getDoubleArrayValue = function (strFieldId) {
+	CDO.prototype.getDoubleArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -236,7 +239,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getStringArrayValue = function (strFieldId) {
+	CDO.prototype.getStringArrayValue = function (strFieldId) {
 		try{
 			var strsValue=this.getFieldValue(strFieldId);
 			if(strsValue==null) return null;
@@ -260,7 +263,7 @@ function CDO() {
 			return null;
 		}			
 	};
-	this.getDateArrayValue = function (strFieldId) {
+	CDO.prototype.getDateArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -270,7 +273,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getTimeArrayValue = function (strFieldId) {
+	CDO.prototype.getTimeArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -280,7 +283,7 @@ function CDO() {
 			return null;
 		}	
 	};
-	this.getDateTimeArrayValue = function (strFieldId) {
+	CDO.prototype.getDateTimeArrayValue = function (strFieldId) {
 		try{
 			var value=this.getFieldValue(strFieldId);
 			if(value==null) return null;
@@ -290,7 +293,7 @@ function CDO() {
 			return null;
 		}		
 	};	
-	this.getCDOArrayValue = function (strFieldId) {
+	CDO.prototype.getCDOArrayValue = function (strFieldId) {
 		var arrValues=this.getFieldValue(strFieldId);
 		if(arrValues==null)return null;
 		var objType=$.type(arrValues);
@@ -307,8 +310,9 @@ function CDO() {
 		}
 		return arrValues;		
 	};
-	//--------------设置数据---------------//
-	this.setByteValue = function (strFieldId, byValue) {
+	
+//====================设置数据===========================//	
+	CDO.prototype.setByteValue = function (strFieldId, byValue) {
 		try{
 			var arr=new Array();
 			arr.push(byValue);
@@ -318,7 +322,7 @@ function CDO() {
 			console.warn("setByteValue occur error,"+err);
 		}
 	};
-	this.setShortValue = function (strFieldId, shValue) {
+	CDO.prototype.setShortValue = function (strFieldId, shValue) {
 		try{
 			var arr=new Array();
 			arr.push(shValue);
@@ -328,7 +332,7 @@ function CDO() {
 			console.warn("setShortValue occur error,"+err);
 		}
 	};
-	this.setIntegerValue = function (strFieldId, nValue) {
+	CDO.prototype.setIntegerValue = function (strFieldId, nValue) {
 		try{
 			var arr=new Array();
 			arr.push(nValue);
@@ -338,7 +342,7 @@ function CDO() {
 			console.warn("setIntegerValue occur error,"+err);
 		}
 	};
-	this.setLongValue = function (strFieldId, lValue) {
+	CDO.prototype.setLongValue = function (strFieldId, lValue) {
 		try{
 			var arr=new Array();
 			arr.push(lValue);		
@@ -348,7 +352,7 @@ function CDO() {
 			console.warn("setLongValue occur error,"+err);
 		}
 	};
-	this.setBooleanValue = function (strFieldId, bValue) {
+	CDO.prototype.setBooleanValue = function (strFieldId, bValue) {
 		try{
 			var arr=new Array();
 			arr.push(bValue);				
@@ -358,7 +362,7 @@ function CDO() {
 			console.warn("setBooleanValue occur error,"+err);
 		}
 	};	
-	this.setFloatValue = function (strFieldId,fValue) {
+	CDO.prototype.setFloatValue = function (strFieldId,fValue) {
 		try{
 			var arr=new Array();
 			arr.push(fValue);			
@@ -368,7 +372,7 @@ function CDO() {
 			console.warn("setFloatValue occur error,"+err);
 		}
 	};
-	this.setDoubleValue = function (strFieldId, dblValue) {
+	CDO.prototype.setDoubleValue = function (strFieldId, dblValue) {
 		try{
 			var arr=new Array();
 			arr.push(dblValue);			
@@ -378,7 +382,7 @@ function CDO() {
 			console.warn("setDoubleValue occur error,"+err);
 		}
 	};
-	this.setStringValue = function (strFieldId,strValue) {
+	CDO.prototype.setStringValue = function (strFieldId,strValue) {
 		try{
 			this.checkField(strFieldId);
 			var objType=$.type(strValue);
@@ -396,7 +400,7 @@ function CDO() {
 			console.warn("setStringValue occur error,"+err);
 		}
 	};	
-	this.setDateValue = function (strFieldId,dateValue) {
+	CDO.prototype.setDateValue = function (strFieldId,dateValue) {
 		try{
 			var arr=new Array();
 			arr.push(dateValue);				
@@ -406,7 +410,7 @@ function CDO() {
 			console.warn("setDateValue occur error,"+err);
 		}
 	};
-	this.setTimeValue = function (strFieldId, timeValue) {
+	CDO.prototype.setTimeValue = function (strFieldId, timeValue) {
 		try{
 			var arr=new Array();
 			arr.push(timeValue);	
@@ -416,7 +420,7 @@ function CDO() {
 			console.warn("setTimeValue occur error,"+err);
 		}
 	};
-	this.setDateTimeValue = function (strFieldId, dtValue) {
+	CDO.prototype.setDateTimeValue = function (strFieldId, dtValue) {
 		try{
 			var arr=new Array();
 			arr.push(dtValue);	
@@ -426,7 +430,7 @@ function CDO() {
 			console.warn("setDateTimeValue occur error,"+err);
 		}
 	};	
-	this.setCDOValue = function (strFieldId, cdoValue) {
+	CDO.prototype.setCDOValue = function (strFieldId, cdoValue) {
 		if(cdoValue instanceof CDO){
 			this.put(strFieldId,cdoValue);	
 		}else{
@@ -434,7 +438,7 @@ function CDO() {
 		}		
 	};
 	
-	this.regByteVal=function(strFieldId,byValues){
+	CDO.prototype.regByteVal=function(strFieldId,byValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,byValues);
 		var rules="^-?\\d{1,3}$";
@@ -452,7 +456,7 @@ function CDO() {
 		}
 		return byValues;
 	};
-	this.regShortVal=function(strFieldId,shValues){
+	CDO.prototype.regShortVal=function(strFieldId,shValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,shValues);
 		var rules="^-?\\d{1,5}$";
@@ -470,7 +474,7 @@ function CDO() {
 		}
 		return shValues;
 	};	
-	this.regIntegerVal=function(strFieldId,nValues){
+	CDO.prototype.regIntegerVal=function(strFieldId,nValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,nValues);
 		var rules="^-?\\d{1,10}$";		
@@ -489,7 +493,7 @@ function CDO() {
 		return nValues;
 	};	
 	
-	this.regLongVal=function(strFieldId,lValues){
+	CDO.prototype.regLongVal=function(strFieldId,lValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,lValues);		
 		var rules="^-?\\d{1,19}$";
@@ -508,7 +512,7 @@ function CDO() {
 		return lValues;
 	};	
 	
-	this.regBooleanVal=function(strFieldId,bValues){
+	CDO.prototype.regBooleanVal=function(strFieldId,bValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,bValues);	
 		
@@ -556,7 +560,7 @@ function CDO() {
 		}
 		return bValues;
 	};		
-	this.regFloatVal=function(strFieldId,fValues){
+	CDO.prototype.regFloatVal=function(strFieldId,fValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,fValues);	
 		var rules="^-?\\d*\\.\\d+$";
@@ -571,7 +575,7 @@ function CDO() {
 		return fValues;
 	};
 	
-	this.decodeHtml=function(strValue){
+	CDO.prototype.decodeHtml=function(strValue){
 		var s="";
 		if(strValue!=null && strValue.length>0){
 			s= strValue.replace(/&amp;/g,"&");
@@ -585,7 +589,7 @@ function CDO() {
 		}
 		return s;		
 	};	
-	this.encodeHtml=function(str){
+	CDO.prototype.encodeHtml=function(str){
 		var s = "";
 		if(str!=null && str.length >0){
 			s = str.replace(/&/g,"&amp;");
@@ -600,7 +604,7 @@ function CDO() {
 		}
 		return s;
 	};	
-	this.regDateVal=function(strFieldId,dateValues){
+	CDO.prototype.regDateVal=function(strFieldId,dateValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,dateValues);	
 		var rules="^\\d{4}-(1[0-2]|0[1-9])-([12][0-9]|3[01]|0[1-9])$";
@@ -622,7 +626,7 @@ function CDO() {
 		}
 		return retArr;
 	};	
-	this.regTimeVal=function(strFieldId,timeValues){
+	CDO.prototype.regTimeVal=function(strFieldId,timeValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,timeValues);			
 		var rules="^([01][0-9]|[2][0-3]):[0-5][0-9]:[0-5][0-9]$";
@@ -644,7 +648,7 @@ function CDO() {
 		}
 		return retArr;
 	};	
-	this.regDateTimeVal=function(strFieldId,dtValues){
+	CDO.prototype.regDateTimeVal=function(strFieldId,dtValues){
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,dtValues);	
 		var rules="^\\d{4}-(1[0-2]|0[1-9])-([12][0-9]|3[01]|0[1-9]) ([01][0-9]|[2][0-3]):[0-5][0-9]:[0-5][0-9]$";
@@ -657,13 +661,13 @@ function CDO() {
 		}
 		return dtValues;
 	};
-	this.checkArrVal=function(strFieldId,arrValues){
+	CDO.prototype.checkArrVal=function(strFieldId,arrValues){
 		var objType=$.type(arrValues);
 		if(objType!="array"){
 			throw "Invalid FieldId " + strFieldId+",value is not array";
 		}	
 	};
-	this.checkField=function(strFieldId){	
+	CDO.prototype.checkField=function(strFieldId){	
 		//var rules="^((?!\\.).)*$";
 		var rules="^[a-zA-Z][0-9A-Za-z\\-_]{0,15}$"
 		var exp = new RegExp(rules);
@@ -672,7 +676,7 @@ function CDO() {
 				throw "Invalid FieldId " + strFieldId+",strFieldId rule is "+rules;
 		}
 	};		
-	this.setByteArrayValue = function (strFieldId, bysValue) {
+	CDO.prototype.setByteArrayValue = function (strFieldId, bysValue) {
 		try{		
 			var value=this.regByteVal(strFieldId,bysValue);
 			this.put(strFieldId,value);
@@ -680,7 +684,7 @@ function CDO() {
 			console.warn("setByteArrayValue occur error,"+err);
 		 }
 	};
-	this.setShortArrayValue = function (strFieldId, shsValue) {
+	CDO.prototype.setShortArrayValue = function (strFieldId, shsValue) {
 		try{
 			var value=this.regShortVal(strFieldId,shsValue);
 			this.put(strFieldId,value);
@@ -688,7 +692,7 @@ function CDO() {
 			console.warn("setShortArrayValue occur error,"+err);
 		  }
 	};
-	this.setIntegerArrayValue = function (strFieldId, nsValue) {
+	CDO.prototype.setIntegerArrayValue = function (strFieldId, nsValue) {
 		try{
 			var value=this.regIntegerVal(strFieldId,nsValue);
 			this.put(strFieldId,value);
@@ -696,7 +700,7 @@ function CDO() {
 			console.warn("setIntegerArrayValue occur error,"+err);
 		}
 	};
-	this.setLongArrayValue = function (strFieldId, lsValue) {
+	CDO.prototype.setLongArrayValue = function (strFieldId, lsValue) {
 		try{
 			var value=this.regLongVal(strFieldId,lsValue);
 			this.put(strFieldId,value);
@@ -704,7 +708,7 @@ function CDO() {
 			console.warn("setLongArrayValue occur error,"+err);
 		}
 	};
-	this.setBooleanArrayValue=function(strFieldId,bsValue){
+	CDO.prototype.setBooleanArrayValue=function(strFieldId,bsValue){
 		try{
 			var value=this.regBooleanVal(strFieldId,bsValue);
 			this.put(strFieldId,value);
@@ -713,7 +717,7 @@ function CDO() {
 		}	
 		
 	};
-	this.setFloatArrayValue = function (strFieldId, fsValue) {
+	CDO.prototype.setFloatArrayValue = function (strFieldId, fsValue) {
 		try{
 			var value=this.regFloatVal(strFieldId,fsValue);
 			this.put(strFieldId,value);
@@ -721,7 +725,7 @@ function CDO() {
 			console.warn("setFloatArrayValue occur error,"+err);
 		 }
 	};
-	this.setDoubleArrayValue = function (strFieldId, dblsValue) {
+	CDO.prototype.setDoubleArrayValue = function (strFieldId, dblsValue) {
 		try{
 			var value=this.regFloatVal(strFieldId,dblsValue);
 			this.put(strFieldId,value);
@@ -729,7 +733,7 @@ function CDO() {
 			console.warn("setDoubleArrayValue occur error,"+err);
 		}
 	};
-	this.setStringArrayValue = function (strFieldId,strsValue) {
+	CDO.prototype.setStringArrayValue = function (strFieldId,strsValue) {
 		this.checkField(strFieldId);
 		this.checkArrVal(strFieldId,strsValue);
 		for(var i=0;i<strsValue.length;i++){
@@ -746,7 +750,7 @@ function CDO() {
 		}
 		this.put(strFieldId,strsValue);
 	};
-	this.setDateArrayValue = function (strFieldId, strsValue) {
+	CDO.prototype.setDateArrayValue = function (strFieldId, strsValue) {
 		try{
 			var value=this.regDateVal(strFieldId,strsValue);
 			this.put(strFieldId,value);
@@ -754,7 +758,7 @@ function CDO() {
 			console.warn("setDateArrayValue occur error,"+err);
 		 }
 	};
-	this.setTimeArrayValue = function (strFieldId, strsValue) {
+	CDO.prototype.setTimeArrayValue = function (strFieldId, strsValue) {
 		try{
 			var value=this.regTimeVal(strFieldId,strsValue);
 			this.put(strFieldId,value);
@@ -762,7 +766,7 @@ function CDO() {
 			console.warn("setTimeArrayValue occur error,"+err);
 		 }
 	};
-	this.setDateTimeArrayValue = function (strFieldId, strsValue) {
+	CDO.prototype.setDateTimeArrayValue = function (strFieldId, strsValue) {
 		try{
 			var value=this.regDateTimeVal(strFieldId,strsValue);
 			this.put(strFieldId,value);
@@ -770,7 +774,7 @@ function CDO() {
 			console.warn("setDateTimeArrayValue occur error,"+err);
 		}
 	};
-	this.setCDOArrayValue = function (strFieldId, cdosValue) {
+	CDO.prototype.setCDOArrayValue = function (strFieldId, cdosValue) {
 		var objType=$.type(cdosValue);
 		if(objType!="array"){
 			throw "Invalid FieldId " + strFieldId+",value is not CDOArray,value="+cdosValue;
@@ -784,20 +788,20 @@ function CDO() {
 		this.put(strFieldId,cdosValue);
 	};
 	
-	this.getItem=function(){
+	CDO.prototype.getItem=function(){
 		return this.hmItem;
 	};
 	 
-	this.toJSON=function(){
+	CDO.prototype.toJSON=function(){
 		var JSONObject={};
 		this.stringifyJSON(JSONObject,this.getItem());
 		return JSONObject;
 	} 
-	this.toString = function()
+	CDO.prototype.toString = function()
 	{
 		return JSON.stringify(this.toJSON());
 	};
-	this.stringifyJSON=function(_JSONObject,_hmItem){
+	CDO.prototype.stringifyJSON=function(_JSONObject,_hmItem){
 		for(var key in _hmItem){
 			var value=_hmItem[key];
 			var objType=$.type(value);			
@@ -817,7 +821,7 @@ function CDO() {
 			}			
 		}
 	};
-	this.stringifyJSONArray=function(_JSONObject,_key,_array){
+	CDO.prototype.stringifyJSONArray=function(_JSONObject,_key,_array){
 		if(_array.length==0){
 			_JSONObject[_key]=_array;		
 		}else{
@@ -837,5 +841,3 @@ function CDO() {
 			}
 		}
 	};
-	
-};

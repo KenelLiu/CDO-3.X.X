@@ -150,11 +150,11 @@ public abstract class TransService implements ITransService
 			}catch (SQLException e) {
 				logger.error(strTransName+":调用开启/提交事务时发生错误,message="+e.getMessage(),e);
 				if(autoStartTransaction){try{rollback(transaction,dataGroupId);} catch (SQLException e1){}}
-				return Return.valueOf(-99,"处理数据发生异常,请查看后台日志.");
+				return Return.valueOf(-99,"调用某些方法处理数据发生错误,请查看后台日志.");
 			}catch(Throwable e){
 				logger.error(strTransName+":函数调用发生错误,message="+e.getMessage(),e);
 				if(autoStartTransaction){try{rollback(transaction,dataGroupId);} catch (SQLException e1){}}
-				return Return.valueOf(-99, "处理数据发生异常,请查看后台日志.");
+				return Return.valueOf(-99, "调用某些方法处理数据发生错误,请查看后台日志.");
 			}finally{
 				pop(transactionChain);
 			}
