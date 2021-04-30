@@ -11,14 +11,14 @@ package com.cdoframework.cdolib.database.xsd.descriptors;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import com.cdoframework.cdolib.database.xsd.SQLBlockTypeItem;
+import com.cdoframework.cdolib.database.xsd.Switch;
 
 /**
  * 
  * 
  * @version $Revision$ $Date$
  */
-public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class SwitchDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
     /**
      * Field _elementDefinition.
@@ -45,38 +45,36 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
      */
     private org.exolab.castor.xml.XMLFieldDescriptor _identity;
 
-    public SQLBlockTypeItemDescriptor() {
+    public SwitchDescriptor() {
         super();
-        _xmlName = "SQLBlockType";
-        _elementDefinition = false;
+        _xmlName = "Switch";
+        _elementDefinition = true;
 
         //-- set grouping compositor
-        setCompositorAsChoice();
+        setCompositorAsSequence();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
 
-        //-- initialize element descriptors
-
-        //-- outputTable
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "outputTable", "OutputTable", org.exolab.castor.xml.NodeType.Element);
+        //-- var
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "var", "Var", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {
             @Override
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getOutputTable();
+                Switch target = (Switch) object;
+                return target.getVar();
             }
             @Override
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setOutputTable( (java.lang.String) value);
+                    Switch target = (Switch) object;
+                    target.setVar( (java.lang.String) value);
                 } catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
@@ -92,9 +90,8 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
         desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
-        addSequenceElement(desc);
 
-        //-- validation code for: outputTable
+        //-- validation code for: var
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
@@ -102,73 +99,29 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
             typeValidator = new org.exolab.castor.xml.validators.StringValidator();
             fieldValidator.setValidator(typeValidator);
             typeValidator.addPattern("\\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\\.|\\[|\\])*\\}");
-            typeValidator.setWhiteSpace("preserve");
-        }
-        desc.setValidator(fieldValidator);
-        //-- outputSQL
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "outputSQL", "OutputSQL", org.exolab.castor.xml.NodeType.Element);
-        desc.setImmutable(true);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getOutputSQL();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setOutputSQL( (java.lang.String) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
-            }
-        };
-        desc.setSchemaType("string");
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-        addSequenceElement(desc);
-
-        //-- validation code for: outputSQL
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-            org.exolab.castor.xml.validators.StringValidator typeValidator;
-            typeValidator = new org.exolab.castor.xml.validators.StringValidator();
-            fieldValidator.setValidator(typeValidator);
             typeValidator.setWhiteSpace("preserve");
             typeValidator.setMinLength(1);
         }
         desc.setValidator(fieldValidator);
-        //-- outputField
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "outputField", "OutputField", org.exolab.castor.xml.NodeType.Element);
-        desc.setImmutable(true);
+        //-- initialize element descriptors
+
+        //-- caseNull
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.CaseNull.class, "caseNull", "CaseNull", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {
             @Override
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getOutputField();
+                Switch target = (Switch) object;
+                return target.getCaseNull();
             }
             @Override
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setOutputField( (java.lang.String) value);
+                    Switch target = (Switch) object;
+                    target.setCaseNull( (com.cdoframework.cdolib.database.xsd.CaseNull) value);
                 } catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
@@ -176,84 +129,45 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
             @Override
             @SuppressWarnings("unused")
             public java.lang.Object newInstance(java.lang.Object parent) {
-                return null;
+                return new com.cdoframework.cdolib.database.xsd.CaseNull();
             }
         };
-        desc.setSchemaType("string");
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.CaseNull");
         desc.setHandler(handler);
-        desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         addSequenceElement(desc);
 
-        //-- validation code for: outputField
+        //-- validation code for: caseNull
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-            org.exolab.castor.xml.validators.StringValidator typeValidator;
-            typeValidator = new org.exolab.castor.xml.validators.StringValidator();
-            fieldValidator.setValidator(typeValidator);
-            typeValidator.addPattern("\\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\\.|\\[|\\])*\\}");
-            typeValidator.setWhiteSpace("preserve");
-        }
-        desc.setValidator(fieldValidator);
-        //-- SQLIf
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.SQLIf.class, "SQLIf", "SQLIf", org.exolab.castor.xml.NodeType.Element);
-        handler = new org.exolab.castor.xml.XMLFieldHandler() {
-            @Override
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getSQLIf();
-            }
-            @Override
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setSQLIf( (com.cdoframework.cdolib.database.xsd.SQLIf) value);
-                } catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            @Override
-            @SuppressWarnings("unused")
-            public java.lang.Object newInstance(java.lang.Object parent) {
-                return new com.cdoframework.cdolib.database.xsd.SQLIf();
-            }
-        };
-        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.SQLIf");
-        desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-        addSequenceElement(desc);
-
-        //-- validation code for: SQLIf
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-        //-- SQLFor
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.SQLFor.class, "SQLFor", "SQLFor", org.exolab.castor.xml.NodeType.Element);
+        //-- _caseList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Case.class, "_caseList", "Case", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {
             @Override
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getSQLFor();
+                Switch target = (Switch) object;
+                return target.getCase();
             }
             @Override
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setSQLFor( (com.cdoframework.cdolib.database.xsd.SQLFor) value);
+                    Switch target = (Switch) object;
+                    target.addCase( (com.cdoframework.cdolib.database.xsd.Case) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue(Object object) throws IllegalStateException, IllegalArgumentException {
+                try {
+                    Switch target = (Switch) object;
+                    target.removeAllCase();
                 } catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
@@ -261,39 +175,39 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
             @Override
             @SuppressWarnings("unused")
             public java.lang.Object newInstance(java.lang.Object parent) {
-                return new com.cdoframework.cdolib.database.xsd.SQLFor();
+                return new com.cdoframework.cdolib.database.xsd.Case();
             }
         };
-        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.SQLFor");
+        desc.setSchemaType("list");
+        desc.setComponentType("com.cdoframework.cdolib.database.xsd.Case");
         desc.setHandler(handler);
-        desc.setRequired(true);
-        desc.setMultivalued(false);
+        desc.setMultivalued(true);
         addFieldDescriptor(desc);
         addSequenceElement(desc);
 
-        //-- validation code for: SQLFor
+        //-- validation code for: _caseList
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
+        fieldValidator.setMinOccurs(0);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-        //-- SQLSwitch
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.SQLSwitch.class, "SQLSwitch", "SQLSwitch", org.exolab.castor.xml.NodeType.Element);
+        //-- _default
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Default.class, "_default", "Default", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {
             @Override
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                return target.getSQLSwitch();
+                Switch target = (Switch) object;
+                return target.getDefault();
             }
             @Override
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SQLBlockTypeItem target = (SQLBlockTypeItem) object;
-                    target.setSQLSwitch( (com.cdoframework.cdolib.database.xsd.SQLSwitch) value);
+                    Switch target = (Switch) object;
+                    target.setDefault( (com.cdoframework.cdolib.database.xsd.Default) value);
                 } catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
@@ -301,19 +215,17 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
             @Override
             @SuppressWarnings("unused")
             public java.lang.Object newInstance(java.lang.Object parent) {
-                return new com.cdoframework.cdolib.database.xsd.SQLSwitch();
+                return new com.cdoframework.cdolib.database.xsd.Default();
             }
         };
-        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.SQLSwitch");
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.Default");
         desc.setHandler(handler);
-        desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         addSequenceElement(desc);
 
-        //-- validation code for: SQLSwitch
+        //-- validation code for: _default
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
@@ -347,7 +259,7 @@ public class SQLBlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLCl
      */
     @Override()
     public java.lang.Class getJavaClass() {
-        return com.cdoframework.cdolib.database.xsd.SQLBlockTypeItem.class;
+        return com.cdoframework.cdolib.database.xsd.Switch.class;
     }
 
     /**

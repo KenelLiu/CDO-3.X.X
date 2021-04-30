@@ -10,23 +10,33 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.cdo.field.Field;
+import com.cdo.field.FieldType;
 import com.cdo.util.sql.SQLUtil;
 import com.cdoframework.cdolib.base.Return;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
 import com.cdoframework.cdolib.database.xsd.BlockType;
 import com.cdoframework.cdolib.database.xsd.BlockTypeItem;
+import com.cdoframework.cdolib.database.xsd.Case;
+import com.cdoframework.cdolib.database.xsd.CaseNull;
+import com.cdoframework.cdolib.database.xsd.Default;
 import com.cdoframework.cdolib.database.xsd.Delete;
 import com.cdoframework.cdolib.database.xsd.Else;
 import com.cdoframework.cdolib.database.xsd.For;
 import com.cdoframework.cdolib.database.xsd.If;
 import com.cdoframework.cdolib.database.xsd.Insert;
+import com.cdoframework.cdolib.database.xsd.NullSQLThen;
+import com.cdoframework.cdolib.database.xsd.NullThen;
 import com.cdoframework.cdolib.database.xsd.OnException;
 import com.cdoframework.cdolib.database.xsd.SQLBlockType;
 import com.cdoframework.cdolib.database.xsd.SQLBlockTypeItem;
+import com.cdoframework.cdolib.database.xsd.SQLCase;
+import com.cdoframework.cdolib.database.xsd.SQLCaseNull;
+import com.cdoframework.cdolib.database.xsd.SQLDefault;
 import com.cdoframework.cdolib.database.xsd.SQLElse;
 import com.cdoframework.cdolib.database.xsd.SQLFor;
 import com.cdoframework.cdolib.database.xsd.SQLIf;
+import com.cdoframework.cdolib.database.xsd.SQLSwitch;
 import com.cdoframework.cdolib.database.xsd.SQLThen;
 import com.cdoframework.cdolib.database.xsd.SQLTrans;
 import com.cdoframework.cdolib.database.xsd.SQLTransChoiceItem;
@@ -35,6 +45,7 @@ import com.cdoframework.cdolib.database.xsd.SelectRecord;
 import com.cdoframework.cdolib.database.xsd.SelectRecordSet;
 import com.cdoframework.cdolib.database.xsd.SelectTable;
 import com.cdoframework.cdolib.database.xsd.SetVar;
+import com.cdoframework.cdolib.database.xsd.Switch;
 import com.cdoframework.cdolib.database.xsd.Then;
 import com.cdoframework.cdolib.database.xsd.Update;
 import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
@@ -54,71 +65,7 @@ public class DataServiceParse
 	//内部类,所有内部类在此声明----------------------------------------------------------------------------------
 
 	//静态对象,所有static在此声明并初始化------------------------------------------------------------------------
-	Logger logger  = Logger.getLogger(DataServiceParse.class);
-
-	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException{
-		int nReturnItemCount=returnObject.getReturnItemCount();
-		for(int j=0;j<nReturnItemCount;j++)
-		{
-			String strFieldId=returnObject.getReturnItem(j).getFieldId();
-			String strValueId=returnObject.getReturnItem(j).getValueId();
-			strFieldId=strFieldId.substring(1,strFieldId.length()-1);
-			strValueId=strValueId.substring(1,strValueId.length()-1);
-			Field object=null;
-			try
-			{
-				if(cdoRequest.exists(strValueId))
-					object=cdoRequest.getObject(strValueId);
-			}
-			catch(Exception e)
-			{
-				continue;
-			}
-
-			// 输出
-			if(object==null)
-			{
-				continue;
-			}
-		
-			Object objValue=object.getObjectValue();
-			//=======设置返回数据=======//
-			DataEngineHelp.setFieldValue(cdoResponse, object.getFieldType(), strFieldId, objValue);			
-		}
-		ret.setCode(returnObject.getCode());
-		ret.setInfo(returnObject.getInfo());
-		ret.setText(returnObject.getText());
-	}
-	/**
-	 * 检查If的条件
-	 * @param strValue1
-	 * @param strOperator
-	 * @param strValue2
-	 * @param strType
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean checkCondition(String strValue1,String strOperator,String strValue2,IfTypeType ifType,String strType,CDO cdoRequest)
-	{
-		return DataEngineHelp.checkCondition(strValue1, strOperator, strValue2, ifType, strType, cdoRequest);
-	}
-
-	/**
-	 * 检查If的条件
-	 * 
-	 * @param strValue1
-	 * @param strOperator
-	 * @param strValue2
-	 * @param strType
-	 * @param cdoRequest
-	 * @return
-	 * @throws Exception
-	 */
-	protected boolean checkCondition(String strValue1,String strOperator,String strValue2,SQLIfTypeType sqlIfType,String strType,CDO cdoRequest)
-	{
-		return DataEngineHelp.checkCondition(strValue1, strOperator, strValue2, sqlIfType, strType, cdoRequest);
-	}
+	Logger logger  = Logger.getLogger(DataServiceParse.class);	
 	/**
 	 * 处理SQL语句中的If语句
 	 * 
@@ -129,9 +76,18 @@ public class DataServiceParse
 	 */
 	private int handleSQLIf(SQLIf sqlIf,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap)
 	{
-		// 检查执行条件
-		boolean bCondition=checkCondition(sqlIf.getValue1(),sqlIf.getOperator().toString(),sqlIf.getValue2(),sqlIf
-						.getType(),sqlIf.getType().toString(),cdoRequest);
+		//============处理NullThen========//
+		NullSQLThen nullSqlThen=sqlIf.getNullSQLThen();
+		if(nullSqlThen!=null){
+			String strValue1=sqlIf.getValue1();
+			strValue1=strValue1.substring(1,strValue1.length()-1);
+			boolean isExist=cdoRequest.exists(strValue1);
+			if(!isExist){
+				return handleSQLBlock(nullSqlThen,cdoRequest,strbSQL,selTblMap);
+			}
+		}
+		//=============其它正常情况.检查执行条件==========//
+		boolean bCondition=DataEngineHelp.checkCondition(sqlIf,cdoRequest);
 		if(bCondition==true)
 		{// Handle Then
 			SQLThen sqlThen=sqlIf.getSQLThen();
@@ -145,7 +101,7 @@ public class DataServiceParse
 				return 0;
 			}
 			return handleSQLBlock(sqlElse,cdoRequest,strbSQL,selTblMap);
-		}
+		}			
 	}
 	/**
 	 * 处理SQL语句中的For语句
@@ -196,7 +152,56 @@ public class DataServiceParse
 
 		return 0;
 	}
-
+	/**
+	 * 处理SQLBlock对象，得到输出的SQL语句
+	 * 
+	 * @param sqlBlock
+	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
+	 */
+	private int handleSQLSwitch(SQLSwitch sqlSwitch,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap){
+		String var=sqlSwitch.getVar();		
+		var=var.substring(1,var.length()-1);
+		boolean isExist=cdoRequest.exists(var);
+		//=========处理为CaseNull的情况========//
+		SQLCaseNull caseNull=sqlSwitch.getSQLCaseNull();
+		if(caseNull!=null && !isExist){
+			return handleSQLBlock(caseNull,cdoRequest,strbSQL,selTblMap);
+		}
+		//===========处理Case情况==========//
+		String varValue=cdoRequest.getObjectValue(var).toString();		
+		SQLCase[] cases=sqlSwitch.getSQLCase();
+		if(cases!=null && cases.length>0){
+			for(int i=0;i<cases.length;i++){
+				String value=cases[i].getValue();
+				if(value.startsWith("{") && value.endsWith("}")){
+					value=value.substring(1,value.length()-1);
+					value=cdoRequest.getObjectValue(value).toString();
+				}
+				//========值有分隔符===========//
+				String separate=cases[i].getSeparate();
+				if(separate!=null && !separate.equals("")){
+					String[] args=value.split(separate);
+					for(int k=0;k<args.length;k++){
+						if(varValue.equals(args[k])){														
+							return handleSQLBlock(cases[i],cdoRequest,strbSQL,selTblMap);					
+						}	
+					}
+				}else{
+					//========值没有分隔符=========//
+					if(varValue.equals(value)){													
+						return handleSQLBlock(cases[i],cdoRequest,strbSQL,selTblMap);			
+					}	
+				}					
+				
+			}
+		}			
+		//===========处理Case default情况==========//
+		SQLDefault defaults=sqlSwitch.getSQLDefault();
+		if(defaults!=null){			
+			return handleSQLBlock(defaults,cdoRequest,strbSQL,selTblMap);					
+		}			
+		return 0;
+	}
 	/**
 	 * 处理SQLBlock对象，得到输出的SQL语句
 	 * 
@@ -253,6 +258,17 @@ public class DataServiceParse
 				else
 				{// 碰到Break或Return
 					return nResult;
+				}				
+			}else if(item.getSQLSwitch()!=null){
+				//SQLSwitch
+				int nResult=handleSQLSwitch(item.getSQLSwitch(),cdoRequest,strbSQL,selTblMap);
+				if(nResult==0)
+				{// 自然执行完毕
+					continue;
+				}
+				else
+				{// 碰到Break或Return
+					return nResult;
 				}
 			}
 			else
@@ -264,7 +280,7 @@ public class DataServiceParse
 		// 自然执行完毕
 		return 0;
 	}
-
+	
 	/**
 	 * 处理If语句
 	 * 
@@ -275,8 +291,17 @@ public class DataServiceParse
 	 */
 	private int handleIf(IDataEngine dataEngine ,Connection connection,If ifItem,CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException
 	{
-		// 检查执行条件
-		boolean bCondition=checkCondition(ifItem.getValue1(),ifItem.getOperator().toString(),ifItem.getValue2(),ifItem.getType(),ifItem.getType().toString(),cdoRequest);
+		//==============检查NullThen====================//
+		NullThen nullThen=ifItem.getNullThen();
+		if(nullThen!=null ){
+			String strValue1=ifItem.getValue1();
+			strValue1=strValue1.substring(1,strValue1.length()-1);
+			boolean isExist=cdoRequest.exists(strValue1);			
+			if(!isExist)
+				return handleBlock(dataEngine,connection,nullThen,cdoRequest,cdoResponse,ret,selTblMap);
+		}
+		//============检查其它正常执行条件===============//
+		boolean bCondition=DataEngineHelp.checkCondition(ifItem,cdoRequest);
 		if(bCondition==true)
 		{// Handle Then
 			Then thenItem=ifItem.getThen();
@@ -341,7 +366,53 @@ public class DataServiceParse
 
 		return 0;
 	}
-
+	/**
+	 * 处理SQLBlock对象，得到输出的SQL语句
+	 * 
+	 * @param sqlBlock
+	 * @return 0-自然执行完毕，1-碰到Break退出，2-碰到Return退出
+	 */
+	private int handleSwitch(IDataEngine dataEngine ,Connection connection,Switch switchs,CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException{
+		String var=switchs.getVar();		
+		var=var.substring(1,var.length()-1);
+		boolean isExist=cdoRequest.exists(var);
+		//=======处理为CaseNull的情况=======//
+		CaseNull caseNull=switchs.getCaseNull();
+		if(caseNull!=null && !isExist){
+			return handleBlock(dataEngine,connection,caseNull,cdoRequest,cdoResponse,ret,selTblMap);
+		}
+		//=======处理Case情况=============//
+		String varValue=cdoRequest.getObjectValue(var).toString();	
+		Case[] cases=switchs.getCase();
+		if(cases!=null && cases.length>0){
+			for(int i=0;i<cases.length;i++){
+				String value=cases[i].getValue();
+				if(value.startsWith("{") && value.endsWith("}")){
+					value=value.substring(1,value.length()-1);
+					value=cdoRequest.getObjectValue(value).toString();
+				}
+				String separate=cases[i].getSeparate();
+				if(separate!=null && !separate.equals("")){
+					String[] args=value.split(separate);
+					for(int k=0;k<args.length;k++){
+						if(varValue.equals(args[k])){
+							return handleBlock(dataEngine,connection,cases[i],cdoRequest,cdoResponse,ret,selTblMap);				
+						}	
+					}
+				}else{
+					if(varValue.equals(value)){
+						return handleBlock(dataEngine,connection,cases[i],cdoRequest,cdoResponse,ret,selTblMap);					
+					}	
+				}
+			}
+		}
+		//===========处理Case Default情况==========//
+		Default defaults=switchs.getDefault();
+		if(defaults!=null){			
+			return handleBlock(dataEngine,connection,defaults,cdoRequest,cdoResponse,ret,selTblMap);					
+		}			
+		return 0;
+	}
 
 	/*
 	 * 处理每个block内容
@@ -350,11 +421,11 @@ public class DataServiceParse
 	 */
 	private int handleBlock(IDataEngine dataEngine,Connection connection,BlockType block,
 							CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException
-	{
+	{		
 		int nItemCount=block.getBlockTypeItemCount();
 		for(int i=0;i<nItemCount;i++)
 		{
-			BlockTypeItem blockItem=block.getBlockTypeItem(i);
+			BlockTypeItem blockItem=block.getBlockTypeItem(i);			
 			if(blockItem.getSelectTable()!=null){
 				// 获得将要执行的SQL
 				SelectTable selectTable=(SelectTable)blockItem.getSelectTable();
@@ -509,9 +580,18 @@ public class DataServiceParse
 				{// 碰到Break或Return
 					return nResult;
 				}
-			}
-			else if(blockItem.getReturn()!=null)
-			{
+			}else if(blockItem.getSwitch()!=null){
+				int nResult=this.handleSwitch(dataEngine,connection,(Switch)blockItem.getSwitch(),cdoRequest,cdoResponse,ret,selTblMap);
+				if(nResult==0)
+				{// 自然执行完毕
+					continue;
+				}
+				else
+				{// 碰到Break或Return
+					return nResult;
+				}				
+			}else if(blockItem.getReturn()!=null){
+				
 				com.cdoframework.cdolib.database.xsd.Return returnObject=(com.cdoframework.cdolib.database.xsd.Return)blockItem.getReturn();
 				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
 
@@ -658,71 +738,55 @@ public class DataServiceParse
 			{
 				SQLTransChoiceItem transItem=trans.getSQLTransChoice().getSQLTransChoiceItem(i);
 				BlockTypeItem blockItem=null;
-				if(transItem.getSelectTable()!=null){
-					
+				if(transItem.getSelectTable()!=null){					
 					blockItem=new BlockTypeItem();
 					blockItem.setSelectTable(transItem.getSelectTable());
 					if(selTblMap==null)
 						selTblMap=new HashMap<String,String>(5);
-				}
-				else if(transItem.getInsert()!=null)
-				{
+				}else if(transItem.getInsert()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setInsert(transItem.getInsert());
-				}
-				else if(transItem.getUpdate()!=null)
-				{
+				}else if(transItem.getUpdate()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setUpdate(transItem.getUpdate());
-				}
-				else if(transItem.getDelete()!=null)
-				{
+				}else if(transItem.getDelete()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setDelete(transItem.getDelete());
-				}
-				else if(transItem.getSelectRecordSet()!=null)
-				{
+				}else if(transItem.getSelectRecordSet()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setSelectRecordSet(transItem.getSelectRecordSet());
-				}
-				else if(transItem.getSelectRecord()!=null)
-				{
+				}else if(transItem.getSelectRecord()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setSelectRecord(transItem.getSelectRecord());
-				}
-				else if(transItem.getSelectField()!=null)
-				{
+				}else if(transItem.getSelectField()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setSelectField(transItem.getSelectField());
-				}
-				else if(transItem.getIf()!=null)
-				{
+				}else if(transItem.getIf()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setIf(transItem.getIf());
-				}
-				else if(transItem.getFor()!=null)
-				{
+				}else if(transItem.getFor()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setFor(transItem.getFor());
-				}
-				else if(transItem.getSetVar()!=null){
+				}else if(transItem.getSwitch()!=null){
+					blockItem=new BlockTypeItem();
+					blockItem.setSwitch(transItem.getSwitch());
+				}else if(transItem.getSetVar()!=null){
 					blockItem=new BlockTypeItem();
 					blockItem.setSetVar(transItem.getSetVar());
 				}
-				if(blockItem!=null)
-				{
+				//==========若block不为null,添加后进行集中处理======//
+				if(blockItem!=null){
 					block.addBlockTypeItem(blockItem);
 				}
 			}
 
-			// 处理事务
+			//============处理bolck里代码==============//
 			int nResult=handleBlock(dataEngine,connection,block,cdoRequest,cdoResponse,ret,selTblMap);
 			if(nResult!=2){
 				// Break或自然执行完毕退出
 				com.cdoframework.cdolib.database.xsd.Return returnObject=trans.getReturn();
 				this.handleReturn(returnObject,cdoRequest,cdoResponse,ret);
-			}
-			
+			}			
 			if(transactionStatus.isNewConn && transactionStatus.isTransaction){
 				connection.commit();
 			}			
@@ -764,7 +828,40 @@ public class DataServiceParse
 		}		
 		return ret;
 	}
-
+	/**
+	 * 处理返回
+	 * @param returnObject
+	 * @param cdoRequest
+	 * @param cdoResponse
+	 * @param ret
+	 * @throws SQLException
+	 */
+	private void handleReturn(com.cdoframework.cdolib.database.xsd.Return returnObject,CDO cdoRequest,CDO cdoResponse,Return ret) throws SQLException{
+		int nReturnItemCount=returnObject.getReturnItemCount();
+		for(int j=0;j<nReturnItemCount;j++){
+			String strFieldId=returnObject.getReturnItem(j).getFieldId();
+			String strValueId=returnObject.getReturnItem(j).getValueId();
+			strFieldId=strFieldId.substring(1,strFieldId.length()-1);
+			strValueId=strValueId.substring(1,strValueId.length()-1);
+			Field object=null;
+			try{
+				if(cdoRequest.exists(strValueId))
+					object=cdoRequest.getObject(strValueId);
+			}catch(Exception e){
+				continue;
+			}
+			// 输出
+			if(object==null){
+				continue;
+			}		
+			Object objValue=object.getObjectValue();
+			//=======设置返回数据=======//
+			DataEngineHelp.setFieldValue(cdoResponse, object.getFieldType(), strFieldId, objValue);			
+		}
+		ret.setCode(returnObject.getCode());
+		ret.setInfo(returnObject.getInfo());
+		ret.setText(returnObject.getText());
+	}
 	//公共方法,所有可提供外部使用的函数在此定义为public方法------------------------------------------------------
 	
 	public Return handleTrans(HashMap<String,IDataEngine> hmDataEngine,SQLTrans sqlTrans, CDO cdoRequest,CDO cdoResponse)

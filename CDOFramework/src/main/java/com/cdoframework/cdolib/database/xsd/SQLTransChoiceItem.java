@@ -61,6 +61,11 @@ public class SQLTransChoiceItem implements java.io.Serializable {
     private com.cdoframework.cdolib.database.xsd.For _for;
 
     /**
+     * Field _switch.
+     */
+    private com.cdoframework.cdolib.database.xsd.Switch _switch;
+
+    /**
      * Field setVar.
      */
     private com.cdoframework.cdolib.database.xsd.SetVar setVar;
@@ -148,6 +153,15 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     public com.cdoframework.cdolib.database.xsd.SetVar getSetVar() {
         return this.setVar;
+    }
+
+    /**
+     * Returns the value of field 'switch'.
+     * 
+     * @return the value of field 'Switch'.
+     */
+    public com.cdoframework.cdolib.database.xsd.Switch getSwitch() {
+        return this._switch;
     }
 
     /**
@@ -240,6 +254,16 @@ public class SQLTransChoiceItem implements java.io.Serializable {
      */
     public void setSetVar(final com.cdoframework.cdolib.database.xsd.SetVar setVar) {
         this.setVar = setVar;
+    }
+
+    /**
+     * Sets the value of field 'switch'.
+     * 
+     * @param _switch
+     * @param switch the value of field 'switch'.
+     */
+    public void setSwitch(final com.cdoframework.cdolib.database.xsd.Switch _switch) {
+        this._switch = _switch;
     }
 
     /**

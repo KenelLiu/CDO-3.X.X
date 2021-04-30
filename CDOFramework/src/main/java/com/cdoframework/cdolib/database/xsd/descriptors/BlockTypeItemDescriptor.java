@@ -459,6 +459,46 @@ public class BlockTypeItemDescriptor extends org.exolab.castor.xml.util.XMLClass
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
+        //-- _switch
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Switch.class, "_switch", "Switch", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            @Override
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                BlockTypeItem target = (BlockTypeItem) object;
+                return target.getSwitch();
+            }
+            @Override
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    BlockTypeItem target = (BlockTypeItem) object;
+                    target.setSwitch( (com.cdoframework.cdolib.database.xsd.Switch) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            @Override
+            @SuppressWarnings("unused")
+            public java.lang.Object newInstance(java.lang.Object parent) {
+                return new com.cdoframework.cdolib.database.xsd.Switch();
+            }
+        };
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.Switch");
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        addSequenceElement(desc);
+
+        //-- validation code for: _switch
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
         //-- _return
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Return.class, "_return", "Return", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {

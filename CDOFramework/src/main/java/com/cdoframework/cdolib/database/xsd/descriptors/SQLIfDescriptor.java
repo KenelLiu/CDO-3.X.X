@@ -231,6 +231,44 @@ public class SQLIfDescriptor extends org.exolab.castor.xml.util.XMLClassDescript
         desc.setValidator(fieldValidator);
         //-- initialize element descriptors
 
+        //-- nullSQLThen
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.NullSQLThen.class, "nullSQLThen", "NullSQLThen", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            @Override
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                SQLIf target = (SQLIf) object;
+                return target.getNullSQLThen();
+            }
+            @Override
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    SQLIf target = (SQLIf) object;
+                    target.setNullSQLThen( (com.cdoframework.cdolib.database.xsd.NullSQLThen) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            @Override
+            @SuppressWarnings("unused")
+            public java.lang.Object newInstance(java.lang.Object parent) {
+                return new com.cdoframework.cdolib.database.xsd.NullSQLThen();
+            }
+        };
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.NullSQLThen");
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        addSequenceElement(desc);
+
+        //-- validation code for: nullSQLThen
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
         //-- SQLThen
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.SQLThen.class, "SQLThen", "SQLThen", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {

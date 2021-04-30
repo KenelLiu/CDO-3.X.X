@@ -28,12 +28,17 @@ public class If implements java.io.Serializable {
     /**
      * Field value2.
      */
-    private java.lang.String value2 = "";
+    private java.lang.String value2;
 
     /**
      * Field type.
      */
     private com.cdoframework.cdolib.database.xsd.types.IfTypeType type;
+
+    /**
+     * Field nullThen.
+     */
+    private com.cdoframework.cdolib.database.xsd.NullThen nullThen;
 
     /**
      * Field then.
@@ -47,7 +52,6 @@ public class If implements java.io.Serializable {
 
     public If() {
         super();
-        setValue2("");
     }
 
     /**
@@ -57,6 +61,15 @@ public class If implements java.io.Serializable {
      */
     public com.cdoframework.cdolib.database.xsd.Else getElse() {
         return this._else;
+    }
+
+    /**
+     * Returns the value of field 'nullThen'.
+     * 
+     * @return the value of field 'NullThen'.
+     */
+    public com.cdoframework.cdolib.database.xsd.NullThen getNullThen() {
+        return this.nullThen;
     }
 
     /**
@@ -154,6 +167,15 @@ public class If implements java.io.Serializable {
      */
     public void setElse(final com.cdoframework.cdolib.database.xsd.Else _else) {
         this._else = _else;
+    }
+
+    /**
+     * Sets the value of field 'nullThen'.
+     * 
+     * @param nullThen the value of field 'nullThen'.
+     */
+    public void setNullThen(final com.cdoframework.cdolib.database.xsd.NullThen nullThen) {
+        this.nullThen = nullThen;
     }
 
     /**

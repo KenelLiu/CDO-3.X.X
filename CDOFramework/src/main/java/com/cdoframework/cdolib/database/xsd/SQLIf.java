@@ -36,6 +36,11 @@ public class SQLIf implements java.io.Serializable {
     private com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType type;
 
     /**
+     * Field nullSQLThen.
+     */
+    private com.cdoframework.cdolib.database.xsd.NullSQLThen nullSQLThen;
+
+    /**
      * Field SQLThen.
      */
     private com.cdoframework.cdolib.database.xsd.SQLThen SQLThen;
@@ -47,6 +52,15 @@ public class SQLIf implements java.io.Serializable {
 
     public SQLIf() {
         super();
+    }
+
+    /**
+     * Returns the value of field 'nullSQLThen'.
+     * 
+     * @return the value of field 'NullSQLThen'.
+     */
+    public com.cdoframework.cdolib.database.xsd.NullSQLThen getNullSQLThen() {
+        return this.nullSQLThen;
     }
 
     /**
@@ -143,6 +157,15 @@ public class SQLIf implements java.io.Serializable {
      */
     public void marshal(final org.xml.sax.ContentHandler handler) throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
         org.exolab.castor.xml.Marshaller.marshal(this, handler);
+    }
+
+    /**
+     * Sets the value of field 'nullSQLThen'.
+     * 
+     * @param nullSQLThen the value of field 'nullSQLThen'.
+     */
+    public void setNullSQLThen(final com.cdoframework.cdolib.database.xsd.NullSQLThen nullSQLThen) {
+        this.nullSQLThen = nullSQLThen;
     }
 
     /**

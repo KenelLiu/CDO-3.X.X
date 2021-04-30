@@ -174,11 +174,13 @@ public class IfDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorI
         };
         desc.setSchemaType("string");
         desc.setHandler(handler);
+        desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
 
         //-- validation code for: value2
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(1);
         { //-- local scope
             org.exolab.castor.xml.validators.StringValidator typeValidator;
             typeValidator = new org.exolab.castor.xml.validators.StringValidator();
@@ -229,6 +231,44 @@ public class IfDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorI
         desc.setValidator(fieldValidator);
         //-- initialize element descriptors
 
+        //-- nullThen
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.NullThen.class, "nullThen", "NullThen", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            @Override
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                If target = (If) object;
+                return target.getNullThen();
+            }
+            @Override
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    If target = (If) object;
+                    target.setNullThen( (com.cdoframework.cdolib.database.xsd.NullThen) value);
+                } catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            @Override
+            @SuppressWarnings("unused")
+            public java.lang.Object newInstance(java.lang.Object parent) {
+                return new com.cdoframework.cdolib.database.xsd.NullThen();
+            }
+        };
+        desc.setSchemaType("com.cdoframework.cdolib.database.xsd.NullThen");
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        addSequenceElement(desc);
+
+        //-- validation code for: nullThen
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
         //-- then
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(com.cdoframework.cdolib.database.xsd.Then.class, "then", "Then", org.exolab.castor.xml.NodeType.Element);
         handler = new org.exolab.castor.xml.XMLFieldHandler() {

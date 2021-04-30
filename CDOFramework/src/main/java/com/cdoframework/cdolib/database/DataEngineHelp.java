@@ -32,7 +32,10 @@ import com.cdo.field.array.TimeArrayField;
 import com.cdoframework.cdolib.data.cdo.CDO;
 import com.cdoframework.cdolib.data.cdo.CDOArrayField;
 import com.cdoframework.cdolib.data.cdo.CDOField;
+import com.cdoframework.cdolib.database.xsd.If;
+import com.cdoframework.cdolib.database.xsd.SQLIf;
 import com.cdoframework.cdolib.database.xsd.SetVar;
+import com.cdoframework.cdolib.database.xsd.types.IfOperatorType;
 import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
 import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 
@@ -175,50 +178,22 @@ public class DataEngineHelp {
 		}
 	}
 	
-	static boolean checkCondition(String strValue1,String strOperator,String strValue2,SQLIfTypeType sqlIfTypeType,String strType,
-			CDO cdoRequest){
-		IfTypeType ifType=null;
-		switch (sqlIfTypeType) {
-			case BOOLEAN:
-				ifType=IfTypeType.BOOLEAN;
-				break;
-			case BYTE:
-				ifType=IfTypeType.BYTE;
-				break;
-			case SHORT:
-				ifType=IfTypeType.SHORT;
-				break;
-			case INTEGER:
-				ifType=IfTypeType.INTEGER;
-				break;
-			case LONG:
-				ifType=IfTypeType.LONG;
-				break;
-			case FLOAT:
-				ifType=IfTypeType.FLOAT;
-				break;
-			case DOUBLE:
-				ifType=IfTypeType.DOUBLE;
-				break;
-			case STRING:
-				ifType=IfTypeType.STRING;
-				break;
-			case DATE:
-				ifType=IfTypeType.DATE;
-				break;
-			case TIME:
-				ifType=IfTypeType.TIME;
-				break;
-			case DATETIME:
-				ifType=IfTypeType.DATETIME;
-				break;				
-			default:
-				break;
-		}
-		return checkCondition(strValue1, strOperator, strValue2, ifType, strType, cdoRequest);
+	static boolean checkCondition(SQLIf sqlIf,CDO cdoRequest){
+		//sqlIf.getValue1(),sqlIf.getOperator().toString(),sqlIf.getValue2(),sqlIf.getType(),sqlIf.getType().toString(),cdoRequest
+		//将SQLIF 转换成IF ,因为处理逻辑相同
+		If ifItem=new If();
+		ifItem.setValue1(sqlIf.getValue1());
+		ifItem.setOperator(IfOperatorType.fromValue(sqlIf.getOperator().value()));
+		ifItem.setValue2(sqlIf.getValue2());		
+		ifItem.setType(IfTypeType.fromValue(sqlIf.getType().value()));	
+		return checkCondition(ifItem, cdoRequest);
 	}   
-	static boolean checkCondition(String strValue1,String strOperator,String strValue2,IfTypeType ifType,String strType,
-			CDO cdoRequest){
+	static boolean checkCondition(If ifItem,CDO cdoRequest){
+		//ifItem.getValue1(),ifItem.getOperator().toString(),ifItem.getValue2(),ifItem.getType(),ifItem.getType().toString(),cdoRequest
+		String strValue1=ifItem.getValue1();
+		String strOperator=ifItem.getOperator().value();
+		String strValue2=ifItem.getValue2();
+		IfTypeType ifType=ifItem.getType();				
     	// IS
 		if(strOperator.equalsIgnoreCase("IS")==true){
 			// 解析FieldId
@@ -327,7 +302,7 @@ public class DataEngineHelp {
 				}
 				default:
 				{
-					throw new RuntimeException("Invalid type "+strType);
+					throw new RuntimeException("Invalid type "+ifType.value());
 				}
 			}
 	  }else if(strOperator.equalsIgnoreCase("NOTMATCH")){
@@ -341,7 +316,7 @@ public class DataEngineHelp {
 				}
 				default:
 				{
-					throw new RuntimeException("Invalid type "+strType);
+					throw new RuntimeException("Invalid type "+ifType.value());
 				}
 			}
 		}

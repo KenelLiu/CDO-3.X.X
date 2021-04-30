@@ -71,6 +71,11 @@ public class BlockTypeItem implements java.io.Serializable {
     private com.cdoframework.cdolib.database.xsd.For _for;
 
     /**
+     * Field _switch.
+     */
+    private com.cdoframework.cdolib.database.xsd.Switch _switch;
+
+    /**
      * Field _return.
      */
     private com.cdoframework.cdolib.database.xsd.Return _return;
@@ -195,6 +200,15 @@ public class BlockTypeItem implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'switch'.
+     * 
+     * @return the value of field 'Switch'.
+     */
+    public com.cdoframework.cdolib.database.xsd.Switch getSwitch() {
+        return this._switch;
+    }
+
+    /**
      * Returns the value of field 'update'.
      * 
      * @return the value of field 'Update'.
@@ -315,6 +329,17 @@ public class BlockTypeItem implements java.io.Serializable {
     public void setSetVar(final com.cdoframework.cdolib.database.xsd.SetVar setVar) {
         this.setVar = setVar;
         this._choiceValue = setVar;
+    }
+
+    /**
+     * Sets the value of field 'switch'.
+     * 
+     * @param _switch
+     * @param switch the value of field 'switch'.
+     */
+    public void setSwitch(final com.cdoframework.cdolib.database.xsd.Switch _switch) {
+        this._switch = _switch;
+        this._choiceValue = _switch;
     }
 
     /**

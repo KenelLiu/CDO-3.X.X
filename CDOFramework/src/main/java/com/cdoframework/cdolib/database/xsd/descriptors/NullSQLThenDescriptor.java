@@ -5,20 +5,20 @@
  * $Id$
  */
 
-package com.cdoframework.cdolib.database.xsd.types.descriptors;
+package com.cdoframework.cdolib.database.xsd.descriptors;
 
   //---------------------------------/
  //- Imported classes and packages -/
 //---------------------------------/
 
-import com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType;
+import com.cdoframework.cdolib.database.xsd.NullSQLThen;
 
 /**
  * 
  * 
  * @version $Revision$ $Date$
  */
-public class SQLTransPropagationTypeDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class NullSQLThenDescriptor extends com.cdoframework.cdolib.database.xsd.descriptors.SQLBlockTypeDescriptor {
 
     /**
      * Field _elementDefinition.
@@ -45,10 +45,11 @@ public class SQLTransPropagationTypeDescriptor extends org.exolab.castor.xml.uti
      */
     private org.exolab.castor.xml.XMLFieldDescriptor _identity;
 
-    public SQLTransPropagationTypeDescriptor() {
+    public NullSQLThenDescriptor() {
         super();
-        _xmlName = "SQLTransPropagationType";
-        _elementDefinition = false;
+        setExtendsWithoutFlatten(new com.cdoframework.cdolib.database.xsd.descriptors.SQLBlockTypeDescriptor());
+        _xmlName = "NullSQLThen";
+        _elementDefinition = true;
     }
 
     /**
@@ -69,6 +70,9 @@ public class SQLTransPropagationTypeDescriptor extends org.exolab.castor.xml.uti
      */
     @Override()
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
+        if (_identity == null) {
+            return super.getIdentity();
+        }
         return _identity;
     }
 
@@ -79,7 +83,7 @@ public class SQLTransPropagationTypeDescriptor extends org.exolab.castor.xml.uti
      */
     @Override()
     public java.lang.Class getJavaClass() {
-        return com.cdoframework.cdolib.database.xsd.types.SQLTransPropagationType.class;
+        return com.cdoframework.cdolib.database.xsd.NullSQLThen.class;
     }
 
     /**

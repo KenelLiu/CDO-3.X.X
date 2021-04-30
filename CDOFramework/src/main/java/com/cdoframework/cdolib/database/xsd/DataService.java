@@ -6,7 +6,6 @@
  */
 
 package com.cdoframework.cdolib.database.xsd;
-
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.apache.log4j.Logger;
 import com.cdoframework.cdolib.database.TransDefine;
 import com.cdoframework.cdolib.servicebus.IServicePlugin;
 import com.cdoframework.cdolib.servicebus.Service;
-
 /**
  * 
  * 
@@ -164,9 +162,8 @@ public class DataService implements java.io.Serializable {
   	{
   		StringReader reader=null;
   		try{
-  			reader=new StringReader(strXML);
-  			DataService dataService=(DataService)DataService.unmarshal(reader);			
-  			return dataService;
+  			reader=new StringReader(strXML);  				
+  			return DataService.unmarshal(reader);
   		}finally{
   			if(reader!=null){
   				try{reader.close();}catch(Exception e){
@@ -248,6 +245,5 @@ public class DataService implements java.io.Serializable {
   	public Map<String,TransDefine> getTransMap()
   	{
   		return hmTransDefine;
-  	}    	
-
+  	}   
 }

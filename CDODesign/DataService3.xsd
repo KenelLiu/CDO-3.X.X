@@ -34,6 +34,7 @@
 	<xs:element name="SQLIf">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="NullSQLThen" type="SQLBlockType" minOccurs="0"/>
 				<xs:element name="SQLThen" type="SQLBlockType" minOccurs="0"/>
 				<xs:element name="SQLElse" type="SQLBlockType" minOccurs="0"/>
 			</xs:sequence>
@@ -151,6 +152,7 @@
 			</xs:element>
 			<xs:element ref="SQLIf"/>
 			<xs:element ref="SQLFor"/>
+			<xs:element ref="SQLSwitch"/>
 		</xs:choice>
 	</xs:complexType>
 	<xs:element name="SelectTable">
@@ -272,6 +274,7 @@
 			<xs:element ref="SetVar"/>
 			<xs:element ref="If"/>
 			<xs:element ref="For"/>
+			<xs:element ref="Switch"/>
 			<xs:element ref="Return"/>
 			<xs:element ref="Break"/>
 		</xs:choice>
@@ -325,6 +328,7 @@
 	<xs:element name="If">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="NullThen" type="BlockType" minOccurs="0"/>
 				<xs:element name="Then" type="BlockType" minOccurs="0"/>
 				<xs:element name="Else" type="BlockType" minOccurs="0"/>
 			</xs:sequence>
@@ -352,7 +356,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
-			<xs:attribute name="Value2" type="xs:string" use="optional" default=""/>
+			<xs:attribute name="Value2" type="xs:string" use="required"/>
 			<xs:attribute name="Type" use="required">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -433,6 +437,7 @@
 					<xs:element ref="SelectRecordSet"/>
 					<xs:element ref="If"/>
 					<xs:element ref="For"/>
+					<xs:element ref="Switch"/>
 					<xs:element ref="SetVar"/>
 				</xs:choice>
 				<xs:element ref="OnException"/>
@@ -484,6 +489,58 @@
 				<xs:element ref="OnError" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="Return"/>
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Switch">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="CaseNull" type="BlockType" minOccurs="0"/>
+				<xs:element name="Case" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="BlockType">
+								<xs:attribute name="Value" type="xs:string" use="required"/>
+								<xs:attribute name="Separate" type="xs:string" default=""/>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Default" type="BlockType" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Var" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:pattern value="\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\.|\[|\])*\}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SQLSwitch">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SQLCaseNull" type="SQLBlockType" minOccurs="0"/>
+				<xs:element name="SQLCase" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:complexContent>
+							<xs:extension base="SQLBlockType">
+								<xs:attribute name="Value" type="xs:string" use="required"/>
+								<xs:attribute name="Separate" type="xs:string" default=""/>
+							</xs:extension>
+						</xs:complexContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="SQLDefault" type="SQLBlockType" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="Var" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:pattern value="\{([a-z]|[A-Z])([a-z]|[A-Z]|[0-9]|\.|\[|\])*\}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

@@ -45,6 +45,11 @@ public class SQLBlockTypeItem implements java.io.Serializable {
      */
     private com.cdoframework.cdolib.database.xsd.SQLFor SQLFor;
 
+    /**
+     * Field SQLSwitch.
+     */
+    private com.cdoframework.cdolib.database.xsd.SQLSwitch SQLSwitch;
+
     public SQLBlockTypeItem() {
         super();
     }
@@ -106,6 +111,15 @@ public class SQLBlockTypeItem implements java.io.Serializable {
     }
 
     /**
+     * Returns the value of field 'SQLSwitch'.
+     * 
+     * @return the value of field 'SQLSwitch'.
+     */
+    public com.cdoframework.cdolib.database.xsd.SQLSwitch getSQLSwitch() {
+        return this.SQLSwitch;
+    }
+
+    /**
      * Sets the value of field 'outputField'.
      * 
      * @param outputField the value of field 'outputField'.
@@ -153,6 +167,16 @@ public class SQLBlockTypeItem implements java.io.Serializable {
     public void setSQLIf(final com.cdoframework.cdolib.database.xsd.SQLIf SQLIf) {
         this.SQLIf = SQLIf;
         this._choiceValue = SQLIf;
+    }
+
+    /**
+     * Sets the value of field 'SQLSwitch'.
+     * 
+     * @param SQLSwitch the value of field 'SQLSwitch'.
+     */
+    public void setSQLSwitch(final com.cdoframework.cdolib.database.xsd.SQLSwitch SQLSwitch) {
+        this.SQLSwitch = SQLSwitch;
+        this._choiceValue = SQLSwitch;
     }
 
 }
