@@ -48,8 +48,6 @@ import com.cdoframework.cdolib.database.xsd.SetVar;
 import com.cdoframework.cdolib.database.xsd.Switch;
 import com.cdoframework.cdolib.database.xsd.Then;
 import com.cdoframework.cdolib.database.xsd.Update;
-import com.cdoframework.cdolib.database.xsd.types.IfTypeType;
-import com.cdoframework.cdolib.database.xsd.types.SQLIfTypeType;
 import com.cdoframework.transaction.Propagation;
 import com.cdoframework.transaction.TransactionChainThreadLocal;
 import com.cdoframework.transaction.TransactionImpl;
@@ -79,9 +77,16 @@ public class DataServiceParse
 		//============处理NullThen========//
 		NullSQLThen nullSqlThen=sqlIf.getNullSQLThen();
 		if(nullSqlThen!=null){
+			//========判断是否存在========//
 			String strValue1=sqlIf.getValue1();
 			strValue1=strValue1.substring(1,strValue1.length()-1);
-			boolean isExist=cdoRequest.exists(strValue1);
+			boolean isExist=cdoRequest.exists(strValue1);	
+			if(isExist){
+				//判断是否为NullField
+				if(cdoRequest.getField(strValue1).getFieldType()==FieldType.type.NULL){
+					isExist=false;
+				}
+			}
 			if(!isExist){
 				return handleSQLBlock(nullSqlThen,cdoRequest,strbSQL,selTblMap);
 			}
@@ -91,6 +96,9 @@ public class DataServiceParse
 		if(bCondition==true)
 		{// Handle Then
 			SQLThen sqlThen=sqlIf.getSQLThen();
+			if(sqlThen==null){
+				return 0;
+			}
 			return handleSQLBlock(sqlThen,cdoRequest,strbSQL,selTblMap);
 		}
 		else
@@ -161,11 +169,19 @@ public class DataServiceParse
 	private int handleSQLSwitch(SQLSwitch sqlSwitch,CDO cdoRequest,StringBuilder strbSQL,Map<String,String> selTblMap){
 		String var=sqlSwitch.getVar();		
 		var=var.substring(1,var.length()-1);
-		boolean isExist=cdoRequest.exists(var);
 		//=========处理为CaseNull的情况========//
 		SQLCaseNull caseNull=sqlSwitch.getSQLCaseNull();
-		if(caseNull!=null && !isExist){
-			return handleSQLBlock(caseNull,cdoRequest,strbSQL,selTblMap);
+		if(caseNull!=null){
+			//判断是否存在
+			boolean isExist=cdoRequest.exists(var);	
+			if(isExist){
+				//判断是否为NullField
+				if(cdoRequest.getField(var).getFieldType()==FieldType.type.NULL){
+					isExist=false;
+				}
+			}
+			if(!isExist)
+				return handleSQLBlock(caseNull,cdoRequest,strbSQL,selTblMap);
 		}
 		//===========处理Case情况==========//
 		String varValue=cdoRequest.getObjectValue(var).toString();		
@@ -294,9 +310,16 @@ public class DataServiceParse
 		//==============检查NullThen====================//
 		NullThen nullThen=ifItem.getNullThen();
 		if(nullThen!=null ){
+			//========判断是否存在========//
 			String strValue1=ifItem.getValue1();
 			strValue1=strValue1.substring(1,strValue1.length()-1);
-			boolean isExist=cdoRequest.exists(strValue1);			
+			boolean isExist=cdoRequest.exists(strValue1);	
+			if(isExist){
+				//判断是否为NullField
+				if(cdoRequest.getField(strValue1).getFieldType()==FieldType.type.NULL){
+					isExist=false;
+				}
+			}
 			if(!isExist)
 				return handleBlock(dataEngine,connection,nullThen,cdoRequest,cdoResponse,ret,selTblMap);
 		}
@@ -305,13 +328,15 @@ public class DataServiceParse
 		if(bCondition==true)
 		{// Handle Then
 			Then thenItem=ifItem.getThen();
+			if(thenItem==null){
+				return 0;
+			}
 			return handleBlock(dataEngine,connection,thenItem,cdoRequest,cdoResponse,ret,selTblMap);
 		}
 		else
 		{// handle Else
 			Else elseItem=ifItem.getElse();
-			if(elseItem==null)
-			{// 没有else模块，当作自然执行完毕处理???
+			if(elseItem==null){
 				return 0;
 			}
 			return handleBlock(dataEngine,connection,elseItem,cdoRequest,cdoResponse,ret,selTblMap);
@@ -375,14 +400,22 @@ public class DataServiceParse
 	private int handleSwitch(IDataEngine dataEngine ,Connection connection,Switch switchs,CDO cdoRequest,CDO cdoResponse,Return ret,Map<String,String> selTblMap) throws SQLException,IOException{
 		String var=switchs.getVar();		
 		var=var.substring(1,var.length()-1);
-		boolean isExist=cdoRequest.exists(var);
 		//=======处理为CaseNull的情况=======//
 		CaseNull caseNull=switchs.getCaseNull();
-		if(caseNull!=null && !isExist){
-			return handleBlock(dataEngine,connection,caseNull,cdoRequest,cdoResponse,ret,selTblMap);
+		if(caseNull!=null){
+			//判断是否存在
+			boolean isExist=cdoRequest.exists(var);	
+			if(isExist){
+				//判断是否为NullField
+				if(cdoRequest.getField(var).getFieldType()==FieldType.type.NULL){
+					isExist=false;
+				}
+			}
+			if(!isExist)			
+				return handleBlock(dataEngine,connection,caseNull,cdoRequest,cdoResponse,ret,selTblMap);
 		}
 		//=======处理Case情况=============//
-		String varValue=cdoRequest.getObjectValue(var).toString();	
+		String varValue=cdoRequest.getObjectValue(var).toString();
 		Case[] cases=switchs.getCase();
 		if(cases!=null && cases.length>0){
 			for(int i=0;i<cases.length;i++){
