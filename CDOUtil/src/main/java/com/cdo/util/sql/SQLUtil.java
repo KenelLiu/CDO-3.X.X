@@ -339,13 +339,13 @@ public class SQLUtil {
 		 * @throws SQLException
 		 */
 		public static PreparedStatement prepareStatement(Connection conn,String strSourceSQL,CDO cdoRequest,String strCharset) throws SQLException{
-			
-			Analyzed.onSQLStatement(strSourceSQL);
+			Analyzed analyzed=Analyzed.getInstance();
+			analyzed.onSQLStatement(strSourceSQL);
 
 			PreparedStatement ps=null;
 
 			// 分析原始SQL语句，得到其中的变量
-			AnalyzedSQL anaSQL=Analyzed.getInstance().analyzeSourceSQL(strSourceSQL);
+			AnalyzedSQL anaSQL=analyzed.analyzeSourceSQL(strSourceSQL);
 			if(anaSQL==null)
 			{
 				throw new SQLException("Analyze source SQL exception: "+strSourceSQL);
@@ -423,7 +423,7 @@ public class SQLUtil {
 						}
 					}
 				}
-				Analyzed.onExecuteSQL(anaSQL.strSQL, anaSQL.alParaName, cdoRequest);
+				analyzed.onExecuteSQL(conn,anaSQL.strSQL, anaSQL.alParaName, cdoRequest);
 			}
 			catch(SQLException e)
 			{
